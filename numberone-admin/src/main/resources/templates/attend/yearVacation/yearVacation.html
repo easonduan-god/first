@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	
+	<div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="yearVacation-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								所属部门：<select name="params[deptId]" th:with="type=${@dict.getTypeByUserId('sys_dept')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								员&nbsp;&nbsp;工：<select form-control select2-hidden-accessible name="params[userId]">
+									<option value="0" th:if="${userList.size()>=1}">所有</option>
+									<option th:each="userItem : ${userList}" th:text="${userItem.userName}+'-'+${userItem.loginName}+'-'+${userItem.empId}" th:value="${userItem.userId}" th:selected="${user.userId==userItem.userId}"></option>
+								</select>
+							</li>
+							<li>
+								年度：<input type="text" class="year-input" name="year" autocomplete="off"/>
+							</li>
+							
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+		
+			<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+		        <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="attend:dayclock:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+	        
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script th:inline="javascript">
+		var prefix = ctx + "attend/yearVacation";
+		
+		$(function() {
+			layui.use('laydate', function(){
+			  var laydate = layui.laydate;
+			  
+			  laydate.render({
+				  elem: '.year-input',
+				  type: 'year',
+				  trigger: 'click'
+				});
+			});
+			
+		    var options = {
+		        url: prefix + "/list",
+		        createUrl: prefix + "/add",
+		        updateUrl: prefix + "/edit/{id}",
+		        removeUrl: prefix + "/remove",
+		        exportUrl: prefix + "/export",
+		        modalName: "年假",
+		        search: false,
+		        showExport: false,
+		        columns: [{
+								field: 'user.empId',   
+								title: '工号',
+								align: 'center',
+								valign: 'middle'
+							},{
+								field: 'user.userName',   
+								title: '姓名',
+								align: 'center',
+								valign: 'middle'
+							}, {
+								field: 'dept.deptName',   
+								title: '部门',
+								align: 'center',
+								valign: 'middle'
+							}, {
+								field: 'year',   
+								title: '年度',
+								align: 'center',
+								valign: 'middle'/* ,
+								formatter: function(value, row, index) {
+									
+					                return value.split(' ')[0];
+					            } */
+							}, {
+								field: 'timeTotal',   
+								title: '年假总天数',
+								align: 'center',
+								valign: 'middle'
+							}, {
+								field: 'timeUsed',   
+								title: '已使用年假',
+								align: 'center',
+								valign: 'middle'
+							}, {
+								field: 'timeSurplus',   
+								title: '剩余年假',
+								align: 'center',
+								valign: 'middle'
+							}
+						]
+		    };
+		    $.table.init(options);
+		});
+		
+		/* 角色管理-分配数据权限 */
+		function rule(roleId) {
+		    var url = prefix + '/rule/' + roleId;
+		    $.modal.open("分配数据权限", url);
+		}
+		
+		/* 角色状态显示 */
+		function statusTools(row) {
+		    if (row.status == 1) {
+    			return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.roleId + '\')"></i> ';
+    		} else {
+    			return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.roleId + '\')"></i> ';
+    		}
+		}
+		
+		/* 角色管理-停用 */
+		function disable(roleId) {
+			$.modal.confirm("确认要停用角色吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 1 });
+		    })
+		}
+
+		/* 角色管理启用 */
+		function enable(roleId) {
+			$.modal.confirm("确认要启用角色吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 0 });
+		    })
+		}
+		
+		/*字典列表-详细*/
+		function originalData() {
+		    var url = prefix + '/originalData';
+		    createMenuItem(url, "原始数据");
+		}
+	</script>
+</body>
+</html>

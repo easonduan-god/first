@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	
+	<div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="work-form">
+					<div class="select-list">
+						<ul>
+							<li class="select-time">
+								<label>时间范围： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
+							</li>
+							<li>
+								日程名称：<input type="text" name="workdateName"/>
+							</li>
+							<li>
+								日程类型：<select id="workdateType" name="workdateType" th:with="type=${@dict.getType('emp_workdate_type')}">
+									<option value="">所有</option>
+				                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+				                </select>
+							</li>
+							<li>
+								日程状态：<select id="workdateFlag" name="workdateFlag" th:with="type=${@dict.getType('emp_workdate_flag')}">
+									<option value="">所有</option>
+			                    	<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+				                </select>
+							</li>
+							
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+		
+			<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+		        <a class="btn btn-success" onclick="$.operate.add()" >
+	                <i class="fa fa-plus"></i> 新增
+	            </a>
+	             <a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" >
+		            <i class="fa fa-edit"></i> 修改
+		        </a>
+	            <a class="btn btn-danger btn-del disabled" onclick="$.operate.removeAll()">
+	                <i class="fa fa-remove"></i> 删除
+	            </a><!-- shiro:hasPermission="system:user:import" -->
+	        </div>
+	        
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script th:inline="javascript">
+		var datas = [[${@dict.getType('emp_attend_result')}]];
+		var prefix = ctx + "attend/workday";
+		
+		$(function() {
+		    var options = {
+		        url: prefix + "/list",
+		        sortName: "workdate",
+		        sortable: true,                     //是否启用排序
+		        sortOrder: "asc",  
+		        modalName: "工作日",
+		        createUrl: prefix + "/add",
+		        updateUrl: prefix + "/edit/{id}",
+		        removeUrl: prefix + "/remove",
+		        pagination :true,
+		        exportUrl: prefix + "/export",
+		        importUrl: prefix + "/importData",
+		        importTemplateUrl: prefix + "/importTemplate",
+		        search: false,
+		        showSearch:false,
+		        showExport: false,
+		        columns: [{
+					            checkbox: true
+					        },{
+					            field: 'nonworkId',
+					            visible:false,
+					            title: '记录id'
+					        },{
+								title: '日期',
+								field: 'workdate',
+								align: 'center',
+								valign: 'middle',
+								formatter: function(value, row, index) {
+									
+					                return value.split(" ")[0];
+					        	}
+							},{
+								title: '日期名称',
+								field: 'workdateName',
+								align: 'center',
+								valign: 'middle'
+							},{
+								title: '日期类型',
+								field: 'workdateType',
+								align: 'center',
+								valign: 'middle',
+								formatter: function(value, row, index) {
+									var result = "";
+									switch(value){
+										case 0:result="普通";break;
+										case 1:result="法定假日";break;
+										case 2:result="公司调休";break;
+										case 3:result="其他";break;
+									}
+					                return result;
+					        	}
+							}, {
+								title: '状态',
+								field: 'workdateFlag',
+								align: 'center',
+								valign: 'middle',
+								formatter: function(value, row, index) {
+									var result = "";
+									switch(value){
+										case 0:result="正常";break;
+										case 1:result="工作日";break;
+										case 2:result="休息日";break;
+									}
+					                return result;
+					        	}
+							},{
+								field: 'description',   
+								title: '说明',
+								align: 'center',
+								valign: 'middle'
+							}
+						]
+		    };
+		    $.table.init(options);
+		});
+		
+		/* 角色管理-分配数据权限 */
+		function rule(roleId) {
+		    var url = prefix + '/rule/' + roleId;
+		    $.modal.open("分配数据权限", url);
+		}
+		
+		/* 角色状态显示 */
+		function statusTools(row) {
+		    if (row.status == 1) {
+    			return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.roleId + '\')"></i> ';
+    		} else {
+    			return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.roleId + '\')"></i> ';
+    		}
+		}
+		
+		/* 角色管理-停用 */
+		function disable(roleId) {
+			$.modal.confirm("确认要停用角色吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 1 });
+		    })
+		}
+
+		/* 角色管理启用 */
+		function enable(roleId) {
+			$.modal.confirm("确认要启用角色吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 0 });
+		    })
+		}
+		
+		/*字典列表-详细*/
+		function originalData() {
+		    var url = prefix + '/originalData';
+		    createMenuItem(url, "原始数据");
+		}
+	</script>
+</body>
+</html>

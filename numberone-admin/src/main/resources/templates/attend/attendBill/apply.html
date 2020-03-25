@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/numberone/css/ry-ui.css}" rel="stylesheet" />
+<style>
+</style>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form role="form" id="attendBill-apply-form" class="form-horizontal m-t">
+							<div class="col-md-12">
+								<div class="form-group draggable text-info">
+									<div class="col-sm-3">
+										<p class="form-control-static">
+											上月累计请假：<span
+												th:text="${resutlMap['lastMonthLeave']}"></span>天;
+										</p>
+									</div>
+									<div class="col-sm-3">
+										<p class="form-control-static">
+											本月累计请假：<span
+												th:text="${resutlMap['currMonthLeave']}"></span>天;
+										</p>
+									</div>
+									<div class="col-sm-3">
+										<p class="form-control-static">
+											年假总天数：<span
+												th:text="${resutlMap['yearVacationTotal']}"></span>天;
+										</p>
+									</div>
+									<div class="col-sm-3">
+										<p class="form-control-static">
+											年假剩余天数：<span
+												th:text="${resutlMap['yearVacationSurplus']}"></span>天.
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">考勤类型：</label>
+									<div class="col-sm-9">
+										<select name="attendType" class="form-control" id="attendType"
+											th:with="type=${@dict.getType('emp_attend_type')}">
+											<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+												th:value="${dict.dictValue}"></option>
+										</select>
+										<input type="hidden" name="params[attendTypeText]" id="attendTypeText">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">申请日期：</label>
+									<div class="col-sm-9">
+										<input type="text" name="applyDate" class="form-control"
+											readonly="readonly" th:value="${currDate}">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">开始日期：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control select-time" id="startDate" name="startDate">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">结束日期：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control select-time" id="endDate" name="endDate" autocomplete="off">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">开始时间：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control" id="startTimeShow" name="startTimeShow">
+										<input type="hidden"  name="startTime">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">结束时间：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control" id="endTimeShow" name="endTimeShow">
+										<input type="hidden"  name="endTime">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">申请工作日天数：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control" id="applyWorkdays" readonly="readonly">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">申请工作日工时：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control" id="applyWorkdayTimes" readonly="readonly">
+										<input type="hidden" name="params[attendBillTempId]" id="attendBillTempId" >
+										<input type="hidden" name="theme" id="theme" >
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">事由：</label>
+									<div class="col-sm-9">
+									    <textarea name="matter" class="form-control" ></textarea>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="hr-line-dashed"></div>
+								<div class="form-group draggable">
+									<div class="col-sm-12 col-sm-offset-4">
+										<button type="button" class="btn btn-primary" onclick="calcWorkdays()">计算申请工作日天数</button>
+										<button type="button" class="btn btn-primary" onclick="launchAudit()">发起审批</button>
+										<input  class="btn btn-danger"
+											type="reset" value="重置"></button>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script th:src="@{/js/jquery-ui-1.10.4.min.js}"></script>
+	<script th:inline="javascript">
+	var prefix = ctx + "attend/attendBill";
+	var goWorkTime = [[${@config.getKey('OAManage.goWorkTime')}]];
+	var offWorkTime = [[${@config.getKey('OAManage.offWorkTime')}]];
+	var calculate_flag = false;
+	var form_change = false;
+	var formDate = null;
+	$(function(){
+		layui.use('laydate', function() {
+			var laydate = layui.laydate;
+			var startTime = laydate.render({
+				elem: '#startTimeShow',
+				type: 'time',
+				value: goWorkTime,
+			    min: goWorkTime,
+			    max: offWorkTime,
+				theme: 'molv',
+				done: function(value, date) {
+				}
+			});
+			laydate.render({
+				elem: '#endTimeShow',
+				type: 'time',
+				value: offWorkTime,
+				min: goWorkTime,
+				max: offWorkTime,
+				theme: 'molv',
+				done: function(value, date) {}
+			});
+		});
+		
+		
+		$("#attendBill-apply-form").validate({
+        	rules:{
+        		startDate:{
+        			required:true
+        		},
+        		endDate:{
+        			required:true
+        		},
+        		startTimeShow:{
+        			required:true
+        		},
+        		endTimeShow:{
+        			required:true
+        		},
+        		matter:{
+        			required:true
+        		}
+            },	
+        	messages: {
+            }
+        });
+		
+		//监控考勤类型变化,变化后重置表单，并且将计算状态置为false
+		$("#attendType").change(function(){
+			var attendTypeChecked = $("#attendType :selected");
+			document.getElementById("attendBill-apply-form").reset();
+			attendTypeChecked.attr("selected",true);
+			//alert(attendTypeChecked.text());
+			calculate_flag = false;
+		});
+	});
+	
+		/* 计算工时 */
+		function calcWorkdays(){
+			if(!$.validate.form()){
+				return;
+			}
+			//拼接时间日期
+			var startDate = $("input[name=startDate]");
+			var startTime = $("input[name=startTimeShow]");
+			var endDate = $("input[name=endDate]");
+			var endTime = $("input[name=endTimeShow]");
+			$("input[name=startTime]").val(startDate.val()+" "+startTime.val());
+			$("input[name=endTime]").val(endDate.val()+" "+endTime.val());
+			
+			//考勤类型字符
+			$("#attendTypeText").val($("#attendType :selected").text());
+			var newFormDate = $("#attendBill-apply-form").serialize();
+			if(formDate!=newFormDate) form_change = false;
+			if(form_change) return;
+			//提交到后台计算工时
+			$.modal.loading("计算中。。。");
+			$.post(prefix+"/calcWorkdays", newFormDate,function(data){
+				//0是成功
+				if(data.code==0){
+					$.modal.closeLoading();
+					$("#applyWorkdays").val(data.workDays);
+					$("#applyWorkdayTimes").val(data.workdayHours);
+					$("#attendBillTempId").val(data.attendBillTempId);
+					$("#theme").val(data.theme);
+					formDate = newFormDate;
+					form_change = true;
+					calculate_flag = true;
+				}else{
+					$.modal.closeLoading();
+					$.modal.msgError(data.msg);
+				}
+			}); 
+			
+		}
+		
+		/* 发起审批 */
+		function launchAudit(){
+			if(!calculate_flag){
+				$.modal.msgError("请先计算工时");
+				return;
+			}
+			if(!$.validate.form()){
+				return;
+			}
+			$.modal.loading("提交中。。。");
+			/* 提交 */
+			$.post(prefix+"/launchAudit", $("#attendBill-apply-form").serialize(),function(data){
+				//0是成功
+				if(data.code==0){
+					$.modal.closeLoading();
+					document.getElementById("attendBill-apply-form").reset();
+					calculate_flag = false;
+					formDate = null;
+					$.modal.msg(data.msg);
+				}else{
+					$.modal.closeLoading();
+					$.modal.msgError(data.msg);
+				}
+			}); 
+		}
+	</script>
+</body>
+</html>

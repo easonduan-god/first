@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Eson简单日历控件-农历插件</title>
+		<meta name="keywords" content="Eson,日历,控件,web,css,js,mae,thinkasp"/>
+		<meta name="description" content="用于web的Eson简单日历控件，支持任意绑定，自定义控件数量，自定义星期显示，自定义工作日的第一天，自定义日期格式，表单自动绑定。"/>
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link href="style.css" type="text/css" rel="stylesheet" />
+		<link href="styles/eson.css" type="text/css" rel="stylesheet" />
+		<style type="text/css">
+			#inputtext_n { margin-top: 40px;}
+			.calendar-header {padding: 8px 0;}
+			.calendar-quick .calendar-quick-contents a { padding: 10px 0;}
+			.calendar-body-wapper { padding-bottom: 5px;}
+			.calendar-body { vertical-align: top;}
+			.calendar-body li {line-height:140%; vertical-align: top; color:#000; font-size:16px}
+			.calendar-body li div {overflow: hidden; line-height:120% !important;}
+			.calendar-body li.weeks{height:24px; font-size:14px; font-weight:normal}
+			.calendar-body li div span{font-size:12px; color:#ccc}
+			.calendar-body li div span.hover{color:#2CB4BF}
+			.calendar-body li.selected div span{color:#fff}
+			.calendar-body li.current div span{color:#2CB4BF}
+		</style>
+		<script type="text/javascript" src="eson.min.js"></script>
+		<script type="text/javascript" src="nl.min.js"></script>
+		<script type="text/javascript">
+			var levels={};
+			function get(id){
+				return document.getElementById(id);
+			}
+			function get_val(id){
+				return document.getElementById(id).value;
+			}
+			function set_val(id, val){
+				document.getElementById(id).value = val;
+			}
+			window.onload = function(){
+				Eson('inputtext_n', {
+					width : 421,
+					cell_height : 50,
+					onselect : function(y, M, d){
+						try{
+							var date = NL(new Date(y, M-1, d)), festival = date.festival();
+							if(festival){
+								var fess = "", item;
+								for(var i=0;i<festival.length;i++){
+									item = festival[i];
+									if(item) fess += item.value +  "，";
+								}
+								if(fess) fess = fess.slice(0, -1);
+							}
+							get("result").innerHTML = 
+								"公历：" + Eson.format(date.oDate, "yyyy-M-d") + "&nbsp;星期" + date.cnDay + "<br />" + 
+								"农历：" + date.lunarYear + "年(" + date.animal + ")" + date.lMonth + "月(" + (date.isBigMonth ? "大": "小")  + ")" + date.lDate + (date.term ? '&nbsp;' + date.term : "") + "<br />" + 
+								"干支：" + date.gzYear + "年" + date.gzMonth + "月" + date.gzDate + "日<br />" + 
+								(fess ? "节日：" + fess : "");
+						}catch(ex){
+							get("result").innerHTML = "已选日期：" + y + "-" + M + "-" + d;
+						}
+					},
+					before_render : function(){
+						maps={};
+					},
+					date_up : function(y, m, d){
+						try{
+							var date = NL(new Date(y, m-1, d)), festival = date.festival();
+							var show = date.lDate, cls_name="";
+							if(show == "初一") show = date.lMonth + "月";
+							if(festival){
+								var fes = "",item;
+								for(var i=0;i<festival.length;i++){
+									item = festival[i];
+									if(!item) continue;
+									if(!maps.hasOwnProperty(item.value)){
+										fes = item.value;
+										maps[fes] = "yes";
+										break;
+									}
+								}
+								if(fes){
+									show = fes;
+									cls_name = "hover";
+								}
+							}
+							if(!fes && date.term){
+								show = date.term;
+								cls_name = "hover";
+							}
+							return d + '<br /><span' + (cls_name ? ' class="' + cls_name + '"' : '') + '>' + show + '</span>';
+						}catch(ex){}
+					}
+				});
+			};
+		</script>
+	</head>
+	<body>
+		<div class="wapper">
+			<h2>Eson简单日历控件</h2>
+			<p>用于web的简单日历控件，支持单选，多选，自定义控件数量，自定义星期显示，自定义工作日的第一天，自定义日期格式，表单自动绑定。</p>
+			<p><a href="http://www.thinkasp.cn/" target="_blank">http://www.thinkasp.cn/</a></p>
+			<p id="skin-selector">目录：<a href="index.html">默认</a>&nbsp;<a href="index-blue.html">主题设置</a>&nbsp;<a href="index2.html">销毁和重建</a>&nbsp;<a href="nl.html">农历插件</a>&nbsp;<a target="_blank" href="https://github.com/zhanghuiguoanlige/eson">代码</a></p>
+			<div id="inputtext_n"></div>
+			<div id="result"></div>
+		</div>
+	</body>
+</html>

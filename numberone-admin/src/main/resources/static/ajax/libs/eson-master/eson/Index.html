@@ -1,0 +1,242 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Eson简单日历控件</title>
+		<meta name="keywords" content="Eson,日历,控件,web,css,js,mae,thinkasp"/>
+		<meta name="description" content="用于web的Eson简单日历控件，支持任意绑定，自定义控件数量，自定义星期显示，自定义工作日的第一天，自定义日期格式，表单自动绑定。"/>
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link href="style.css" type="text/css" rel="stylesheet" />
+		<link href="styles/eson.css" type="text/css" rel="stylesheet" />
+		<link href="../css/marked-highlight.css" type="text/css" rel="stylesheet" />
+		<script type="text/javascript" src="../scripts/highlight.js"></script>
+		<script type="text/javascript" src="eson.min.js"></script>
+		<script type="text/javascript" src="../scripts/jquery-1.9.0.js"></script>
+		<script type="text/javascript">
+			var levels={};
+			function get(id){
+				return document.getElementById(id);
+			}
+			function get_val(id){
+				return document.getElementById(id).value;
+			}
+			function set_val(id, val){
+				document.getElementById(id).value = val;
+			}		
+			function ParseContents(){
+				var nav = '<div class="mae-article-nav">', len = 0, lastlevel=0, lasttag='', level=0;
+				$(".wapper").find("h1,h2,h3,h4,h5,h6,h7").each(function(){
+					var tagname = this.tagName.toLowerCase();
+					if(!levels[tagname]){
+						if(tagname != lasttag){
+							if(tagname>lasttag) level = ++lastlevel;
+							else level = --lastlevel;
+						}
+						levels[tagname] = level;
+					}else{
+						level = levels[tagname];
+					}
+					nav += '<' + this.tagName + ' class="mae-level-' + level + '"><a href="#acr-' + len + '">- ' + this.innerHTML + '</a></' + this.tagName + '>';
+					$(this).prepend('<a name="acr-' + len + '" class="mae-acr" href="#acr-top">TOP</a>');
+					len++;
+					lasttag = tagname;
+				});
+				nav += '</div>';
+				if(len>0) $("#skin-selector").after(nav);
+			}
+			window.onload = function(){
+				ParseContents();
+				Eson('calendar', {
+					first_week_day : 1,
+					weeks : "一二三四五六日",
+					onselect : function(y,m,d){
+						get("result").innerHTML = y + "-" + m + "-" + d;
+					}
+				});
+				Eson('inputtext', {
+					onselect : function(y,m,d){
+						set_val("inputtext", y + "-" + m + "-" + d);
+					}
+				});
+				Eson('selectdate', {
+					date : "2012-3-24",
+					onselect : function(y,m,d){
+						set_val("inputtext2", y + "-" + m + "-" + d);
+					}
+				});
+				Eson('inputtext_m', {
+					multi_select : true
+				});
+				Eson('inputtext_n', {
+					multi_select : true
+				});
+				Eson('inputtext_j', {
+					multi_select : true,
+					multi : false
+				});
+				Eson('inputtext_i', {
+					multi_select : true,
+					max_count : 3
+				});
+				Eson('inputtext_time', {
+					show_time : true
+				});
+				Eson('inputtext3', {
+					date : "2012-3-24",
+					min : "2012-3-3",
+					max : "2012-4-3 23:59:59"
+				});
+				Eson('inputtext_k', {
+					multi_select : true,
+					control_union : true
+				});
+				SyntaxHighlighter.defaults.gutter = false;
+				SyntaxHighlighter.highlight();
+			};
+		</script>
+	</head>
+	<body>
+		<div class="wapper">
+			<h2>Eson简单日历控件</h2>
+			<p>用于web的简单日历控件，支持单选，多选，自定义控件数量，自定义星期显示，自定义工作日的第一天，自定义日期格式，表单自动绑定。</p>
+			<p><a href="http://www.thinkasp.cn/" target="_blank">http://www.thinkasp.cn/</a></p>
+			<p id="skin-selector">目录：<a href="index.html">默认</a>&nbsp;<a href="index-blue.html">主题设置</a>&nbsp;<a href="index2.html">销毁和重建</a>&nbsp;<a href="nl.html">农历插件</a>&nbsp;<a target="_blank" href="https://github.com/zhanghuiguoanlige/eson">代码</a></p>
+			<h3>参数</h3>
+<div class="mae-code"><pre class="brush : js;">
+	Eson('calendar', {
+		date : new Date(),			//初始日期，默认为当前日期
+		set_up_date : null,			//包含控件展示月份的日期
+		first_week_day : 0,			//一周的第一天，默认为星期日。可选。
+		weeks : "日一二三四五六",	//星期的显示文本，例如 : ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat']。可选。
+		multi_select : false,		//是否允许多选
+		//日期选择事件，this引用为选择的日期对象，y, M, d分别代表年、月、日。
+		//如果允许显示时间，则h,m,s分别代表小时，分钟和秒
+		//如果允许多选，则y为包含已选择日期的数组
+		//如果不定义，并且绑定的文本框，则直接将值赋值给文本框（多选时多个日期逗号连接）。
+		onselect : function(y, M, d, h, m, s){},
+		onerror : function(msg){},	//控件出错事件
+		format : "",				//日期格式，未定义onselect时有效。可选yyyy/MM/M/dd/d/H/HH/h/hh/mm/m/ss/s组合。
+		min : null,					//设定起始日期
+		max : null,					//设定结束日期
+		width : null,				//设置控件自动控制的宽度，默认不设置，根据css展示。
+		cell_height : null,			//设置控件日期单元格的高度，宽度由控件自行计算。
+		show_time : false,			//是否显示时间
+		date_up : function(y, m, d){},		//填充单元格事件，可通过返回值控制单元格内容
+		before_render : function(date){},	//开始渲染单元格事件
+		after_render : function(date){},	//单元格渲染结束事件
+		max_count : 0,				//显示多控件时，最多显示的控件数,
+		control_union : false		//是否允许控制器联动（控制器值控件中的年份选择器）,
+		after_select_year : function(y, type){},	//控制器选择年份的事件，y为选择的年份，type为操作类型
+		after_select_month : function(m, type){}	//控制器选择月份的事件，m为选择的月份，type为操作类型
+	});
+</pre></div>
+			<h3>关于操作类型</h3>
+<div class="mae-code"><pre class="brush : text;">
+after_select_year和after_select_month中的操作类型可取值为：-1,0,1。
+-1代表点击了左控制器（减一年或月），0代表点击了面板来选择，1代表点击了右控制器（加一年或月）。
+</pre></div>
+			<h3>主题（以下两种方式只能使用一种）</h3>
+			<h4>直接引入主题</h4>
+			<p>通过link标签引入主题文件或style标签写入主题的css代码。缺点是多主题不能共存。</p>
+			<h4>主题选择器</h4>
+			<p>通过Eson，自动引入指定主题，必须定义主题目录路径。多主题可以共存。</p>
+<div class="mae-code"><pre class="brush : js;">
+Eson.skin_path = 'styles/'; //不能漏掉后面的“/”
+//方式1、全局主题引入
+Eson.skin = 'eson'; //全局主题。默认主题为eson，必须显示设置（如果使用默认主题的话）。
+//方式2、配置项skin引入
+Eson('input1', {skin : 'blue'}); //Eson会自动引入blue主题，并应用到当前控件
+</pre></div>
+			<h3>A、单选</h3>
+			<h4>1、绑定到DIV容器</h4>
+			<p id="result"></p>
+			<div id="calendar"></div>
+<div class="mae-code"><pre class="brush : js;">
+	Eson('calendar', {
+		first_week_day : 1,
+		weeks : "一二三四五六日",
+		onselect : function(y,m,d){
+			get("result").innerHTML = y + "-" + m + "-" + d;
+		}
+	});
+</pre></div>
+			<h4>2、绑定文本框（文本框获得焦点时弹出）</h4>
+			<div><input id="inputtext" type="text" value="2009-9-3" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext', {
+	onselect : function(y,m,d){
+		set_val("inputtext", y + "-" + m + "-" + d);
+	}
+});
+//或
+Eson('inputtext');
+</pre></div>
+			<h4>3、绑定文本框（显示时间）</h4>
+			<div><input id="inputtext_time" type="text" value="2009-9-3 12:34:23" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext_time', {
+	show_time : true
+});
+</pre></div>
+			<h4>4、绑定任一元素</h4>
+			<div><input id="inputtext2" type="text" value="" readonly="readonly" /> <a id="selectdate" style="cursor: pointer; color: red;">选择日期</a></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('selectdate', {
+	date : "2012-3-24",
+	onselect : function(y,m,d){
+		set_val("inputtext2", y + "-" + m + "-" + d);
+	}
+});
+</pre></div>
+			<h4>5、限定起止时间</h4>
+			<div><input id="inputtext3" type="text" value="" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext3', {
+	date : "2012-3-24",
+	min : "2012-3-3",
+	max : "2012-4-3 23:59:59"
+});
+</pre></div>
+			<h3>B、多选</h3>
+			<h4>1、同月单控件</h4>
+			<div><input id="inputtext_m" type="text" size="50" value="2009-9-3,2009-9-5,2009-9-23" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext_m', {
+	multi_select : true
+});
+</pre></div>
+			<h4>2、不同月多控件</h4>
+			<div><input id="inputtext_n" type="text" size="50" value="2009-9-3,2009-10-5,2011-9-23" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext_n', {
+	multi_select : true
+});
+</pre></div>
+			<h4>3、不同月多控件，控制器联动</h4>
+			<div><input id="inputtext_k" type="text" size="50" value="2009-9-3,2009-10-5,2011-9-23" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext_k', {
+	multi_select : true,
+	control_union : true
+});
+</pre></div>
+			<h4>4、不同月强制单控件</h4>
+			<div><input id="inputtext_j" type="text" size="50" value="2009-9-3,2009-10-5,2011-9-23" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext_j', {
+	multi_select : true,
+	multi : false
+});
+</pre></div>
+			<h4>5、不同月多控件，限制最多控件个数</h4>
+			<div><input id="inputtext_i" type="text" size="50" value="2009-9-3,2009-10-5,2011-9-23,2011-9-24,2011-10-24" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext_i', {
+	multi_select : true,
+	max_count : 3
+});
+</pre></div>
+<div class="mae-footer">&copy; 2015 www.thinkasp.cn All Rights Reserved.</div>
+		</div>
+	</body>
+</html>

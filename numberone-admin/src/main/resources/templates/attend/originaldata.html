@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	
+	<div class="container-div">
+		<div class="row">
+		
+			<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+		        <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="attend:dayclock:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+	        
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script th:inline="javascript">
+		var prefix = ctx + "attend/dayclock";
+		
+		$(function() {
+		    var options = {
+		        url: prefix + "/attendInfoList",
+		        sortName: "recordTime",
+		        sortable: true,                     //是否启用排序
+		        sortOrder: "desc",  
+		        modalName: "考勤原始信息",
+		        search: false,
+		        showSearch:false,
+		        showExport: false,
+		        columns: [{
+								title: '姓名',
+								field: 'user.userName',
+								align: 'center',
+								valign: 'middle',
+							}, {
+								title: '工号',
+								field: 'empId',
+								align: 'center',
+								valign: 'middle',
+							},{
+								field: 'attendDate',   
+								title: '考勤日期',
+								align: 'center',
+								valign: 'middle',
+								formatter: function(value, row, index) {
+									
+					                return value.split(" ")[0];
+					        	}
+							},{
+								field: 'week', 
+								title: '星期',
+								align: 'center',
+								valign: 'middle',
+								formatter: function(value, row, index) {
+									var week = "";
+									switch(value){
+									case 1:week="日";break;
+									case 2:week="一";break;
+									case 3:week="二";break;
+									case 4:week="三";break;
+									case 5:week="四";break;
+									case 6:week="五";break;
+									case 7:week="六";break;
+									}
+					                return "星期"+week;
+					        	}
+								
+							},{
+								field: 'recordTime', 
+								title: '打卡时间',
+								align: 'center',
+								valign: 'middle'
+								
+							}
+						]
+		    };
+		    $.table.init(options);
+		});
+	</script>
+</body>
+</html>

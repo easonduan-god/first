@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.emp.mapper.EmpNonworkdayMapper">
+  <resultMap id="BaseResultMap" type="com.numberone.emp.domain.EmpNonworkday">
+    <id column="nonwork_id" jdbcType="VARCHAR" property="nonworkId" />
+    <result column="workdate" jdbcType="DATE" property="workdate" />
+    <result column="workdate_type" jdbcType="INTEGER" property="workdateType" />
+    <result column="workdate_name" jdbcType="VARCHAR" property="workdateName" />
+    <result column="workdate_flag" jdbcType="INTEGER" property="workdateFlag" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    nonwork_id, workdate, workdate_type, workdate_name, workdate_flag, description
+  </sql>
+  <select id="selectByExample" parameterType="com.numberone.emp.domain.EmpNonworkdayExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from emp_nonworkday
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from emp_nonworkday
+    where nonwork_id = #{nonworkId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from emp_nonworkday
+    where nonwork_id = #{nonworkId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.numberone.emp.domain.EmpNonworkdayExample">
+    delete from emp_nonworkday
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.numberone.emp.domain.EmpNonworkday">
+    insert into emp_nonworkday (nonwork_id, workdate, workdate_type, 
+      workdate_name, workdate_flag, description
+      )
+    values (#{nonworkId,jdbcType=VARCHAR}, #{workdate,jdbcType=DATE}, #{workdateType,jdbcType=VARCHAR}, 
+      #{workdateName,jdbcType=VARCHAR}, #{workdateFlag,jdbcType=INTEGER}, #{description,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.numberone.emp.domain.EmpNonworkday">
+    insert into emp_nonworkday
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="nonworkId != null">
+        nonwork_id,
+      </if>
+      <if test="workdate != null">
+        workdate,
+      </if>
+      <if test="workdateType != null">
+        workdate_type,
+      </if>
+      <if test="workdateName != null">
+        workdate_name,
+      </if>
+      <if test="workdateFlag != null">
+        workdate_flag,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="nonworkId != null">
+        #{nonworkId,jdbcType=VARCHAR},
+      </if>
+      <if test="workdate != null">
+        #{workdate,jdbcType=DATE},
+      </if>
+      <if test="workdateType != null">
+        #{workdateType,jdbcType=VARCHAR},
+      </if>
+      <if test="workdateName != null">
+        #{workdateName,jdbcType=VARCHAR},
+      </if>
+      <if test="workdateFlag != null">
+        #{workdateFlag,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.numberone.emp.domain.EmpNonworkdayExample" resultType="java.lang.Integer">
+    select count(*) from emp_nonworkday
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update emp_nonworkday
+    <set>
+      <if test="record.nonworkId != null">
+        nonwork_id = #{record.nonworkId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workdate != null">
+        workdate = #{record.workdate,jdbcType=DATE},
+      </if>
+      <if test="record.workdateType != null">
+        workdate_type = #{record.workdateType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workdateName != null">
+        workdate_name = #{record.workdateName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workdateFlag != null">
+        workdate_flag = #{record.workdateFlag,jdbcType=INTEGER},
+      </if>
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update emp_nonworkday
+    set nonwork_id = #{record.nonworkId,jdbcType=VARCHAR},
+      workdate = #{record.workdate,jdbcType=DATE},
+      workdate_type = #{record.workdateType,jdbcType=VARCHAR},
+      workdate_name = #{record.workdateName,jdbcType=VARCHAR},
+      workdate_flag = #{record.workdateFlag,jdbcType=INTEGER},
+      description = #{record.description,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.numberone.emp.domain.EmpNonworkday">
+    update emp_nonworkday
+    <set>
+      <if test="workdate != null">
+        workdate = #{workdate,jdbcType=DATE},
+      </if>
+      <if test="workdateType != null">
+        workdate_type = #{workdateType,jdbcType=VARCHAR},
+      </if>
+      <if test="workdateName != null">
+        workdate_name = #{workdateName,jdbcType=VARCHAR},
+      </if>
+      <if test="workdateFlag != null">
+        workdate_flag = #{workdateFlag,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where nonwork_id = #{nonworkId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.numberone.emp.domain.EmpNonworkday">
+    update emp_nonworkday
+    set workdate = #{workdate,jdbcType=DATE},
+      workdate_type = #{workdateType,jdbcType=VARCHAR},
+      workdate_name = #{workdateName,jdbcType=VARCHAR},
+      workdate_flag = #{workdateFlag,jdbcType=INTEGER},
+      description = #{description,jdbcType=VARCHAR}
+    where nonwork_id = #{nonworkId,jdbcType=VARCHAR}
+  </update>
+  <sql id="Base_sql1" >
+    nonwork_id , workdate , workdate_type , workdate_name , workdate_flag , description
+  </sql>
+  <!-- 查询日常出勤单，包含用户和部门信息 -->
+  <select id="selectWorkdayList" parameterType="empNonworkday" resultMap="BaseResultMap">
+		select  
+		<include refid="Base_sql1" />
+		from emp_nonworkday 
+		where 1=1 
+		<if test="workdateType != null">
+			AND workdate_type = #{workdateType}
+		</if>
+		<if test="workdateFlag != null">
+			AND workdate_flag = #{workdateFlag}
+		</if>
+		<if test="workdateName != null and workdateName != ''">
+			AND workdate_name like concat('%', #{workdateName}, '%')
+		</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(workdate,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(workdate,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+		<!-- 数据范围过滤 -->
+		${params.dataScope}
+	</select>
+	
+	<delete id="deleteWorkdayByIds" parameterType="Long">
+ 		delete from emp_nonworkday where nonwork_id in
+ 		<foreach collection="array" item="nonworkId" open="(" separator="," close=")">
+ 			#{nonworkId}
+        </foreach> 
+ 	</delete>
+ 	<delete id="deleteWorkdayById" parameterType="Long">
+ 		delete from emp_nonworkday where nonwork_id = #{nonworkId}
+ 	</delete>
+ 	
+ 	<select id="checkWorkdateUnique" parameterType="date" resultType="int">
+		select count(1) from emp_nonworkday where 1=1
+			AND date_format(workdate,'%y%m%d') = date_format(#{workdate},'%y%m%d')
+	</select>
+	
+ 	<select id="checkWorkdateUniqueForUpdate" parameterType="empNonworkday" resultType="int">
+		select count(1) from emp_nonworkday where nonwork_id != #{nonworkId}
+			AND date_format(workdate,'%y%m%d') = date_format(#{workdate},'%y%m%d')
+	</select>
+	
+</mapper>

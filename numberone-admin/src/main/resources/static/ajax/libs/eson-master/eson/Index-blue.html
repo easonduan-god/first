@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Eson简单日历控件-主题设置</title>
+		<meta name="keywords" content="Eson,日历,控件,web,css,js,mae,thinkasp"/>
+		<meta name="description" content="用于web的Eson简单日历控件，支持任意绑定，自定义控件数量，自定义星期显示，自定义工作日的第一天，自定义日期格式，表单自动绑定。"/>
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link href="style.css" type="text/css" rel="stylesheet" />
+		<link href="../css/marked-highlight.css" type="text/css" rel="stylesheet" />
+		<script type="text/javascript" src="../scripts/highlight.js"></script>
+		<script type="text/javascript" src="eson.min.js"></script>
+		<script type="text/javascript" src="../scripts/jquery-1.9.0.js"></script>
+		<script type="text/javascript">	
+			window.onload = function(){
+				Eson.skin_path = 'styles/';
+				Eson('inputtext', {skin : 'blue'});
+				Eson('inputtext2', {skin : 'eson'});
+				SyntaxHighlighter.defaults.gutter = false;
+				SyntaxHighlighter.highlight();
+			};
+		</script>
+	</head>
+	<body>
+		<div class="wapper">
+			<h2>Eson简单日历控件</h2>
+			<p>用于web的简单日历控件，支持单选，多选，自定义控件数量，自定义星期显示，自定义工作日的第一天，自定义日期格式，表单自动绑定。</p>
+			<p><a href="http://www.thinkasp.cn/" target="_blank">http://www.thinkasp.cn/</a></p>
+			<p id="skin-selector">目录：<a href="index.html">默认</a>&nbsp;<a href="index-blue.html">主题设置</a>&nbsp;<a href="index2.html">销毁和重建</a>&nbsp;<a href="nl.html">农历插件</a>&nbsp;<a target="_blank" href="https://github.com/zhanghuiguoanlige/eson">代码</a></p>
+			<h3>设置主题路径（必需）</h3>
+<div class="mae-code"><pre class="brush : js;">
+Eson.skin_path = 'styles/';
+</pre></div>
+			<h3>蓝色主题</h3>
+			<h4>绑定文本框（文本框获得焦点时弹出）</h4>
+			<div><input id="inputtext" type="text" value="2009-9-3" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext', {skin : 'blue'});
+</pre></div>
+			<h3>多主题共存</h3>
+			<h4>绑定文本框（文本框获得焦点时弹出）</h4>
+			<div><input id="inputtext2" type="text" value="" /></div>
+<div class="mae-code"><pre class="brush : js;">
+Eson('inputtext2', {skin : 'eson'});
+</pre></div>
+<div class="mae-footer">&copy; 2015 www.thinkasp.cn All Rights Reserved.</div>
+		</div>
+	</body>
+</html>

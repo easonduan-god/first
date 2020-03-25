@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.system.mapper.SysFileMapper">
+    
+    <resultMap type="SysFileBean" id="SysFileResult">
+        <result property="fileId"    column="file_id"    />
+        <result property="originalFileName"    column="original_file_name"    />
+        <result property="filePath"    column="file_path"    />
+        <result property="fileSize"    column="file_size"    />
+    </resultMap>
+	
+	<sql id="selectSysFileVo">
+        select file_id, original_file_name, file_path, file_size from sys_file
+    </sql>
+	
+    <select id="selectSysFileList" parameterType="SysFileBean" resultMap="SysFileResult">
+        <include refid="selectSysFileVo"/>
+        <where>  
+            <if test="fileId != null  and fileId != '' "> and file_id = #{fileId}</if>
+             <if test="originalFileName != null  and originalFileName != '' "> and original_file_name = #{originalFileName}</if>
+             <if test="filePath != null  and filePath != '' "> and file_path = #{filePath}</if>
+             <if test="fileSize != null  and fileSize != '' "> and file_size = #{fileSize}</if>
+         </where>
+    </select>
+    
+    <select id="selectSysFileById" parameterType="String" resultMap="SysFileResult">
+        <include refid="selectSysFileVo"/>
+        where file_id = #{fileId}
+    </select>
+        
+    <insert id="insertSysFile" parameterType="SysFile">
+        insert into sys_file
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="fileId != null  and fileId != ''  ">file_id,</if>
+			<if test="originalFileName != null  and originalFileName != ''  ">original_file_name,</if>
+			<if test="filePath != null  and filePath != ''  ">file_path,</if>
+			<if test="fileSize != null  and fileSize != ''  ">file_size,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="fileId != null  and fileId != ''  ">#{fileId},</if>
+			<if test="originalFileName != null  and originalFileName != ''  ">#{originalFileName},</if>
+			<if test="filePath != null  and filePath != ''  ">#{filePath},</if>
+			<if test="fileSize != null  and fileSize != ''  ">#{fileSize},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateSysFile" parameterType="SysFileBean">
+        update sys_file
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="originalFileName != null  and originalFileName != ''  ">original_file_name = #{originalFileName},</if>
+            <if test="filePath != null  and filePath != ''  ">file_path = #{filePath},</if>
+            <if test="fileSize != null  and fileSize != ''  ">file_size = #{fileSize},</if>
+        </trim>
+        where file_id = #{fileId}
+    </update>
+
+	<delete id="deleteSysFileById" parameterType="String">
+        delete from sys_file where file_id = #{fileId}
+    </delete>
+	
+    <delete id="deleteSysFileByIds" parameterType="String">
+        delete from sys_file where file_id in 
+        <foreach item="fileId" collection="array" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
+    </delete>
+    
+</mapper>

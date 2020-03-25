@@ -1,0 +1,67 @@
+﻿/*!
+Eson Date input control style
+first create by 'UANV,ESONCalendar and so on'
+modify by anlige @ www.thinkasp.cn
+last modify at 2015-10-26
+beautify by coldstone @ www.easyasp.cn
+*/
+.inline-block {display:inline-block;zoom:1;*display:inline; }
+.calendar-group {border: 1px solid #ddd;background-color:#fefefe;font:normal 14px /120% 'Consolas','Courier New','Microsoft YaHei'; border-radius:3px; box-shadow:0 0 2px 0px #ddd}
+.calendar-group .calendar-close {text-align: right; padding-right: 12px; padding-bottom: 3px; cursor: pointer;}
+
+.calendar-main{background-color:#fefefe;font:normal 14px /120% 'Consolas','Courier New','Microsoft YaHei';padding: 0; margin: 0;width:212px; position: relative;box-shadow:0 0 0px 0px #fff}
+.calendar-group .calendar-main {display:inline-block;zoom:1;*display:inline; border: 0px; padding: 3px 3px 0 3px; width:210px; box-shadow:0 0 0px 0px #fff}
+.calendar-main ul,.calendar-main li {list-style:none;margin:0;padding:0;box-sizing:content-box;}
+
+.calendar-body-wapper {width:210px;border-color:#ddd; border-width:0 1px 1px 1px; border-style:solid; padding-bottom:3px;border-bottom-left-radius:3px;border-bottom-right-radius:3px; box-shadow:0 0 2px 0px #ddd}
+.calendar-group .calendar-body-wapper {border-width:0;padding-bottom:0;box-shadow:0 0 0 0 #fff;}
+
+.calendar-body li {display:inline-block;width:30px; cursor:pointer; text-align:center; line-height:24px;margin: 0;zoom:1;*display:inline; }
+.calendar-body li.weeks{font-weight:normal;border-bottom:1px #ddd solid;padding: 0; margin-bottom: 3px;  color:#333; background-color: #f5f5f5;font-size:12px}
+.calendar-body li.weeks.checked { font-weight:bold;color: #2CB4BF;}
+.calendar-body li div{margin: 2px; border-radius:3px}
+.calendar-body li div i {font-style: normal;}
+.calendar-body li.unselected div {cursor:pointer;}
+.calendar-body li.sunday div {cursor:pointer; color:red}
+.calendar-body li.disabled div {cursor:normal; color:#aaa}
+.calendar-body li.current div {background-color: #dfeff7; color: #408fcf;}
+.calendar-body li.selected div {cursor:pointer;background-image:none;background-color:#408fcf;color:#fff;  }
+.calendar-body li.cal-end {display: block; width:0;height:0;overflow: hidden; position: relative;line-height:auto; margin: 0; padding: 0;}
+
+.calendar-header{text-align:center;padding:0;overflow:hidden; background-color: #3289cd; border-top-left-radius:3px; border-top-right-radius:3px;}
+.calendar-header .select-box{margin: 0; color:#fff; }
+.calendar-header .select-box li { margin:0 2px; height:24px; line-height:24px; cursor: pointer; display: inline-block;zoom:1;*display:inline; vertical-align: middle;}
+.calendar-header .select-box li:hover {color:#fff}
+.calendar-header .select-box li.area-left,.calendar-header .select-box li.area-right {margin-left: 0; width: 0;height: 0;border-top: 5px dashed transparent;border-bottom: 5px dashed transparent;overflow: hidden; font-size: 0; line-height:0}
+.calendar-header .select-box li.area-left{ border-right: 5px solid #fff;}
+.calendar-header .select-box li.area-right{border-left: 5px solid #fff;}
+.calendar-header .select-box li.area-month,.calendar-header .select-box li.area-month-left { margin-left:20px}
+.calendar-header .select-box li.area-middle,.calendar-header .select-box li.area-middle-month { margin-right:4px}
+.calendar-header .select-box li.area-current { float: left; margin-left: 8px;}
+.calendar-header .select-box li.area-middle-month {width:18px}
+
+.calendar-quick {position: absolute; width:100%;  display: none; vertical-align: top; padding-bottom: 3px; text-align: center;}
+.calendar-quick.calendar-quick-time {padding-top: 3px;padding-bottom: 0px;}
+.calendar-quick .calendar-quick-contents { width:96%; margin: auto; background-color: #fafafa; border: 1px solid #ddd; box-shadow:0 0 2px 0 #ddd; padding: 3px 0; text-align: left;-width:100%;-margin-left:2px;}
+.calendar-quick .calendar-quick-contents a {display: inline-block; width:20%; text-align: center; margin: 2px auto; cursor: pointer;}
+.calendar-quick .calendar-quick-contents a.hover {color: red;}
+.calendar-quick .calendar-quick-contents div a{width:16.666%;}
+.calendar-quick-minorsec .calendar-quick-contents div a {width:9.9%}
+.calendar-quick-minorsec .calendar-quick-contents div a.odd {width:10%}
+
+.calendar-arraw{ margin-left: 20px;display: none;position: absolute; left:0}
+.calendar-arraw div {position: absolute;width:0;height:0; border-left:5px dashed transparent;border-right:5px dashed transparent; overflow: hidden; font-size: 0; line-height:0; }
+.calendar-arraw-up div.a {border-bottom:5px solid #fafafa; margin-top: -4px; }
+.calendar-arraw-up div.b { border-bottom:5px solid #ddd; margin-top: -5px;}
+.calendar-arraw-down div.a { border-top:5px solid #fafafa; margin-top: -1px;}
+.calendar-arraw-down div.b  { border-top:5px solid #ddd; margin-top: 0px; }
+.calendar-main .calendar-arraw-up div.a,.calendar-main .calendar-arraw-up div.b{border-bottom:5px solid #3289cd; }
+.calendar-quick .calendar-arraw-up div.a {border-bottom:5px solid #fafafa; margin-top: -4px; }
+.calendar-quick .calendar-arraw-up div.b { border-bottom:5px solid #ddd; margin-top: -5px;}
+.calendar-quick .calendar-arraw-down div.a { border-top:5px solid #fafafa; margin-top: -1px;}
+.calendar-quick .calendar-arraw-down div.b  { border-top:5px solid #ddd; margin-top: 0px; }
+.calendar-main .calendar-arraw-down{ margin-top: 3px;}
+.calendar-quick .calendar-arraw-down{ margin-top: 0px;}
+
+.calendar-time {margin: 0 auto 2px; cursor: pointer;  padding-top: 6px;}
+.calendar-time div { display: inline-block;zoom:1;*display:inline; height:18px; line-height:18px; padding: 0 8px; }

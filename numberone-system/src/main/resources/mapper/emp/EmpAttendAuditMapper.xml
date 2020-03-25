@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.emp.mapper.EmpAttendAuditMapper">
+    
+    <resultMap type="EmpAttendAudit" id="EmpAttendAuditResult">
+        <result property="attendAuditId"    column="attend_audit_id"    />
+        <result property="attendBillId"    column="attend_bill_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="auditTime"    column="audit_time"    />
+        <result property="auditName"    column="audit_name"    />
+        <result property="auditUserId"    column="audit_user_id"    />
+        <result property="auditEmpId"    column="audit_emp_id"    />
+        <result property="auditJob"    column="audit_job"    />
+        <result property="auditFlag"    column="audit_flag"    />
+        <result property="remark"    column="remark"    />
+        <association property="empAttendBill"    column="attend_bill_id" javaType="EmpAttendBill" resultMap="attendBillResult" />
+    </resultMap>
+	<resultMap id="attendBillResult" type="empAttendBill">
+	    <id column="attend_bill_id" property="attendBillId" />
+	    <result column="emp_id"  property="empId" />
+	    <result column="user_id"  property="userId" />
+	    <result column="theme"  property="theme" />
+	    <result column="attend_type" property="attendType" />
+	    <result column="dept_name" property="deptName" />
+	    <result column="dept_id" property="deptId" />
+	    <result column="user_name" property="userName" />
+	    <result column="apply_date" property="applyDate" />
+	    <result column="start_date" property="startDate" />
+	    <result column="end_date" property="endDate" />
+	    <result column="start_time" property="startTime" />
+	    <result column="end_time" property="endTime" />
+	    <result column="apply_workdays" property="applyWorkdays" />
+	    <result column="apply_workday_times" property="applyWorkdayTimes" />
+	    <result column="matter" property="matter" />
+	    <result column="is_offet" property="isOffet" />
+	    <result column="complete_flag" property="completeFlag" />
+	    <result column="audit_flag" property="auditFlag" />
+	  </resultMap>
+	<sql id="selectEmpAttendAuditVo">
+        select attend_audit_id, attend_bill_id, user_id, emp_id, audit_time, audit_name, audit_user_id, audit_emp_id, audit_job, audit_flag,remark from emp_attend_audit
+    </sql>
+	
+    <select id="selectEmpAttendAuditList" parameterType="EmpAttendAudit" resultMap="EmpAttendAuditResult">
+        <include refid="selectEmpAttendAuditVo"/>
+        <where>  
+            <if test="attendAuditId != null  and attendAuditId != '' "> and attend_audit_id = #{attendAuditId}</if>
+             <if test="attendBillId != null  and attendBillId != '' "> and attend_bill_id = #{attendBillId}</if>
+             <if test="userId != null "> and user_id = #{userId}</if>
+             <if test="empId != null  and empId != '' "> and emp_id = #{empId}</if>
+             <if test="auditTime != null "> and audit_time = #{auditTime}</if>
+             <if test="auditName != null  and auditName != '' "> and audit_name = #{auditName}</if>
+             <if test="auditUserId != null "> and audit_user_id = #{auditUserId}</if>
+             <if test="auditEmpId != null  and auditEmpId != '' "> and audit_emp_id = #{auditEmpId}</if>
+             <if test="auditJob != null  and auditJob != '' "> and audit_job = #{auditJob}</if>
+             <if test="auditFlag != null "> and audit_flag = #{auditFlag}</if>
+         </where>
+    </select>
+
+    
+    <select id="selectEmpAttendAuditById" parameterType="String" resultMap="EmpAttendAuditResult">
+        <include refid="selectEmpAttendAuditVo"/>
+        where attend_audit_id = #{attendAuditId}
+    </select>
+        
+    <insert id="insertEmpAttendAudit" parameterType="EmpAttendAudit">
+        insert into emp_attend_audit
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="attendAuditId != null  and attendAuditId != ''  ">attend_audit_id,</if>
+			<if test="attendBillId != null  and attendBillId != ''  ">attend_bill_id,</if>
+			<if test="userId != null  ">user_id,</if>
+			<if test="empId != null  and empId != ''  ">emp_id,</if>
+			<if test="auditTime != null  ">audit_time,</if>
+			<if test="auditName != null  and auditName != ''  ">audit_name,</if>
+			<if test="auditUserId != null  ">audit_user_id,</if>
+			<if test="auditEmpId != null  and auditEmpId != ''  ">audit_emp_id,</if>
+			<if test="auditJob != null  and auditJob != ''  ">audit_job,</if>
+			<if test="auditFlag != null  ">audit_flag,</if>
+			<if test="remark != null  ">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="attendAuditId != null  and attendAuditId != ''  ">#{attendAuditId},</if>
+			<if test="attendBillId != null  and attendBillId != ''  ">#{attendBillId},</if>
+			<if test="userId != null  ">#{userId},</if>
+			<if test="empId != null  and empId != ''  ">#{empId},</if>
+			<if test="auditTime != null  ">#{auditTime},</if>
+			<if test="auditName != null  and auditName != ''  ">#{auditName},</if>
+			<if test="auditUserId != null  ">#{auditUserId},</if>
+			<if test="auditEmpId != null  and auditEmpId != ''  ">#{auditEmpId},</if>
+			<if test="auditJob != null  and auditJob != ''  ">#{auditJob},</if>
+			<if test="auditFlag != null  ">#{auditFlag},</if>
+			<if test="remark != null  ">#{remark},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateEmpAttendAudit" parameterType="EmpAttendAudit">
+        update emp_attend_audit
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="attendBillId != null  and attendBillId != ''  ">attend_bill_id = #{attendBillId},</if>
+            <if test="userId != null  ">user_id = #{userId},</if>
+            <if test="empId != null  and empId != ''  ">emp_id = #{empId},</if>
+            <if test="auditTime != null  ">audit_time = #{auditTime},</if>
+            <if test="auditName != null  and auditName != ''  ">audit_name = #{auditName},</if>
+            <if test="auditUserId != null  ">audit_user_id = #{auditUserId},</if>
+            <if test="auditEmpId != null  and auditEmpId != ''  ">audit_emp_id = #{auditEmpId},</if>
+            <if test="auditJob != null  and auditJob != ''  ">audit_job = #{auditJob},</if>
+            <if test="auditFlag != null  ">audit_flag = #{auditFlag},</if>
+            <if test="remark != null  ">remark = #{remark},</if>
+        </trim>
+        where attend_audit_id = #{attendAuditId}
+    </update>
+
+	<delete id="deleteEmpAttendAuditById" parameterType="String">
+        delete from emp_attend_audit where attend_audit_id = #{attendAuditId}
+    </delete>
+	
+    <delete id="deleteEmpAttendAuditByIds" parameterType="String">
+        delete from emp_attend_audit where attend_audit_id in 
+        <foreach item="attendAuditId" collection="array" open="(" separator="," close=")">
+            #{attendAuditId}
+        </foreach>
+    </delete>
+    <sql id="selectAuditVo_new">
+        SELECT aa.attend_audit_id , aa.attend_bill_id , aa.user_id , aa.emp_id , aa.audit_time , aa.audit_name , aa.audit_user_id , aa.audit_emp_id , aa.audit_job , aa.audit_flag ,aa.remark, ab.theme , ab.apply_date , ab.start_date , ab.end_date , ab.apply_workdays , ab.matter
+        FROM
+	    emp_attend_audit AS aa
+	    INNER JOIN emp_attend_bill AS ab 
+	        ON (aa.attend_bill_id = ab.attend_bill_id)
+    </sql>
+    <!-- 查询审核单待办已办 -->
+    <select id="selectAuditList" parameterType="EmpAttendAudit" resultMap="EmpAttendAuditResult">
+        <include refid="selectAuditVo_new"/>
+        <where>  
+            <!-- 0 未审核 audit_flag==1 -->
+            <if test="params.auditStatus == null or params.auditStatus == 0 or params.auditStatus == '' ">
+	            <if test="params.deptId != null  and params.deptId != '' "> and ab.dept_id = #{params.deptId}</if>
+	            <if test="params.userIdArr != null "> 
+	            	and aa.user_id in 
+	            	<foreach item="userId" collection="params.userIdArr" open="(" separator="," close=")">
+			            #{userId}
+			        </foreach>
+	            </if>
+	            and aa.audit_flag=1
+            </if>
+            <!-- 1 已审核 audit_flag==2 3 -->
+            <if test="params.auditStatus != null and params.auditStatus == 1 ">
+	             and aa.audit_flag &gt;= 2 
+	            <if test="empAttendBill != null and empAttendBill.startDate != null"><!-- 开始日期检索 -->
+					AND date_format(ab.apply_date,'%y%m%d') &gt;= date_format(#{empAttendBill.startDate},'%y%m%d')
+				</if>
+				<if test="empAttendBill != null and empAttendBill.endDate != null"><!-- 结束日期检索 -->
+					AND date_format(ab.apply_date,'%y%m%d') &lt;= date_format(#{empAttendBill.endDate},'%y%m%d')
+				</if>
+            </if>
+			<if test="empAttendBill != null and empAttendBill.theme != null and empAttendBill.theme != '' ">
+				AND ab.theme like concat('%',#{empAttendBill.theme},'%')
+			</if>
+         </where>
+    </select>
+    
+    <!-- 查询分配给自己的审核单待办已办 -->
+    <select id="selectAuditListByAuditId" parameterType="EmpAttendAudit" resultMap="EmpAttendAuditResult">
+        <include refid="selectAuditVo_new"/>
+        <where>  
+            <!-- 0 未审核 audit_flag==1 -->
+            <if test="params.auditStatus == null or params.auditStatus == 0 or params.auditStatus == '' ">
+	            <if test="params.deptId != null  and params.deptId != '' "> and ab.dept_id = #{params.deptId}</if>
+	            <if test="params.userIdArr != null "> 
+	            	and aa.user_id in 
+	            	<foreach item="userId" collection="params.userIdArr" open="(" separator="," close=")">
+			            #{userId}
+			        </foreach>
+	            </if>
+	            and aa.audit_flag=1
+            </if>
+            <!-- 1 已审核 audit_flag==2 3 -->
+            <if test="params.auditStatus != null and params.auditStatus == 1 ">
+	             and aa.audit_flag &gt;= 2 
+	            <if test="empAttendBill != null and empAttendBill.startDate != null"><!-- 开始日期检索 -->
+					AND date_format(ab.apply_date,'%y%m%d') &gt;= date_format(#{empAttendBill.startDate},'%y%m%d')
+				</if>
+				<if test="empAttendBill != null and empAttendBill.endDate != null"><!-- 结束日期检索 -->
+					AND date_format(ab.apply_date,'%y%m%d') &lt;= date_format(#{empAttendBill.endDate},'%y%m%d')
+				</if>
+            </if>
+			<if test="empAttendBill != null and empAttendBill.theme != null and empAttendBill.theme != '' ">
+				AND ab.theme like concat('%',#{empAttendBill.theme},'%')
+			</if>
+			AND aa.audit_user_id = ${auditUserId}
+			
+         </where>
+    </select>
+    <!-- 根据考勤审核单id查看考勤单详细信息 -->
+    <sql id="selectEmpAttendAuditVo_new">
+       SELECT ab.emp_id , ab.user_id , ab.theme , ab.attend_type , ab.dept_name , 
+       	ab.dept_id , ab.user_name , ab.apply_date , ab.start_date , ab.end_date , 
+       	ab.start_time , ab.end_time , ab.apply_workdays , ab.apply_workday_times , 
+       	ab.matter , ab.is_offet , ab.complete_flag , ab.audit_flag,aa.attend_audit_id
+		FROM emp_attend_audit AS aa INNER JOIN emp_attend_bill AS ab ON (aa.attend_bill_id = ab.attend_bill_id)
+    </sql>
+    <select id="selectAttendBillByAuditId" parameterType="String" resultMap="EmpAttendAuditResult">
+        <include refid="selectEmpAttendAuditVo_new"/>
+        where aa.attend_audit_id = #{attendAuditId}
+    </select>
+</mapper>

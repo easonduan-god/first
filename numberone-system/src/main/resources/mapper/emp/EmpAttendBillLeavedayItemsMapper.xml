@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.emp.mapper.EmpAttendBillLeavedayItemsMapper">
+    
+    <resultMap type="EmpAttendBillLeavedayItems" id="EmpAttendBillLeavedayItemsResult">
+        <result property="recordId"    column="record_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="attendBillId"    column="attend_bill_id"    />
+        <result property="leavedayItem"    column="leaveday_item"    />
+        <result property="workdayTime"    column="workday_time"    />
+        <result property="attendType"    column="attend_type"    />
+    </resultMap>
+	
+	<sql id="selectEmpAttendBillLeavedayItemsVo">
+        select record_id, user_id, emp_id, attend_bill_id, leaveday_item, workday_time, attend_type from emp_attend_bill_leaveday_items
+    </sql>
+	
+    <select id="selectEmpAttendBillLeavedayItemsList" parameterType="EmpAttendBillLeavedayItems" resultMap="EmpAttendBillLeavedayItemsResult">
+        <include refid="selectEmpAttendBillLeavedayItemsVo"/>
+        <where>  
+            <if test="recordId != null "> and record_id = #{recordId}</if>
+             <if test="userId != null "> and user_id = #{userId}</if>
+             <if test="empId != null  and empId != '' "> and emp_id = #{empId}</if>
+             <if test="attendBillId != null  and attendBillId != '' "> and attend_bill_id = #{attendBillId}</if>
+             <if test="leavedayItem != null "> and leaveday_item = #{leavedayItem}</if>
+             <if test="workdayTime != null "> and workday_time = #{workdayTime}</if>
+             <if test="attendType != null "> and attend_type = #{attendType}</if>
+         </where>
+    </select>
+    
+    <select id="selectEmpAttendBillLeavedayItemsById" parameterType="Integer" resultMap="EmpAttendBillLeavedayItemsResult">
+        <include refid="selectEmpAttendBillLeavedayItemsVo"/>
+        where record_id = #{recordId}
+    </select>
+        
+    <insert id="insertEmpAttendBillLeavedayItems" parameterType="EmpAttendBillLeavedayItems" useGeneratedKeys="true" keyProperty="recordId">
+        insert into emp_attend_bill_leaveday_items
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="userId != null  ">user_id,</if>
+			<if test="empId != null  and empId != ''  ">emp_id,</if>
+			<if test="attendBillId != null  and attendBillId != ''  ">attend_bill_id,</if>
+			<if test="leavedayItem != null  ">leaveday_item,</if>
+			<if test="workdayTime != null  ">workday_time,</if>
+			<if test="attendType != null  ">attend_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="userId != null  ">#{userId},</if>
+			<if test="empId != null  and empId != ''  ">#{empId},</if>
+			<if test="attendBillId != null  and attendBillId != ''  ">#{attendBillId},</if>
+			<if test="leavedayItem != null  ">#{leavedayItem},</if>
+			<if test="workdayTime != null  ">#{workdayTime},</if>
+			<if test="attendType != null  ">#{attendType},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateEmpAttendBillLeavedayItems" parameterType="EmpAttendBillLeavedayItems">
+        update emp_attend_bill_leaveday_items
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null  ">user_id = #{userId},</if>
+            <if test="empId != null  and empId != ''  ">emp_id = #{empId},</if>
+            <if test="attendBillId != null  and attendBillId != ''  ">attend_bill_id = #{attendBillId},</if>
+            <if test="leavedayItem != null  ">leaveday_item = #{leavedayItem},</if>
+            <if test="workdayTime != null  ">workday_time = #{workdayTime},</if>
+            <if test="attendType != null  ">attend_type = #{attendType},</if>
+        </trim>
+        where record_id = #{recordId}
+    </update>
+
+	<delete id="deleteEmpAttendBillLeavedayItemsById" parameterType="Integer">
+        delete from emp_attend_bill_leaveday_items where record_id = #{recordId}
+    </delete>
+	
+    <delete id="deleteEmpAttendBillLeavedayItemsByIds" parameterType="String">
+        delete from emp_attend_bill_leaveday_items where record_id in 
+        <foreach item="recordId" collection="array" open="(" separator="," close=")">
+            #{recordId}
+        </foreach>
+    </delete>
+    
+    <select id="selectLastMonthLeave" parameterType="String"  resultType="double">
+        SELECT 
+	    SUM(workday_time)/8 lastMonthLeave 
+	  FROM
+	    emp_attend_bill_leaveday_items 
+	  WHERE attend_bill_id IN 
+	    (SELECT 
+	      attend_bill_id 
+	    FROM
+	      emp_attend_bill 
+	    WHERE emp_id = #{empId} )
+	    AND MONTH(leaveday_item) = MONTH(SUBDATE(SYSDATE(), INTERVAL 1 MONTH))
+    </select>
+    <select id="selectCurrMonthLeave" parameterType="String" resultType="double">
+        SELECT 
+	    SUM(workday_time)/8 currMonthLeave 
+	  FROM
+	    emp_attend_bill_leaveday_items 
+	  WHERE attend_bill_id IN 
+	    (SELECT 
+	      attend_bill_id 
+	    FROM
+	      emp_attend_bill 
+	    WHERE emp_id = #{empId}) 
+	    AND MONTH(leaveday_item) = MONTH(SYSDATE())
+    </select>
+    <insert id="insertLeavedayItemsTemp" parameterType="EmpAttendBillLeavedayItems" useGeneratedKeys="true" keyProperty="recordId">
+        insert into emp_attend_bill_leaveday_items_temp
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="userId != null and userId !=0">user_id,</if>
+			<if test="empId != null and empId != '' ">emp_id,</if>
+			<if test="attendBillId != null  and attendBillId != ''  ">attend_bill_id,</if>
+			<if test="leavedayItem != null  ">leaveday_item,</if>
+			<if test="workdayTime != null  ">workday_time,</if>
+			<if test="attendType != null  ">attend_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="userId != null and userId !=0">#{userId},</if>
+			<if test="empId != null and empId != '' ">#{empId},</if>
+			<if test="attendBillId != null  and attendBillId != ''  ">#{attendBillId},</if>
+			<if test="leavedayItem != null  ">#{leavedayItem},</if>
+			<if test="workdayTime != null  ">#{workdayTime},</if>
+			<if test="attendType != null  ">#{attendType},</if>
+         </trim>
+    </insert>
+    
+    <delete id="deleteEmpAttendBillLeavedayItemsByAttendBillTempId" parameterType="String">
+        delete from emp_attend_bill_leaveday_items_temp where attend_bill_id = #{attendBillTempId}
+    </delete>
+    
+    <select id="selectDateConflict" parameterType="empAttendBill" resultType="long">
+        SELECT COUNT(1) FROM emp_attend_bill_leaveday_items
+        WHERE user_id=${userId} AND 
+        leaveday_item BETWEEN #{startDate} AND #{endDate}
+    </select>
+</mapper>

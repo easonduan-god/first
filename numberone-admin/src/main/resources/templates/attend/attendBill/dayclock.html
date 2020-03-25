@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	
+	<div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="dayclock-form">
+					<div class="select-list">
+						<ul>
+							<li class="select-time">
+								<label>考勤时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
+							</li>
+							<li>
+								所属部门：<select name="params[deptId]" th:with="type=${@dict.getType('emp_attend_result')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								员工姓名：<input type="text" name="params[userName]"/>
+							</li>
+							<li>
+								考勤状态：<select name="attendResult" th:with="type=${@dict.getType('emp_attend_result')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								考勤类型：<select name="attendType" th:with="type=${@dict.getType('emp_attend_result')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+		
+			<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+		        <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="attend:dayclock:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+		        <a class="btn btn-primary btn-search" onclick="originalData()" shiro:hasPermission="attend:dayclock:originalData">
+		            <i class="fa fa-search"></i> 原始数据
+		        </a>
+	        </div>
+	        
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script th:inline="javascript">
+		var datas = [[${@dict.getType('emp_attend_result')}]];
+		var prefix = ctx + "attend/dayclock";
+		
+		$(function() {
+		    var options = {
+		        url: prefix + "/list",
+		        createUrl: prefix + "/add",
+		        updateUrl: prefix + "/edit/{id}",
+		        removeUrl: prefix + "/remove",
+		        exportUrl: prefix + "/export",
+		        sortName: "attendDate",
+		        sortOrder: "desc",  
+		        modalName: "考勤时间",
+		        search: false,
+		        showExport: false,
+		        columns: [
+							[{
+					            checkbox: true,
+					            colspan: 1,
+								rowspan: 2
+					        },{
+					            title: '操作',
+					            align: 'center',
+					            valign: 'middle',
+								colspan: 1,
+								rowspan: 2,
+					            formatter: function(value, row, index) {
+					                var actions = [];
+					                return actions.join('');
+					            }
+					        }, {
+								title: '打卡信息',
+								field: '',
+								align: 'center',
+								valign: 'middle',
+								colspan: 6,
+								rowsapn: 1
+							}, {
+								title: '考勤结果',
+								field: '',
+								align: 'center',
+								valign: 'middle',
+								colspan: 3,
+								rowsapn: 1
+							}],
+							[{
+									field: 'user.userName',   
+									title: '姓名',
+									align: 'center',
+									valign: 'middle'
+								}, {
+									field: 'dept.deptName',   
+									title: '部门',
+									align: 'center',
+									valign: 'middle'
+								}, {
+									field: 'attendDate',   
+									title: '考勤日期',
+									align: 'center',
+									valign: 'middle',
+									formatter: function(value, row, index) {
+										
+						                return value.split(' ')[0];
+						            }
+								}, {
+									field: 'week',   
+									title: '星期',
+									align: 'center',
+									valign: 'middle',
+									formatter: function(value, row, index) {
+										var week = "";
+										switch(value){
+										case 1:week="日";break;
+										case 2:week="一";break;
+										case 3:week="二";break;
+										case 4:week="三";break;
+										case 5:week="四";break;
+										case 6:week="五";break;
+										case 7:week="六";break;
+										}
+						                return "星期"+week;
+						        	}
+								}, {
+									field: 'firstTime',   
+									title: '最早打卡',
+									align: 'center',
+									valign: 'middle'
+								}, {
+									field: 'lastTime',   
+									title: '最晚打卡',
+									align: 'center',
+									valign: 'middle'
+								}, {
+									field: 'additionalTime',   
+									title: '额外时长',
+									align: 'center',
+									valign: 'middle'
+								},
+								{
+									field: 'attendResult',   
+									title: '考勤状态',
+									align: 'center',
+									valign: 'middle',
+									formatter: function(value, row, index) {
+										var result = "";
+										//0正常 1迟到 2早退 3旷工 4异常 5迟到+早退
+										switch(value){
+											case 0:result="正常";break;
+											case 1:result="迟到";break;
+											case 2:result="早退";break;
+											case 3:result="旷工";break;
+											case 4:result="异常";break;
+											case 5:result="迟到+早退";break;
+										}
+						                return result;
+						            }
+								},
+								{
+									field: 'attendType',   
+									title: '考勤类型',
+									width: 100,
+									align: 'center',
+									valign: 'middle'
+								}
+							]
+						]
+		    };
+		    $.table.init(options);
+		});
+		
+		/* 角色管理-分配数据权限 */
+		function rule(roleId) {
+		    var url = prefix + '/rule/' + roleId;
+		    $.modal.open("分配数据权限", url);
+		}
+		
+		/* 角色状态显示 */
+		function statusTools(row) {
+		    if (row.status == 1) {
+    			return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.roleId + '\')"></i> ';
+    		} else {
+    			return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.roleId + '\')"></i> ';
+    		}
+		}
+		
+		/* 角色管理-停用 */
+		function disable(roleId) {
+			$.modal.confirm("确认要停用角色吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 1 });
+		    })
+		}
+
+		/* 角色管理启用 */
+		function enable(roleId) {
+			$.modal.confirm("确认要启用角色吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 0 });
+		    })
+		}
+		
+		/*字典列表-详细*/
+		function originalData() {
+		    var url = prefix + '/originalData';
+		    createMenuItem(url, "原始数据");
+		}
+	</script>
+</body>
+</html>

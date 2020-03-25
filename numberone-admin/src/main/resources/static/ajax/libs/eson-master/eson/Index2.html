@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Eson简单日历控件-销毁和重建</title>
+		<meta name="keywords" content="Eson,日历,控件,web,css,js,mae,thinkasp"/>
+		<meta name="description" content="用于web的Eson简单日历控件，支持任意绑定，自定义控件数量，自定义星期显示，自定义工作日的第一天，自定义日期格式，表单自动绑定。"/>
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link href="style.css" type="text/css" rel="stylesheet" />
+		<script type="text/javascript" src="eson.min.js"></script>
+		<script type="text/javascript">
+			var levels={}, Tools = [];
+			function get(id){
+				return document.getElementById(id);
+			}
+			function get_val(id){
+				return document.getElementById(id).value;
+			}
+			function set_val(id, val){
+				document.getElementById(id).value = val;
+			}
+			function Destroy(){
+				while(Tools.length>0){
+					var tool = Tools.pop();
+					tool.destroy();
+					tool = null;
+				}
+			}
+			function Rebuild(){
+				Eson.skin = 'eson';
+				Eson.skin_path = 'styles/';
+				Eson.after_build = function(tool){
+					Tools.push(tool);
+				};
+				Eson('inputtext_n', {
+					//min : '2009-9-23',
+					//max : '2009-11-23 23:59:59',
+					show_time : true, 
+					date : '2009-10-26 23:34:23', 
+					before_select : function(date){return date.getMinutes() !== 4;},
+					onselect: function(y, M, d, h, m ,s){
+						get("result").innerHTML = y + "-" + M + "-" + d + " " + h + ":" + m +":" + s;
+					}
+				});
+				Eson('inputtext_m', {control_union : true, multi_select:true});
+				Eson('inputtext_j', {multi_select:true});
+				Eson('inputtext3', {
+					date : "2012-3-24",
+					min : "2012-3-3",
+					max : "2012-4-3 23:59:59"
+				});
+				var e1 = Eson('inputtext_i', {
+					show_time : true, 
+					date : '2015-11-3 23:34:23'
+				});
+				e1.skin("blue");
+			}
+			window.onload = Rebuild;
+		</script>
+	</head>
+	<body>
+		<div class="wapper">
+			<h2>Eson简单日历控件</h2>
+			<p>用于web的简单日历控件，支持单选，多选，自定义控件数量，自定义星期显示，自定义工作日的第一天，自定义日期格式，表单自动绑定。</p>
+			<p><a href="http://www.thinkasp.cn/" target="_blank">http://www.thinkasp.cn/</a></p>
+			<p id="skin-selector">目录：<a href="index.html">默认</a>&nbsp;<a href="index-blue.html">主题设置</a>&nbsp;<a href="index2.html">销毁和重建</a>&nbsp;<a href="nl.html">农历插件</a>&nbsp;<a target="_blank" href="https://github.com/zhanghuiguoanlige/eson">代码</a></p>
+			<input type="button" onclick="Destroy();" value="销毁" />
+			<input type="button" onclick="Rebuild();" value="重建" />
+			<h4>绑定到DIV容器</h4>
+			<div id="inputtext_n"></div>
+			<div id="result"></div>
+			<h4>绑定到INPUT</h4>
+			<div><input id="inputtext_j" value="2009-10-26" size="50" /></div>
+			<h4>绑定到TEXTAREA</h4>
+			<div><textarea id="inputtext_m" cols="50" rows="4">2009-10-26,2009-11-26,2010-11-12</textarea></div>
+			<h4>限定起止时间</h4>
+			<div><input id="inputtext3" type="text" value="" /></div>
+			<h4>绑定到INPUT</h4>
+			<div><input id="inputtext_i" value="" size="50" /></div>
+			<div class="mae-footer">&copy; 2015 www.thinkasp.cn All Rights Reserved.</div>
+		</div>
+	</body>
+</html>

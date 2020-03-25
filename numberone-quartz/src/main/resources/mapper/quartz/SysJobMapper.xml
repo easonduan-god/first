@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.quartz.mapper.SysJobMapper">
+
+	<resultMap type="SysJob" id="SysJobResult">
+		<id     property="jobId"          column="job_id"          />
+		<result property="jobName"        column="job_name"        />
+		<result property="jobGroup"       column="job_group"       />
+		<result property="methodName"     column="method_name"     />
+		<result property="methodParams"   column="method_params"   />
+		<result property="cronExpression" column="cron_expression" />
+		<result property="misfirePolicy"  column="misfire_policy"  />
+		<result property="status"         column="status"          />
+		<result property="createBy"       column="create_by"       />
+		<result property="createTime"     column="create_time"     />
+		<result property="updateBy"       column="update_by"       />
+		<result property="updateTime"     column="update_time"     />
+		<result property="remark"         column="remark"          />
+	</resultMap>
+	<resultMap id="WorkdayResult" type="empNonworkdayQuartz">
+    <id column="nonwork_id" jdbcType="VARCHAR" property="nonworkId" />
+    <result column="workdate" jdbcType="DATE" property="workdate" />
+    <result column="workdate_type" jdbcType="INTEGER" property="workdateType" />
+    <result column="workdate_name" jdbcType="VARCHAR" property="workdateName" />
+    <result column="workdate_flag" jdbcType="INTEGER" property="workdateFlag" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+	<resultMap type="SysUserQuartz" id="SysUserResult">
+		<id     property="userId"       column="user_id"      />
+		<id     property="empId"       column="emp_id"      />
+		<result property="deptId"       column="dept_id"      />
+		<result property="loginName"    column="login_name"   />
+		<result property="userName"     column="user_name"    />
+		<result property="email"        column="email"        />
+		<result property="birthday"        column="birthday"        />
+		<result property="address"        column="address"        />
+		<result property="officePhone"        column="office_phone"        />
+		<result property="phonenumber"  column="phonenumber"  />
+		<result property="sex"          column="sex"          />
+		<result property="avatar"       column="avatar"       />
+		<result property="password"     column="password"     />
+		<result property="salt"         column="salt"         />
+		<result property="status"       column="status"       />
+		<result property="delFlag"      column="del_flag"     />
+		<result property="loginIp"      column="login_ip"     />
+		<result property="loginDate"    column="login_date"   />
+	</resultMap>
+	<resultMap id="EmpAttendinfoResult" type="EmpAttendinfoQuartz">
+	    <id column="attendinfo_id" jdbcType="VARCHAR" property="attendinfoId" />
+	    <result column="user_id"  property="userId" />
+	    <result column="emp_id" jdbcType="VARCHAR" property="empId" />
+	    <result column="attend_date" jdbcType="DATE" property="attendDate" />
+	    <result column="week" jdbcType="INTEGER" property="week" />
+	    <result column="record_time" jdbcType="TIMESTAMP" property="recordTime" />
+	    <result column="remark" jdbcType="VARCHAR" property="remark" />
+	  </resultMap>
+	  <resultMap id="empAttenddayResult" type="empAttenddayQuartz">
+	    <id column="attendday_id" jdbcType="VARCHAR" property="attenddayId" />
+	    <result column="user_id" property="userId" />
+	    <result column="emp_id" jdbcType="VARCHAR" property="empId" />
+	    <result column="attend_date" jdbcType="DATE" property="attendDate" />
+	    <result column="week" jdbcType="INTEGER" property="week" />
+	    <result column="first_time" jdbcType="TIMESTAMP" property="firstTime" />
+	    <result column="last_time" jdbcType="TIMESTAMP" property="lastTime" />
+	    <result column="attend_result" jdbcType="INTEGER" property="attendResult" />
+	    <result column="attend_type" jdbcType="INTEGER" property="attendType" />
+	    <result column="additional_time" jdbcType="DOUBLE" property="additionalTime" />
+	    <result column="remark" jdbcType="VARCHAR" property="remark" />
+	  </resultMap>
+	<sql id="selectJobVo">
+        select job_id, job_name, job_group, method_name, method_params, cron_expression, misfire_policy, status, create_by, create_time, remark 
+		from sys_job
+    </sql>
+	
+	<select id="selectJobList" parameterType="SysJob" resultMap="SysJobResult">
+		<include refid="selectJobVo"/>
+		<where>
+			<if test="jobName != null and jobName != ''">
+				AND job_name like concat('%', #{jobName}, '%')
+			</if>
+			<if test="status != null and status != ''">
+				AND status = #{status}
+			</if>
+			<if test="methodName != null and methodName != ''">
+				AND method_name like concat('%', #{methodName}, '%')
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectJobAll" resultMap="SysJobResult">
+		<include refid="selectJobVo"/>
+	</select>
+	
+	<select id="selectJobById" parameterType="Long" resultMap="SysJobResult">
+		<include refid="selectJobVo"/>
+		where job_id = #{jobId}
+	</select>
+	
+	<delete id="deleteJobById" parameterType="Long">
+ 		delete from sys_job where job_id = #{jobId}
+ 	</delete>
+ 	
+ 	<delete id="deleteJobByIds" parameterType="Long">
+ 		delete from sys_job where job_id in
+ 		<foreach collection="array" item="jobId" open="(" separator="," close=")">
+ 			#{jobId}
+        </foreach> 
+ 	</delete>
+ 	
+ 	<update id="updateJob" parameterType="SysJob">
+ 		update sys_job
+ 		<set>
+ 			<if test="jobName != null and jobName != ''">job_name = #{jobName},</if>
+ 			<if test="jobGroup != null and jobGroup != ''">job_group = #{jobGroup},</if>
+ 			<if test="methodName != null and methodName != ''">method_name = #{methodName},</if>
+ 			<if test="methodParams != null">method_params = #{methodParams},</if>
+ 			<if test="cronExpression != null and cronExpression != ''">cron_expression = #{cronExpression},</if>
+ 			<if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy = #{misfirePolicy},</if>
+ 			<if test="status !=null">status = #{status},</if>
+ 			<if test="remark != null and remark != ''">remark = #{remark},</if>
+ 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+ 			update_time = sysdate()
+ 		</set>
+ 		where job_id = #{jobId}
+	</update>
+ 	
+ 	<insert id="insertJob" parameterType="SysJob" useGeneratedKeys="true" keyProperty="jobId">
+ 		insert into sys_job(
+ 			<if test="jobId != null and jobId != 0">job_id,</if>
+ 			<if test="jobName != null and jobName != ''">job_name,</if>
+ 			<if test="jobGroup != null and jobGroup != ''">job_group,</if>
+ 			<if test="methodName != null and methodName != ''">method_name,</if>
+ 			<if test="methodParams != null and methodParams != ''">method_params,</if>
+ 			<if test="cronExpression != null and cronExpression != ''">cron_expression,</if>
+ 			<if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy,</if>
+ 			<if test="status != null and status != ''">status,</if>
+ 			<if test="remark != null and remark != ''">remark,</if>
+ 			<if test="createBy != null and createBy != ''">create_by,</if>
+ 			create_time
+ 		)values(
+ 			<if test="jobId != null and jobId != 0">#{jobId},</if>
+ 			<if test="jobName != null and jobName != ''">#{jobName},</if>
+ 			<if test="jobGroup != null and jobGroup != ''">#{jobGroup},</if>
+ 			<if test="methodName != null and methodName != ''">#{methodName},</if>
+ 			<if test="methodParams != null and methodParams != ''">#{methodParams},</if>
+ 			<if test="cronExpression != null and cronExpression != ''">#{cronExpression},</if>
+ 			<if test="misfirePolicy != null and misfirePolicy != ''">#{misfirePolicy},</if>
+ 			<if test="status != null and status != ''">#{status},</if>
+ 			<if test="remark != null and remark != ''">#{remark},</if>
+ 			<if test="createBy != null and createBy != ''">#{createBy},</if>
+ 			sysdate()
+ 		)
+	</insert>
+	
+	<!-- 查询所有员工 -->
+	<select id="selectUserAll" resultMap="SysUserResult">
+		select u.user_id,u.emp_id, u.login_name, u.user_name, u.email,u.birthday,u.address,u.office_phone, u.phonenumber, u.password, u.sex, u.avatar, u.salt, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name from sys_user u
+		left join sys_dept d on u.dept_id = d.dept_id
+		where u.del_flag = '0'
+	</select>
+	<!-- 查询考勤记录 6点到次日五点 -->
+	<select id="selectAttendBetween6To5"  resultMap="EmpAttendinfoResult">
+		SELECT attendinfo_id, user_id, emp_id, attend_date, WEEK, record_time, remark 
+		FROM emp_attendinfo 
+		where 1=1 
+		AND user_id = #{userId} 
+   		and record_time &gt;= DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d 05:00:00')
+   		and record_time &lt; DATE_FORMAT(CURDATE(),'%Y-%m-%d 06:00:00')
+   		order by record_time;
+	</select>
+	<!-- 根据员工id查询员工打卡次数，时间间隔为上班时间 9到17点 -->
+	<select id="selectAttendinfoCountBetween9to17" resultType="int">
+		SELECT count(*) from emp_attendinfo where 1=1 
+			and user_id = #{userId}
+   		and record_time &gt;= DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d 09:00:00') 
+   		and record_time &lt; DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d 17:00:00') 
+   		order by record_time 
+	</select>
+	
+	<!-- 查询下班打卡时间 也就是9点后第一次打卡时间 -->
+	<select id="getOffWorkTime" resultType="java.util.Date">
+		SELECT record_time from emp_attendinfo where 1=1 
+			and user_id = #{userId} 
+   		and record_time &gt;= DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d 09:00:00') 
+   		order by record_time 
+   		LIMIT 0,2
+	</select>
+	
+	<!-- 查询本次考勤区间的考勤记录 -->
+	<select id="selectEmpAttenddayByUserId" resultMap="empAttenddayResult">
+		SELECT attendday_id , user_id , emp_id , attend_date , WEEK , last_time , attend_result , attend_type , additional_time , remark
+		FROM emp_attendday
+		where 1=1
+		and user_id = #{userId} 
+   		and DATE_FORMAT(attend_date,'%Y-%m-%d')  = DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d') 
+   		order by attend_date 
+   		LIMIT 0,1
+	</select>
+	
+	<!-- 插入 -->
+	<insert id="insertAttendday" parameterType="empAttenddayQuartz">
+	    insert into emp_attendday
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+	      <if test="attenddayId != null">
+	        attendday_id,
+	      </if>
+	      <if test="userId != null">
+	        user_id,
+	      </if>
+	      <if test="empId != null">
+	        emp_id,
+	      </if>
+	      <if test="attendDate != null">
+	        attend_date,
+	      </if>
+	      <if test="week != null">
+	        week,
+	      </if>
+	      <if test="firstTime != null">
+	        first_time,
+	      </if>
+	      <if test="lastTime != null">
+	        last_time,
+	      </if>
+	      <if test="attendResult != null">
+	        attend_result,
+	      </if>
+	      <if test="attendType != null">
+	        attend_type,
+	      </if>
+	      <if test="additionalTime != null">
+	        additional_time,
+	      </if>
+	      <if test="remark != null">
+	        remark,
+	      </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+	      <if test="attenddayId != null">
+	        #{attenddayId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="userId != null">
+	        #{userId,jdbcType=INTEGER},
+	      </if>
+	      <if test="empId != null">
+	        #{empId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="attendDate != null">
+	        #{attendDate,jdbcType=DATE},
+	      </if>
+	      <if test="week != null">
+	        #{week,jdbcType=INTEGER},
+	      </if>
+	      <if test="firstTime != null">
+	        #{firstTime,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="lastTime != null">
+	        #{lastTime,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="attendResult != null">
+	        #{attendResult,jdbcType=INTEGER},
+	      </if>
+	      <if test="attendType != null">
+	        #{attendType,jdbcType=INTEGER},
+	      </if>
+	      <if test="additionalTime != null">
+	        #{additionalTime,jdbcType=DOUBLE},
+	      </if>
+	      <if test="remark != null">
+	        #{remark,jdbcType=VARCHAR},
+	      </if>
+	    </trim>
+	  </insert>
+	  <!-- 更新 -->
+	  <update id="updateAttendday" parameterType="empAttenddayQuartz">
+	    update emp_attendday
+	    <set>
+	      <if test="userId != null">
+	        user_id = #{userId,jdbcType=INTEGER},
+	      </if>
+	      <if test="empId != null">
+	        emp_id = #{empId,jdbcType=VARCHAR},
+	      </if>
+      <if test="attendDate != null">
+        attend_date = #{attendDate,jdbcType=DATE},
+      </if>
+      <if test="week != null">
+        week = #{week,jdbcType=INTEGER},
+      </if>
+      <if test="firstTime != null">
+        first_time = #{firstTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastTime != null">
+        last_time = #{lastTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attendResult != null">
+        attend_result = #{attendResult,jdbcType=INTEGER},
+      </if>
+      <if test="attendType != null">
+        attend_type = #{attendType,jdbcType=INTEGER},
+      </if>
+      <if test="additionalTime != null">
+        additional_time = #{additionalTime,jdbcType=DOUBLE},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where attendday_id = #{attenddayId,jdbcType=VARCHAR}
+  </update>
+  
+  <!-- 查询当天工作日  -->
+  <select id="selectNowWorkday" resultMap="WorkdayResult">
+		SELECT nonwork_id , workdate , workdate_type , workdate_name , workdate_flag , description
+		FROM emp_nonworkday
+		where 1=1
+   		and DATE_FORMAT(workdate,'%Y-%m-%d') = DATE_FORMAT(CURDATE(),'%Y-%m-%d') 
+   		LIMIT 0,1
+	</select>
+</mapper> 

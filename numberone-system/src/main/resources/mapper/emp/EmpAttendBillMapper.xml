@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.emp.mapper.EmpAttendBillMapper">
+  <resultMap id="BaseResultMap" type="empAttendBill">
+    <id column="attend_bill_id" property="attendBillId" />
+    <result column="emp_id"  property="empId" />
+    <result column="user_id"  property="userId" />
+    <result column="theme"  property="theme" />
+    <result column="attend_type" property="attendType" />
+    <result column="dept_name" property="deptName" />
+    <result column="dept_id" property="deptId" />
+    <result column="user_name" property="userName" />
+    <result column="apply_date" property="applyDate" />
+    <result column="start_date" property="startDate" />
+    <result column="end_date" property="endDate" />
+    <result column="start_time" property="startTime" />
+    <result column="end_time" property="endTime" />
+    <result column="apply_workdays" property="applyWorkdays" />
+    <result column="apply_workday_times" property="applyWorkdayTimes" />
+    <result column="matter" property="matter" />
+    <result column="is_offet" property="isOffet" />
+    <result column="complete_flag" property="completeFlag" />
+    <result column="audit_flag" property="auditFlag" />
+    <result column="del_flag" property="delFlag" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    attend_bill_id, emp_id, user_id, theme, attend_type, dept_name, dept_id, user_name, 
+    apply_date, start_date, end_date, start_time, end_time, apply_workdays, apply_workday_times, 
+    matter, is_offet, complete_flag, audit_flag, del_flag
+  </sql>
+  <select id="selectByExample" parameterType="empAttendBillExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from emp_attend_bill
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from emp_attend_bill
+    where attend_bill_id = #{attendBillId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from emp_attend_bill
+    where attend_bill_id = #{attendBillId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="empAttendBillExample">
+    delete from emp_attend_bill
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="empAttendBill">
+    insert into emp_attend_bill (attend_bill_id, emp_id, user_id, 
+      theme, attend_type, dept_name, 
+      dept_id, user_name, apply_date, 
+      start_date, end_date, start_time, 
+      end_time, apply_workdays, apply_workday_times, 
+      matter, is_offet, complete_flag, 
+      audit_flag, del_flag)
+    values (#{attendBillId,jdbcType=VARCHAR}, #{empId,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER}, 
+      #{theme,jdbcType=VARCHAR}, #{attendType,jdbcType=INTEGER}, #{deptName,jdbcType=VARCHAR}, 
+      #{deptId,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{applyDate,jdbcType=DATE}, 
+      #{startDate,jdbcType=DATE}, #{endDate,jdbcType=DATE}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{applyWorkdays,jdbcType=INTEGER}, #{applyWorkdayTimes,jdbcType=DOUBLE}, 
+      #{matter,jdbcType=VARCHAR}, #{isOffet,jdbcType=INTEGER}, #{completeFlag,jdbcType=INTEGER}, 
+      #{auditFlag,jdbcType=INTEGER}, #{delFlag,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="empAttendBill">
+    insert into emp_attend_bill
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="attendBillId != null">
+        attend_bill_id,
+      </if>
+      <if test="empId != null">
+        emp_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="theme != null">
+        theme,
+      </if>
+      <if test="attendType != null">
+        attend_type,
+      </if>
+      <if test="deptName != null">
+        dept_name,
+      </if>
+      <if test="deptId != null">
+        dept_id,
+      </if>
+      <if test="userName != null">
+        user_name,
+      </if>
+      <if test="applyDate != null">
+        apply_date,
+      </if>
+      <if test="startDate != null">
+        start_date,
+      </if>
+      <if test="endDate != null">
+        end_date,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="applyWorkdays != null">
+        apply_workdays,
+      </if>
+      <if test="applyWorkdayTimes != null">
+        apply_workday_times,
+      </if>
+      <if test="matter != null">
+        matter,
+      </if>
+      <if test="isOffet != null">
+        is_offet,
+      </if>
+      <if test="completeFlag != null">
+        complete_flag,
+      </if>
+      <if test="auditFlag != null">
+        audit_flag,
+      </if>
+      <if test="delFlag != null">
+        del_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="attendBillId != null">
+        #{attendBillId,jdbcType=VARCHAR},
+      </if>
+      <if test="empId != null">
+        #{empId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="theme != null">
+        #{theme,jdbcType=VARCHAR},
+      </if>
+      <if test="attendType != null">
+        #{attendType,jdbcType=INTEGER},
+      </if>
+      <if test="deptName != null">
+        #{deptName,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null">
+        #{deptId,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="applyDate != null">
+        #{applyDate,jdbcType=DATE},
+      </if>
+      <if test="startDate != null">
+        #{startDate,jdbcType=DATE},
+      </if>
+      <if test="endDate != null">
+        #{endDate,jdbcType=DATE},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="applyWorkdays != null">
+        #{applyWorkdays,jdbcType=INTEGER},
+      </if>
+      <if test="applyWorkdayTimes != null">
+        #{applyWorkdayTimes,jdbcType=DOUBLE},
+      </if>
+      <if test="matter != null">
+        #{matter,jdbcType=VARCHAR},
+      </if>
+      <if test="isOffet != null">
+        #{isOffet,jdbcType=INTEGER},
+      </if>
+      <if test="completeFlag != null">
+        #{completeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="auditFlag != null">
+        #{auditFlag,jdbcType=INTEGER},
+      </if>
+      <if test="delFlag != null">
+        #{delFlag,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="empAttendBillExample" resultType="java.lang.Integer">
+    select count(*) from emp_attend_bill
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update emp_attend_bill
+    <set>
+      <if test="record.attendBillId != null">
+        attend_bill_id = #{record.attendBillId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.empId != null">
+        emp_id = #{record.empId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=INTEGER},
+      </if>
+      <if test="record.theme != null">
+        theme = #{record.theme,jdbcType=VARCHAR},
+      </if>
+      <if test="record.attendType != null">
+        attend_type = #{record.attendType,jdbcType=INTEGER},
+      </if>
+      <if test="record.deptName != null">
+        dept_name = #{record.deptName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.deptId != null">
+        dept_id = #{record.deptId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userName != null">
+        user_name = #{record.userName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyDate != null">
+        apply_date = #{record.applyDate,jdbcType=DATE},
+      </if>
+      <if test="record.startDate != null">
+        start_date = #{record.startDate,jdbcType=DATE},
+      </if>
+      <if test="record.endDate != null">
+        end_date = #{record.endDate,jdbcType=DATE},
+      </if>
+      <if test="record.startTime != null">
+        start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.endTime != null">
+        end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.applyWorkdays != null">
+        apply_workdays = #{record.applyWorkdays,jdbcType=INTEGER},
+      </if>
+      <if test="record.applyWorkdayTimes != null">
+        apply_workday_times = #{record.applyWorkdayTimes,jdbcType=DOUBLE},
+      </if>
+      <if test="record.matter != null">
+        matter = #{record.matter,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isOffet != null">
+        is_offet = #{record.isOffet,jdbcType=INTEGER},
+      </if>
+      <if test="record.completeFlag != null">
+        complete_flag = #{record.completeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="record.auditFlag != null">
+        audit_flag = #{record.auditFlag,jdbcType=INTEGER},
+      </if>
+      <if test="record.delFlag != null">
+        del_flag = #{record.delFlag,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update emp_attend_bill
+    set attend_bill_id = #{record.attendBillId,jdbcType=VARCHAR},
+      emp_id = #{record.empId,jdbcType=VARCHAR},
+      user_id = #{record.userId,jdbcType=INTEGER},
+      theme = #{record.theme,jdbcType=VARCHAR},
+      attend_type = #{record.attendType,jdbcType=INTEGER},
+      dept_name = #{record.deptName,jdbcType=VARCHAR},
+      dept_id = #{record.deptId,jdbcType=INTEGER},
+      user_name = #{record.userName,jdbcType=VARCHAR},
+      apply_date = #{record.applyDate,jdbcType=DATE},
+      start_date = #{record.startDate,jdbcType=DATE},
+      end_date = #{record.endDate,jdbcType=DATE},
+      start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      apply_workdays = #{record.applyWorkdays,jdbcType=INTEGER},
+      apply_workday_times = #{record.applyWorkdayTimes,jdbcType=DOUBLE},
+      matter = #{record.matter,jdbcType=VARCHAR},
+      is_offet = #{record.isOffet,jdbcType=INTEGER},
+      complete_flag = #{record.completeFlag,jdbcType=INTEGER},
+      audit_flag = #{record.auditFlag,jdbcType=INTEGER},
+      del_flag = #{record.delFlag,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="empAttendBill">
+    update emp_attend_bill
+    <set>
+      <if test="empId != null">
+        emp_id = #{empId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="theme != null">
+        theme = #{theme,jdbcType=VARCHAR},
+      </if>
+      <if test="attendType != null">
+        attend_type = #{attendType,jdbcType=INTEGER},
+      </if>
+      <if test="deptName != null">
+        dept_name = #{deptName,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null">
+        dept_id = #{deptId,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null">
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="applyDate != null">
+        apply_date = #{applyDate,jdbcType=DATE},
+      </if>
+      <if test="startDate != null">
+        start_date = #{startDate,jdbcType=DATE},
+      </if>
+      <if test="endDate != null">
+        end_date = #{endDate,jdbcType=DATE},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="applyWorkdays != null">
+        apply_workdays = #{applyWorkdays,jdbcType=INTEGER},
+      </if>
+      <if test="applyWorkdayTimes != null">
+        apply_workday_times = #{applyWorkdayTimes,jdbcType=DOUBLE},
+      </if>
+      <if test="matter != null">
+        matter = #{matter,jdbcType=VARCHAR},
+      </if>
+      <if test="isOffet != null">
+        is_offet = #{isOffet,jdbcType=INTEGER},
+      </if>
+      <if test="completeFlag != null">
+        complete_flag = #{completeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="auditFlag != null">
+        audit_flag = #{auditFlag,jdbcType=INTEGER},
+      </if>
+      <if test="delFlag != null">
+        del_flag = #{delFlag,jdbcType=INTEGER},
+      </if>
+    </set>
+    where attend_bill_id = #{attendBillId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="empAttendBill">
+    update emp_attend_bill
+    set emp_id = #{empId,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      theme = #{theme,jdbcType=VARCHAR},
+      attend_type = #{attendType,jdbcType=INTEGER},
+      dept_name = #{deptName,jdbcType=VARCHAR},
+      dept_id = #{deptId,jdbcType=INTEGER},
+      user_name = #{userName,jdbcType=VARCHAR},
+      apply_date = #{applyDate,jdbcType=DATE},
+      start_date = #{startDate,jdbcType=DATE},
+      end_date = #{endDate,jdbcType=DATE},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      apply_workdays = #{applyWorkdays,jdbcType=INTEGER},
+      apply_workday_times = #{applyWorkdayTimes,jdbcType=DOUBLE},
+      matter = #{matter,jdbcType=VARCHAR},
+      is_offet = #{isOffet,jdbcType=INTEGER},
+      complete_flag = #{completeFlag,jdbcType=INTEGER},
+      audit_flag = #{auditFlag,jdbcType=INTEGER},
+      del_flag = #{delFlag,jdbcType=INTEGER}
+    where attend_bill_id = #{attendBillId,jdbcType=VARCHAR}
+  </update>
+  <!-- 新增临时表 -->
+  <insert id="insertAttendBillTemp" parameterType="empAttendBill">
+    insert into emp_attend_bill_temp
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="attendBillId != null">
+        attend_bill_id,
+      </if>
+      <if test="attendType != null">
+        attend_type,
+      </if>
+      <if test="applyWorkdays != null">
+        apply_workdays,
+      </if>
+      <if test="applyWorkdayTimes != null">
+        apply_workday_times,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="attendBillId != null">
+        #{attendBillId,jdbcType=VARCHAR},
+      </if>
+      <if test="attendType != null">
+        #{attendType,jdbcType=INTEGER},
+      </if>
+      <if test="applyWorkdays != null">
+        #{applyWorkdays,jdbcType=INTEGER},
+      </if>
+      <if test="applyWorkdayTimes != null">
+        #{applyWorkdayTimes,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  
+  <delete id="deleteTempById" parameterType="java.lang.String">
+    delete from emp_attend_bill_temp
+    where attend_bill_id = #{attendBillTempId,jdbcType=VARCHAR}
+  </delete>
+  
+  <sql id="Base_Column_List_Temp">
+    attend_bill_id,attend_type, 
+    apply_date, start_date, end_date, start_time, end_time, apply_workdays, apply_workday_times
+  </sql>
+  <select id="selectTempById" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List_Temp" />
+    from emp_attend_bill_temp
+    where attend_bill_id = #{attendBillTempId,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据考勤单临时表id查询休假日项临时表 并直接插入到休假日项，同时关联上考勤单id -->
+  <insert id="insertBatchLeaveItem" parameterType="map">
+    INSERT INTO emp_attend_bill_leaveday_items(record_id
+    	, user_id
+	    , emp_id
+	    , attend_bill_id
+	    , leaveday_item
+	    , workday_time
+	    , attend_type)
+	SELECT
+	    record_id
+	    , user_id
+	    , emp_id
+	    , '${attendBillId}'
+	    , leaveday_item
+	    , workday_time
+	    , attend_type
+	FROM
+	    emp_attend_bill_leaveday_items_temp   
+	    WHERE attend_bill_id=#{attendBillTempId};
+  </insert>
+  
+  <select id="selectAttendBillByAuditId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from emp_attend_bill
+    where attend_bill_id = (select attend_bill_id from emp_attend_audit where attend_audit_id=#{attendAuditId})
+  </select>
+</mapper>

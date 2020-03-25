@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.numberone.emp.mapper.EmpYearVacationMapper" >
+  <resultMap id="BaseResultMap" type="com.numberone.emp.domain.EmpYearVacation" >
+    <id column="year_vacation_id" property="yearVacationId" jdbcType="VARCHAR" />
+    <result column="emp_id" property="empId" jdbcType="VARCHAR" />
+    <result column="year" property="year" jdbcType="INTEGER" />
+    <result column="time_total" property="timeTotal" jdbcType="DOUBLE" />
+    <result column="time_used" property="timeUsed" jdbcType="DOUBLE" />
+    <result column="time_surplus" property="timeSurplus" jdbcType="DOUBLE" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <association property="dept"    column="dept_id" javaType="sysDept" resultMap="deptResult" />
+    <association property="user"    column="user_id" javaType="sysUser" resultMap="userResult" />
+  </resultMap>
+  <resultMap id="deptResult" type="sysDept">
+		<id     property="deptId"   column="dept_id"     />
+		<result property="deptName" column="dept_name"   />
+		<result property="orderNum" column="order_num"   />
+	</resultMap>
+	<resultMap id="userResult" type="sysUser" >
+		<id     property="userId"       column="user_id"      />
+		<id     property="empId"       column="emp_id"      />
+		<result property="deptId"       column="dept_id"      />
+		<result property="userName"     column="user_name"    />
+		<result property="email"        column="email"        />
+		<result property="birthday"        column="birthday"        />
+		<result property="address"        column="address"        />
+		<result property="officePhone"        column="office_phone"        />
+		<result property="phonenumber"  column="phonenumber"  />
+		<result property="sex"          column="sex"          />
+	</resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    year_vacation_id, emp_id, year, time_total, time_used, time_surplus, remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.numberone.emp.domain.EmpYearVacationExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from emp_year_vacation
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from emp_year_vacation
+    where year_vacation_id = #{yearVacationId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from emp_year_vacation
+    where year_vacation_id = #{yearVacationId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.numberone.emp.domain.EmpYearVacationExample" >
+    delete from emp_year_vacation
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.numberone.emp.domain.EmpYearVacation" >
+    insert into emp_year_vacation (year_vacation_id, emp_id, year, 
+      time_total, time_used, time_surplus, 
+      remark)
+    values (#{yearVacationId,jdbcType=VARCHAR}, #{empId,jdbcType=VARCHAR}, #{year,jdbcType=INTEGER}, 
+      #{timeTotal,jdbcType=DOUBLE}, #{timeUsed,jdbcType=DOUBLE}, #{timeSurplus,jdbcType=DOUBLE}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.numberone.emp.domain.EmpYearVacation" >
+    insert into emp_year_vacation
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="yearVacationId != null" >
+        year_vacation_id,
+      </if>
+      <if test="empId != null" >
+        emp_id,
+      </if>
+      <if test="year != null" >
+        year,
+      </if>
+      <if test="timeTotal != null" >
+        time_total,
+      </if>
+      <if test="timeUsed != null" >
+        time_used,
+      </if>
+      <if test="timeSurplus != null" >
+        time_surplus,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="yearVacationId != null" >
+        #{yearVacationId,jdbcType=VARCHAR},
+      </if>
+      <if test="empId != null" >
+        #{empId,jdbcType=VARCHAR},
+      </if>
+      <if test="year != null" >
+        #{year,jdbcType=INTEGER},
+      </if>
+      <if test="timeTotal != null" >
+        #{timeTotal,jdbcType=DOUBLE},
+      </if>
+      <if test="timeUsed != null" >
+        #{timeUsed,jdbcType=DOUBLE},
+      </if>
+      <if test="timeSurplus != null" >
+        #{timeSurplus,jdbcType=DOUBLE},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.numberone.emp.domain.EmpYearVacationExample" resultType="java.lang.Integer" >
+    select count(*) from emp_year_vacation
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update emp_year_vacation
+    <set >
+      <if test="record.yearVacationId != null" >
+        year_vacation_id = #{record.yearVacationId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.empId != null" >
+        emp_id = #{record.empId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.year != null" >
+        year = #{record.year,jdbcType=INTEGER},
+      </if>
+      <if test="record.timeTotal != null" >
+        time_total = #{record.timeTotal,jdbcType=DOUBLE},
+      </if>
+      <if test="record.timeUsed != null" >
+        time_used = #{record.timeUsed,jdbcType=DOUBLE},
+      </if>
+      <if test="record.timeSurplus != null" >
+        time_surplus = #{record.timeSurplus,jdbcType=DOUBLE},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update emp_year_vacation
+    set year_vacation_id = #{record.yearVacationId,jdbcType=VARCHAR},
+      emp_id = #{record.empId,jdbcType=VARCHAR},
+      year = #{record.year,jdbcType=INTEGER},
+      time_total = #{record.timeTotal,jdbcType=DOUBLE},
+      time_used = #{record.timeUsed,jdbcType=DOUBLE},
+      time_surplus = #{record.timeSurplus,jdbcType=DOUBLE},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.numberone.emp.domain.EmpYearVacation" >
+    update emp_year_vacation
+    <set >
+      <if test="empId != null" >
+        emp_id = #{empId,jdbcType=VARCHAR},
+      </if>
+      <if test="year != null" >
+        year = #{year,jdbcType=INTEGER},
+      </if>
+      <if test="timeTotal != null" >
+        time_total = #{timeTotal,jdbcType=DOUBLE},
+      </if>
+      <if test="timeUsed != null" >
+        time_used = #{timeUsed,jdbcType=DOUBLE},
+      </if>
+      <if test="timeSurplus != null" >
+        time_surplus = #{timeSurplus,jdbcType=DOUBLE},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where year_vacation_id = #{yearVacationId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.numberone.emp.domain.EmpYearVacation" >
+    update emp_year_vacation
+    set emp_id = #{empId,jdbcType=VARCHAR},
+      year = #{year,jdbcType=INTEGER},
+      time_total = #{timeTotal,jdbcType=DOUBLE},
+      time_used = #{timeUsed,jdbcType=DOUBLE},
+      time_surplus = #{timeSurplus,jdbcType=DOUBLE},
+      remark = #{remark,jdbcType=VARCHAR}
+    where year_vacation_id = #{yearVacationId,jdbcType=VARCHAR}
+  </update>
+ 
+      
+	<sql id="Base_sql1" >
+    yv.year_vacation_id , yv.emp_id , yv.year , yv.time_total , yv.time_used , 
+    yv.time_surplus , yv.remark , u.user_id , u.user_name , d.dept_name 
+  </sql>
+  <select id="selectYearVacationList" parameterType="EmpYearVacation" resultMap="BaseResultMap">
+		select 
+		<include refid="Base_sql1" />
+		FROM emp_year_vacation AS yv INNER JOIN sys_user AS u
+	    ON (yv.emp_id = u.emp_id) INNER JOIN sys_dept AS d     
+	    ON (u.dept_id = d.dept_id)
+		where 1=1 and yv.del_flag = 0
+		<if test="params.userId != null and params.userId != ''">
+			AND u.user_id = #{params.userId}
+		</if>
+		<if test="params.deptId != null and params.deptId != ''">
+			AND d.dept_id = #{params.deptId}
+		</if>
+		<if test="year != null and year != 0">
+			AND yv.year = #{year}
+		</if>
+		<!-- 数据范围过滤 -->
+		${params.dataScope}
+	</select>
+	<!-- 提交查询年假 其中用户未所有可操作用户 -->
+  <select id="selectListByOperableUserIds" resultMap="BaseResultMap">
+		select 
+		<include refid="Base_sql1" />
+		FROM emp_year_vacation AS yv INNER JOIN sys_user AS u
+	    ON (yv.emp_id = u.emp_id) INNER JOIN sys_dept AS d     
+	    ON (u.dept_id = d.dept_id)
+		where 1=1 and yv.del_flag = 0
+		and u.user_id in 
+		<foreach item="userId" collection="userIds" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+		<if test="empYearVacation.params.deptId != null and empYearVacation.params.deptId != ''">
+			AND d.dept_id = #{empYearVacation.params.deptId}
+		</if>
+		<if test="empYearVacation.year != null and empYearVacation.year != 0">
+			AND yv.year = #{empYearVacation.year}
+		</if>
+		<!-- 数据范围过滤 -->
+		${empYearVacation.params.dataScope}
+	</select>
+</mapper>
