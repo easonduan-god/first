@@ -129,6 +129,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteEmpAttendBillLeavedayItemsByAttendBillTempId" parameterType="String">
         delete from emp_attend_bill_leaveday_items_temp where attend_bill_id = #{attendBillTempId}
     </delete>
+    <delete id="deleteEmpAttendBillLeavedayItemsByAttendBillId" parameterType="String">
+        delete from emp_attend_bill_leaveday_items_temp where attend_bill_id = #{attendBillId}
+    </delete>
     
     <select id="selectDateConflict" parameterType="empAttendBill" resultType="long">
         SELECT COUNT(1) FROM emp_attend_bill_leaveday_items

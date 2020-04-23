@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<id     property="userId"       column="user_id"      />
 		<id     property="empId"       column="emp_id"      />
 		<result property="deptId"       column="dept_id"      />
+		<result property="deptName"       column="dept_name"      />
 		<result property="loginName"    column="login_name"   />
 		<result property="userName"     column="user_name"    />
 		<result property="text"     column="text"    />
@@ -228,4 +229,110 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
 	</select>
+	
+	<!-- 200403 新增 加载用户列表树 也包括期所在部分 根据部门id查询 -->
+	<select id="selectUserTreeDataByDeptId" parameterType="SysUser" resultType="map">
+		(select
+			d.dept_name as name,
+			'false' as checked,
+			d.parent_id as pId,
+			d.dept_id as id,
+			d.dept_name as title,
+			'/img/tree-dept.png' as icon
+		from
+			sys_dept d
+		where
+			d.del_flag = 0
+			and (d.dept_id in ('100',#{deptId}) or d.dept_id = (select parent_id from sys_dept where dept_id = #{deptId}))
+		order by
+			d.order_num)
+		union all
+		(select
+			CONCAT(user_name,'(',emp_id,')') as name,
+			'false' as checked,
+			dept_id as pId,
+			user_id as id,
+			CONCAT(user_name,'(',emp_id,')') as title,
+			'/img/tree-user.png' as icon
+		from sys_user
+		where 
+			del_flag = 0
+			and dept_id = #{deptId}
+		order by create_time asc)
+
+	</select>
+	
+	
+	<!-- 200403 新增 加载用户列表树 也包括期所在部分  管理员 hr ceo查询全部-->
+	<select id="selectAllUserTreeData" parameterType="SysUser" resultType="map">
+		(select
+			d.dept_name as name,
+			'false' as checked,
+			d.parent_id as pId,
+			d.dept_id as id,
+			d.dept_name as title,
+			'/img/tree-dept.png' as icon
+		from
+			sys_dept d
+		where
+			d.del_flag = 0
+		order by
+			d.order_num)
+		union all
+		(select
+			CONCAT(user_name,'(',emp_id,')') as name,
+			'false' as checked,
+			dept_id as pId,
+			user_id as id,
+			user_name as title,
+			'/img/tree-user.png' as icon
+		from sys_user
+		where 
+			del_flag = 0
+		order by create_time asc)
+
+	</select>
+	<!-- 查询员工总数 -->
+	<select id="selectAllUserCount" parameterType="SysUser" resultType="int">
+		select count(1) from sys_user su where su.del_flag = 0
+	</select>
+	
+	<!-- 查询自己部门人数 -->
+	<select id="selectAllCountByDeptId" parameterType="SysUser" resultType="int">
+		select count(1) from sys_user su where su.del_flag = 0 and su.dept_id = #{deptId}
+	</select>
+	<!-- 根据userid查询usernames -->
+	<select id="selectUsernamesByUserIds" resultType="string">
+		select su.user_name from sys_user su where su.del_flag = 0 and su.user_id in
+		<foreach item="userId" collection="#{idArr}" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+	</select>
+	<!-- 根据userid数组和部门查询符合的用户数 -->
+	<select id="selectCountByUserIdsAndDeptId" resultType="int">
+		select count(1) from sys_user su where su.del_flag = 0
+		and su.dept_id = #{deptId}
+		and su.user_id in 
+		<foreach item="userId" collection="userIds" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+	</select>
+	<!-- 20200413 查询所有 得到字段id userid text d.dept_name,'-',u.user_name -->
+	<select id="selectUserListForQuery" resultType="map">
+		select distinct u.user_id as id, concat(d.dept_name,'-',u.user_name) as text,
+		CONCAT(u.user_name,lower(u.emp_id),d.dept_name) as searchText,
+		lower(u.login_name) as loginName
+		from sys_user u left join sys_dept d on u.dept_id = d.dept_id
+		where u.del_flag = '0'
+	</select>
+	<!-- 20200413 新增 查询部门员工 得到字段id userid text d.dept_name,'-',u.user_name -->
+	<select id="selectUserListByDeptIdForQuery" parameterType="Long" resultType="map">
+		select distinct u.user_id as id, concat(d.dept_name,'-',u.user_name) as text,
+		CONCAT(u.user_name,lower(u.emp_id),d.dept_name) as searchText,
+		lower(u.login_name) as loginName
+		from sys_user u left join sys_dept d on u.dept_id = d.dept_id
+		where u.del_flag = '0'
+		and u.dept_id = #{deptId}
+	</select>
+	
 </mapper> 

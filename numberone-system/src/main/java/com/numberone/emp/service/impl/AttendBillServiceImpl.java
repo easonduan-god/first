@@ -1,5 +1,6 @@
 package com.numberone.emp.service.impl;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import com.numberone.common.utils.StringUtils;
 import com.numberone.common.utils.bean.BeanUtils;
 import com.numberone.emp.domain.EmpAttendAudit;
 import com.numberone.emp.domain.EmpAttendBill;
+import com.numberone.emp.domain.EmpAttendBillExample;
 import com.numberone.emp.domain.EmpAttendBillLeavedayItems;
 import com.numberone.emp.domain.EmpYearVacation;
 import com.numberone.emp.domain.EmpYearVacationExample;
@@ -177,7 +179,7 @@ public class AttendBillServiceImpl implements IAttendBillService {
 			empAttendAudit.setUserId(sysUser.getUserId());//申请人用户id
 			empAttendAudit.setEmpId(sysUser.getEmpId());//申请人工号
 			empAttendAudit.setAuditJob(leader.getRolesName());//审核人职位
-			empAttendAudit.setAuditTime(new Date());//审核时间
+			//empAttendAudit.setAuditTime(new Date());//审核时间
 			empAttendAudit.setAuditUserId(leader.getUserId());//审核人用户id
 			empAttendAudit.setAuditEmpId(leader.getEmpId());//审核人工号
 			empAttendAudit.setAuditName(leader.getUserName());//审核人名称
@@ -321,7 +323,24 @@ public class AttendBillServiceImpl implements IAttendBillService {
     		double workDays = Arith.ceil0_5(workdayHours/goWorkHour);
     		workdayHours = Arith.ceil0_5(workdayHours);
     		//6.将工时存到临时表中，并取得临时表的id，将请假日项存到请假日项临时表中，关联考勤单临时表id
-    			//新增考勤单临时表
+    		
+    			//020330 年假 调休假 需要剩余年假工时大于等于申请工时
+    			if(empAttendBill.getAttendType()==1 || empAttendBill.getAttendType()==2){
+    				/*查询年假总天数和剩余天数*/
+    				EmpYearVacationExample example = new EmpYearVacationExample();
+    				example.createCriteria().andEmpIdEqualTo(user.getEmpId()).andYearEqualTo(Integer.parseInt(DateUtils.dateTimeNow(DateUtils.YYYY)));
+    				
+    				List<EmpYearVacation> yearList = empYearVacationMapper.selectByExample(example);
+    				EmpYearVacation yearVacation = null;
+    				if(!StringUtils.isEmpty(yearList)){
+    					yearVacation = yearList.get(0);
+    				}
+    				if(StringUtils.isEmpty(yearList) || yearVacation.getTimeSurplus()<(workdayHours/goWorkHour)){
+    					throw new BusinessException("剩余年假不足");
+    				}
+    			}
+    		
+    		//新增考勤单临时表
     		EmpAttendBill empAttendBillTemp = new EmpAttendBill();
     		empAttendBillTemp.setAttendBillId(attendBillTempId);
     		empAttendBillTemp.setApplyWorkdays(workDays);
@@ -340,6 +359,8 @@ public class AttendBillServiceImpl implements IAttendBillService {
     		
     		result.put("theme", user.getUserName()+"_"+empAttendBill.getParams().get("attendTypeText")+"_"+DateUtils.dateTimeNow("yyyyMMdd"));
     		result.put("code", 0);
+    	}else{
+    		throw new BusinessException("申请工时为0,请检查申请日期中是否包含休息日。");
     	}
     	return result;
 	}
@@ -391,6 +412,22 @@ public class AttendBillServiceImpl implements IAttendBillService {
 			attendAudit.setAuditTime(new Date());
 			attendAudit.setRemark(remark);//备注
 			row += empAttendAuditMapper.updateEmpAttendAudit(attendAudit);
+			
+				//200320 修改 批量审核不通过 忘了修改考勤单状态
+				//设置考勤单为完成状态 审核状态(0未审核 1审核中 2审核不通过 3审核已通过)
+				//获取考勤单
+				EmpAttendBill empAttendBill = empAttendBillMapper.selectAttendBillByAuditId(attendAudit.getAttendAuditId());
+				
+				//设置考勤单为完成状态 审核状态(0未审核 1审核中 2审核不通过 3审核已通过)
+				empAttendBill.setAuditFlag(2);
+				//完成状态(0未完成 1已完成)
+				empAttendBill.setCompleteFlag(1);
+				
+				//更新数据库
+				row += empAttendBillMapper.updateByPrimaryKeySelective(empAttendBill);
+				
+				//200406 修改 批量审核不通过 忘了删除考勤日项表
+				row += empAttendBillLeavedayItemsMapper.deleteEmpAttendBillLeavedayItemsByAttendBillId(empAttendBill.getAttendBillId());
 		}
 		return row;
 	}
@@ -435,6 +472,8 @@ public class AttendBillServiceImpl implements IAttendBillService {
 				
 				//更新新对象的参数
 				newAttendAudit.setAttendAuditId(StringUtils.getUUID());
+				newAttendAudit.setAuditTime(null);
+				newAttendAudit.setRemark("");
 				newAttendAudit.setAuditName(leader.getUserName());
 				newAttendAudit.setAuditUserId(leader.getUserId());
 				newAttendAudit.setAuditFlag(1);
@@ -447,7 +486,7 @@ public class AttendBillServiceImpl implements IAttendBillService {
 			//3.若没有上级了，也就是领导为自身或者为null
 			if(leader==null || leader.getUserId()==sysUser.getUserId()){
 				//获取考勤单
-				EmpAttendBill empAttendBill = empAttendBillMapper.selectAttendBillByAuditId(attendAudit.getAttendBillId());
+				EmpAttendBill empAttendBill = empAttendBillMapper.selectAttendBillByAuditId(attendAudit.getAttendAuditId());
 				
 				//设置考勤单为完成状态 审核状态(0未审核 1审核中 2审核不通过 3审核已通过)
 				empAttendBill.setAuditFlag(3);
@@ -461,6 +500,100 @@ public class AttendBillServiceImpl implements IAttendBillService {
 		}
 		
 		return row;
+	}
+
+	/**
+	 * 查询自己的考勤单
+	 * @param: @param empAttendBill
+	 * @param: @return
+	 * @return: List<EmpAttendBill>
+	 */
+	@Override
+	public List<EmpAttendBill> selectAttendBillOfMine(EmpAttendBill empAttendBill) {
+		return empAttendBillMapper.selectAttendBillOfMine(empAttendBill);
+	}
+
+	@Override
+	public EmpAttendBill selectAttendBillByIdAndRelationMine(String attendBillId,SysUser sysUser) {
+		if("admin".equals(sysUser.getLoginName())){
+			return empAttendBillMapper.selectAttendBillById(attendBillId);
+		}
+		return empAttendBillMapper.selectAttendBillByIdAndRelationMine(attendBillId,sysUser.getUserId());
+	}
+
+	@Override
+	public List<Map<String, Object>> selectAttendBillTrace(String attendBillId) {
+		List<Map<String, Object>> rslist = new ArrayList<Map<String, Object>>();
+		//1.查询考勤单信息
+		EmpAttendBill attendBill = empAttendBillMapper.selectAttendBillById(attendBillId);
+		Map<String, Object> itemMap = new HashMap<String,Object>();
+		BeanUtils.copyProperties(itemMap, attendBill,true);
+		rslist.add(itemMap);
+		//2.查询考勤审核信息
+		List<EmpAttendAudit> auditList = empAttendAuditMapper.selectAttendAuditByAttendBillId(attendBillId);
+		for (EmpAttendAudit empAttendAudit : auditList) {
+			Map<String, Object> auditMap = new HashMap<String,Object>();
+			BeanUtils.copyProperties(auditMap, empAttendAudit,true);
+			rslist.add(auditMap);
+		}
+		
+		//3.查询审核是否结束 完成状态是否为已完成
+		int row = empAttendBillMapper.selectAttendAuditIsEnd(attendBillId);
+		Map<String, Object> endMap = new HashMap<String,Object>();
+		if(row>0){
+			endMap.put("isComplete", 1);
+			rslist.add(endMap);
+		}
+		return rslist;
+	}
+
+	/** 
+	 * @Description: 删除考勤单id
+	 * @param: @param attendBillId
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @throws
+	 */
+	@Override
+	public int removeMine(String attendBillId, SysUser sysUser) {
+		int row = 0;
+		//1.先删除考勤审核单
+		row += empAttendAuditMapper.deleteEmpAttendAuditByAttendBillId(attendBillId,sysUser.getUserId());
+		
+		//2.删除出考勤单
+		EmpAttendBillExample example = new EmpAttendBillExample();
+		example.createCriteria().andUserIdEqualTo(sysUser.getUserId()).andAttendBillIdEqualTo(attendBillId);
+		row += empAttendBillMapper.deleteByExample(example);
+		
+		//3.删除考勤日项
+		row += empAttendBillLeavedayItemsMapper.deleteEmpAttendBillLeavedayItemsByAttendBillId(attendBillId);
+		return row;
+	}
+
+	/** 
+	 * @Description: 根据考勤单id查询详情
+	 * @param: @param attendBillId
+	 * @param: @return
+	 * @throws
+	 */
+	@Override
+	public EmpAttendBill selectAttendBillById(String attendBillId) {
+		return empAttendBillMapper.selectAttendBillById(attendBillId);
+	}
+
+	/** 
+	 * @Description: 查看考勤审核单详情 只能查看与自己相关的 管理员除外
+	 * @param: @param attendAuditId
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @throws
+	 */
+	@Override
+	public EmpAttendAudit selectAttendAuditByAuditIdAndRelationMine(String attendAuditId, SysUser sysUser) {
+		if("admin".equals(sysUser.getLoginName())){
+			return empAttendAuditMapper.selectEmpAttendAuditById(attendAuditId);
+		}
+		return empAttendAuditMapper.selectAttendAuditByAuditIdAndRelationMine(attendAuditId, sysUser.getUserId());
 	}
 
 }

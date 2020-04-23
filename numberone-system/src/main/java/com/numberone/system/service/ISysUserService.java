@@ -159,35 +159,59 @@ public interface ISysUserService
      */
     public int changeStatus(SysUser user);
     
-    /**
-     * 根据用户的岗位查询其可以操作的用户
-     * @param: @param empAttendAudit
-     * @param: @return 参数说明
-     * @return List<EmpAttendAudit> 返回类型
-     */
+   /**
+    * 根据用户的岗位查询其可以操作的用户
+    * @param: @param sysUser
+    * @param: @return
+    * @return: List<SysUser>
+    */
 	public List<SysUser> selectUserByUserIdAndPost(SysUser sysUser);
 	
 	/**
 	 * 查询直属领导
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @return: SysUser
 	 */
 	public SysUser selectLeader(SysUser sysUser);
 	
 	/**
-	 * 通过工号查询
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * 查询直属领导
+	 * @param: @param empId
+	 * @param: @return
+	 * @return: SysUser
 	 */
 	public SysUser selectUserByEmpId(String empId);
 	
 	/**
-	 * 根据员工号或名称或名称首字母搜索
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * 查询直属领导
+	 * @param: @param user
+	 * @param: @return
+	 * @return: List<Map<String,Object>>
 	 */
 	public List<Map<String, Object>> selectUserByKey(SysUser user);
+
+	/**
+	 * 加载用户列表树 也包括其所在部门
+	 * @param: @param sysDept
+	 * @param: @return
+	 * @return: List<Map<String,Object>>
+	 */
+	public List<Map<String, Object>> selectUserTree(SysUser sysUser);
+
+	/**
+	 * 查询用户数量 普通员工只能查询本部门的 管理员 hr ceo查询总人数
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @return: Object
+	 */
+	public Integer selectUserCount(SysUser sysUser);
+
+	/**
+	 * 200225 --新增 用户可以查询的用户列表 hr admin ceo全部 其他用户只能查询本部门员工
+	 * @param: @param user
+	 * @param: @return
+	 * @return: List<SysUser>
+	 */
+	public List<Map<String,String>> selectListByUserAndPostForQuery(SysUser user);
 }

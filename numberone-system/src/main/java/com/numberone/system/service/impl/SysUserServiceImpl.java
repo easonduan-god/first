@@ -178,7 +178,7 @@ public class SysUserServiceImpl implements ISysUserService
         if(length>5){
         	user.setEmpId(userId+"");
         }else{
-        	user.setEmpId("cn"+"00000".substring(0,5-length)+userId);
+        	user.setEmpId("cn"+StringUtils.leftPad(userId+"", 5, "0"));
         }
         userMapper.updateEmpIdOfUser(user);
         
@@ -549,6 +549,74 @@ public class SysUserServiceImpl implements ISysUserService
 	@Override
 	public List<Map<String, Object>> selectUserByKey(SysUser user) {
 		return userMapper.selectUserByKey(user);
+	}
+
+	/** 
+	 * @Description: 加载用户列表树 也包括期所在部分
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @throws
+	 */
+	@Override
+	public List<Map<String, Object>> selectUserTree(SysUser sysUser) {
+		//管理员可以查询全部
+		if("admin".equals(sysUser.getLoginName())){
+			return userMapper.selectAllUserTreeData(sysUser);
+		}
+		//总经理和hr也能查询全部
+		String rolesName = sysUser.getRolesName();
+		if(rolesName.contains("hr") || rolesName.contains("ceo")){
+			return userMapper.selectAllUserTreeData(sysUser);
+		}
+		return userMapper.selectUserTreeDataByDeptId(sysUser);
+	}
+
+	/** 
+	 * @Description: 查询用户数量 普通员工只能查询本部门的 管理员 hr ceo查询总人数
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @throws
+	 */
+	@Override
+	public Integer selectUserCount(SysUser sysUser) {
+		//管理员可以查询全部
+		if("admin".equals(sysUser.getLoginName())){
+			return userMapper.selectAllUserCount(sysUser);
+		}
+		//总经理和hr也能查询全部
+		String rolesName = sysUser.getRolesName();
+		if(rolesName.contains("hr") || rolesName.contains("ceo")){
+			return userMapper.selectAllUserCount(sysUser);
+		}
+		return userMapper.selectAllCountByDeptId(sysUser);
+	}
+
+	/** 
+	 * @Description: 
+	 * @param: @param user
+	 * @param: @return
+	 * @throws
+	 */
+	@Override
+	public List<Map<String,String>> selectListByUserAndPostForQuery(SysUser user) {
+		//1、查询用户岗位
+			//admin用户
+		if("admin".equals(user.getUserName())){
+			return userMapper.selectUserListForQuery();
+		}
+			//非管理员
+		List<SysPost> postList = postMapper.selectPostsByUserId(user.getUserId());
+		String postNameStr = "";
+		for (SysPost sysPost : postList) {
+			postNameStr += "," + sysPost.getPostCode();
+		}
+		//2、判断用户属于什么岗位，以此进行相应操作
+			//ceo 或者 hr
+		if(postNameStr.contains("ceo") || postNameStr.contains("hr")){
+			return userMapper.selectUserListForQuery();
+		}
+		//其他人员
+		return userMapper.selectUserListByDeptIdForQuery(user.getDeptId());
 	}
 
 }

@@ -5,44 +5,83 @@ import java.util.Date;
 import com.numberone.common.base.BaseEntity;
 import com.numberone.system.domain.SysUser;
 
+/**
+ * 考勤单实体类
+ * @author eason
+ * @date 2020-02-20
+ */
 public class EmpAttendBill extends BaseEntity{
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 8764923382946783128L;
-
+	/**
+	 * 考勤单id
+	 */
 	private String attendBillId;
-
+	/**
+	 * 员工id
+	 */
     private String empId;
-
+    /**
+     * 用户id
+     */
     private Long userId;
-
+    /**
+     * 主题
+     */
     private String theme;
-
+    /**
+     * 考勤类型(0事假 1年假 2调休假 3忘记打卡)
+     */
     private Integer attendType;
-
+    /**
+     * 所属部门
+     */
     private String deptName;
-
+    /**
+     * 所属部门编号
+     */
     private Long deptId;
-
+    /**
+     * 员工名
+     */
     private String userName;
-
+    /**
+     * 申请日期
+     */
     private Date applyDate;
-
+    /**
+     * 开始日期
+     */
     private Date startDate;
-
+    /**
+     * 结束日期
+     */
     private Date endDate;
-
+    /**
+     * 开始时间
+     */
     private Date startTime;
-
+    /**
+     * 结束时间
+     */
     private Date endTime;
-
+    /**
+     * 申请工作日天数
+     */
     private Double applyWorkdays;
-
+    /**
+     * 申请工作日工时
+     */
     private Double applyWorkdayTimes;
-
+    /**
+     * 事由
+     */
     private String matter;
-
+    /**
+     * 是否销假(0否 1是)
+     */
     private Integer isOffet;
     /**
      * 完成状态(0未完成 1已完成)
@@ -52,9 +91,17 @@ public class EmpAttendBill extends BaseEntity{
      * 审核状态(0未审核 1审核中 2审核不通过 3审核已通过)
      */
     private Integer auditFlag;
-
+    /**
+     * 审核状态(0未审核 1审核中 2审核不通过 3审核已通过)
+     */
+    private String auditFlagText;
+    /**
+     * 删除标志(0未删除 2已删除)
+     */
     private Integer delFlag;
-    
+    /**
+     * 
+     */    
     private SysUser user;
     
     public String getAttendBillId() {
@@ -204,7 +251,27 @@ public class EmpAttendBill extends BaseEntity{
     public Integer getAuditFlag() {
         return auditFlag;
     }
-
+    /** 审核状态文本(0未审核 1审核中 2审核不通过 3审核已通过) */
+	public String getAuditFlagText() 
+	{
+		if(auditFlag!=null){
+			switch (auditFlag) {
+			case 0:
+				auditFlagText = "未审核";
+				break;
+			case 1:
+				auditFlagText = "审核中";
+				break;
+			case 2:
+				auditFlagText = "审核不通过";
+				break;
+			case 3:
+				auditFlagText = "审核已通过";
+				break;
+			}
+		}
+		return auditFlagText;
+	}
     public void setAuditFlag(Integer auditFlag) {
         this.auditFlag = auditFlag;
     }

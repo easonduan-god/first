@@ -195,13 +195,34 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!-- 根据考勤审核单id查看考勤单详细信息 -->
     <sql id="selectEmpAttendAuditVo_new">
        SELECT ab.emp_id , ab.user_id , ab.theme , ab.attend_type , ab.dept_name , 
+        aa.audit_name , aa.audit_time , aa.audit_emp_id , aa.audit_job , 
        	ab.dept_id , ab.user_name , ab.apply_date , ab.start_date , ab.end_date , 
        	ab.start_time , ab.end_time , ab.apply_workdays , ab.apply_workday_times , 
        	ab.matter , ab.is_offet , ab.complete_flag , ab.audit_flag,aa.attend_audit_id
 		FROM emp_attend_audit AS aa INNER JOIN emp_attend_bill AS ab ON (aa.attend_bill_id = ab.attend_bill_id)
     </sql>
     <select id="selectAttendBillByAuditId" parameterType="String" resultMap="EmpAttendAuditResult">
-        <include refid="selectEmpAttendAuditVo_new"/>
+        <include refid="selectEmpAttendAuditVo"/>
         where aa.attend_audit_id = #{attendAuditId}
+    </select>
+    <!-- 根据审核时间升序排序 空值排最后 -->
+    <select id="selectAttendAuditByAttendBillId" parameterType="String" resultMap="EmpAttendAuditResult">
+        <include refid="selectEmpAttendAuditVo"/>
+        where attend_bill_id = #{attendBillId}
+        order by audit_time is null
+    </select>
+    
+    <!-- 删除考勤审核 根据用户id 考勤单id -->
+	<delete id="deleteEmpAttendAuditByAttendBillId">
+        delete from emp_attend_audit where attend_bill_id = #{attendBillId} and user_id = #{userId}
+    </delete>
+    
+    <select id="selectAttendAuditByAuditIdAndRelationMine" resultMap="EmpAttendAuditResult">
+        <include refid="selectEmpAttendAuditVo"/>
+        where attend_audit_id = #{attendAuditId}
+        and (
+		    user_id = #{userId} 
+		    or audit_user_id = #{userId} 
+	    )
     </select>
 </mapper>

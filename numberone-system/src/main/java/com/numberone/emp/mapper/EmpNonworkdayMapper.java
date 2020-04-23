@@ -43,4 +43,12 @@ public interface EmpNonworkdayMapper {
 	int checkWorkdateUniqueForUpdate(EmpNonworkday empNonworkday);
 
 	Map<String, Integer> selectDateAndTypeMap();
+
+	/**
+	 * 根据日期查询工作日
+	 * @param: @param startDate
+	 * @param: @return
+	 * @return: EmpNonworkday
+	 */
+	EmpNonworkday selectWorkdayByDate(@Param("startDate") Date startDate);
 }

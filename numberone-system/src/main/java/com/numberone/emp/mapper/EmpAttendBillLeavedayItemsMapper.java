@@ -63,38 +63,48 @@ public interface EmpAttendBillLeavedayItemsMapper
 	/**
 	 * 查询上月累计请假
 	 * @param: @param empId
-	 * @param: @return 参数说明
-	 * @return: Double 返回类型
-	 * @throws
+	 * @param: @return
+	 * @return: Double
 	 */
 	public Double selectLastMonthLeave(String empId);
 	/**
 	 * 本月累计请假
 	 * @param: @param empId
-	 * @param: @return 参数说明
-	 * @return: Double 返回类型
-	 * @throws
+	 * @param: @return
+	 * @return: Double
 	 */
 	public Double selectCurrMonthLeave(String empId);
-
+	
+	/**
+	 * 考勤日项临时表
+	 * @param: @param leavedayItemsTemp
+	 * @param: @return
+	 * @return: Long
+	 */
 	public Long insertLeavedayItemsTemp(EmpAttendBillLeavedayItems leavedayItemsTemp);
 	
 	/**
 	 * 根据考勤单临时表id删除
 	 * @param: @param attendBillTempId
-	 * @param: @return 参数说明
-	 * @return: Long 返回类型
-	 * @throws
+	 * @param: @return
+	 * @return: Long
 	 */
 	public Long deleteEmpAttendBillLeavedayItemsByAttendBillTempId(String attendBillTempId);
 	
 	/**
 	 * 根据用户id，开始日期，结束日期,查询考勤冲突日期
 	 * @param: @param empAttendBill
-	 * @param: @return 参数说明
-	 * @return: Long 返回类型
-	 * @throws
+	 * @param: @return
+	 * @return: Long
 	 */
 	public Long selectDateConflict(EmpAttendBill empAttendBill);
+
+	/**
+	 * 根据考勤单表id删除
+	 * @param: @param attendBillId
+	 * @return: void
+	 */
+	public Long deleteEmpAttendBillLeavedayItemsByAttendBillId(String attendBillId);
+
 	
 }

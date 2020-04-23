@@ -272,9 +272,10 @@
 	    ON (yv.emp_id = u.emp_id) INNER JOIN sys_dept AS d     
 	    ON (u.dept_id = d.dept_id)
 		where 1=1 and yv.del_flag = 0
-		<if test="params.userId != null and params.userId != ''">
-			AND u.user_id = #{params.userId}
-		</if>
+		and u.user_id in
+		<foreach item="userId" collection="params.userIds" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
 		<if test="params.deptId != null and params.deptId != ''">
 			AND d.dept_id = #{params.deptId}
 		</if>
@@ -284,7 +285,7 @@
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
 	</select>
-	<!-- 提交查询年假 其中用户未所有可操作用户 -->
+	<!-- 提交查询年假 其中用户为所有可操作用户 -->
   <select id="selectListByOperableUserIds" resultMap="BaseResultMap">
 		select 
 		<include refid="Base_sql1" />

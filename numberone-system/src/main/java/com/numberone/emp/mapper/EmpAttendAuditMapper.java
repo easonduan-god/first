@@ -2,6 +2,8 @@ package com.numberone.emp.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.numberone.emp.domain.EmpAttendAudit;
 import com.numberone.emp.domain.EmpAttendBill;	
 
@@ -85,5 +87,30 @@ public interface EmpAttendAuditMapper
 	public EmpAttendBill selectAttendBillByAuditId(String attendAuditId);
 	
 	
-	
+	/**
+	 * 查询考勤审核 根据考勤单id
+	 * @param: @param attendBillId
+	 * @param: @return      
+	 * @return: List<EmpAttendAudit>      
+	 * @throws
+	 */
+	List<EmpAttendAudit> selectAttendAuditByAttendBillId(String attendBillId);
+
+	/**
+	 * 删除考勤审核 根据用户id 考勤单id
+	 * @param: @param attendBillId
+	 * @param: @param userId
+	 * @param: @return
+	 * @return: int
+	 */
+	public int deleteEmpAttendAuditByAttendBillId(@Param("attendBillId") String attendBillId,@Param("userId") Long userId);
+
+	/**
+	 * 查看考勤审核单详情 只能查看与自己相关的 管理员除外
+	 * @param userId 
+	 * @param: @param attendAuditId
+	 * @param: @return
+	 * @return: EmpAttendAudit
+	 */
+	public EmpAttendAudit selectAttendAuditByAuditIdAndRelationMine(@Param("attendAuditId") String attendAuditId,@Param("userId")  Long userId);
 }

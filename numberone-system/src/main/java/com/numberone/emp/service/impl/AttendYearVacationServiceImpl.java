@@ -1,5 +1,6 @@
 package com.numberone.emp.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,12 @@ public class AttendYearVacationServiceImpl implements IAttendYearVacationService
 	private EmpYearVacationMapper empYearVacationMapper;
 	@Override
 	public List<EmpYearVacation> selectYearVacationList(EmpYearVacation empYearVacation) {
+		String userIds = (String) empYearVacation.getParams().get("userIds");
+		List<Integer> list = new ArrayList<Integer>();
+		for(String userId : userIds.split(",")){
+			list.add(Integer.parseInt(userId));
+		}
+		empYearVacation.getParams().put("userIds", list);
 		return empYearVacationMapper.selectYearVacationList(empYearVacation);
 	}
 	@Override

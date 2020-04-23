@@ -232,7 +232,7 @@
   <select id="selectWorkdayList" parameterType="empNonworkday" resultMap="BaseResultMap">
 		select  
 		<include refid="Base_sql1" />
-		from emp_nonworkday 
+		from emp_nonworkday w
 		where 1=1 
 		<if test="workdateType != null">
 			AND workdate_type = #{workdateType}
@@ -273,4 +273,14 @@
 			AND date_format(workdate,'%y%m%d') = date_format(#{workdate},'%y%m%d')
 	</select>
 	
+	<!-- 查询工作日 根据日期 -->
+  <select id="selectWorkdayByDate" parameterType="Date" resultMap="BaseResultMap">
+		select  
+		<include refid="Base_sql1" />
+		from emp_nonworkday 
+		where 1=1 
+		<if test="startDate != null"><!-- 开始时间检索 -->
+			AND date_format(workdate,'%y%m%d') = date_format(#{startDate},'%y%m%d')
+		</if>
+	</select>
 </mapper>

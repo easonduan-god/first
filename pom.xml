@@ -9,9 +9,17 @@
     <version>3.2</version>
 
     <name>numberone</name>
-	<url>http://www.numberone.vip</url>
     <description>NumberOne管理系统</description>
-    
+    	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>http://localhost:8081/nexus/content/repositories/releases/</url>
+		</repository> 
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://localhost:8081/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository> 
+	</distributionManagement>
     <properties>
 	    <numberone.version>3.2</numberone.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -83,12 +83,12 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     	if(sysFile!=null && !StringUtils.isEmpty(sysFile.getFilePath())){
 	    	if(!StringUtils.isEmpty(sysFile.getFileId())){//没有修改附件
 	    		//修改文件
-	    		fileMapper.updateSysFile(notice.getSysFile());
+	    		fileMapper.updateSysFile(sysFile);
 	    		
 	    	}else{
 	    		notice.getSysFile().setFileId(StringUtils.getUUID());
 	    		//新增文件
-	    		fileMapper.insertSysFile(notice.getSysFile());
+	    		fileMapper.insertSysFile(sysFile);
 	    		
 	    	}
     	}

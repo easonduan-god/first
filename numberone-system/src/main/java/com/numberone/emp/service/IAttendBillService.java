@@ -59,7 +59,7 @@ public interface IAttendBillService {
 	EmpAttendBill selectTempById(String attendBillTempId);
 	
 	/**
-	 * 新增考勤单
+	 * 
 	 * @param: @param empAttendBill
 	 * @param: @return
 	 * @return: Long
@@ -137,6 +137,58 @@ public interface IAttendBillService {
 	 * @return: int
 	 */
 	int batchAuditPass(String auditIds, SysUser sysUser,String remark);
+
+	/**
+	 * 查询自己的考勤单
+	 * @param: @param empAttendBill
+	 * @param: @return
+	 * @return: List<?>
+	*/
+	List<EmpAttendBill> selectAttendBillOfMine(EmpAttendBill empAttendBill);
+
+	/**
+	 * 根据考勤单id查询详情
+	 * @param: @param attendBillId
+	 * @param: @return
+	 * @return: EmpAttendBill
+	*/
+	EmpAttendBill selectAttendBillById(String attendBillId);
+	
+	/**
+	 * 
+	 * 根据考勤单id 查询考勤单审核流程信息 也就是相关考勤审核信息
+	 * @param: @param attendBillId
+	 * @param: @return
+	 * @return: List<Map<String,Object>> 考勤单信息 考勤审核信息
+	 */
+	List<Map<String,Object>> selectAttendBillTrace(String attendBillId);
+
+	/**
+	 * 删除考勤单 根据id
+	 * @param: @param attendBillId
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @return: int
+	 */
+	int removeMine(String attendBillId, SysUser sysUser);
+
+	/**
+	 * 查看与自己相关的考勤单详情 根据考勤单id
+	 * @param: @param attendBillId
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @return: EmpAttendBill
+	 */
+	EmpAttendBill selectAttendBillByIdAndRelationMine(String attendBillId, SysUser sysUser);
+
+	/**
+	 * 查看考勤审核单详情 只能查看与自己相关的 管理员除外
+	 * @param: @param attendAuditId
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @return: Object
+	 */
+	EmpAttendAudit selectAttendAuditByAuditIdAndRelationMine(String attendAuditId, SysUser sysUser);
 
 	
 }

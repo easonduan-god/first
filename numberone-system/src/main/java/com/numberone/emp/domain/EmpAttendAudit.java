@@ -37,6 +37,8 @@ public class EmpAttendAudit extends BaseEntity
 	private String auditJob;
 	/** 审核状态(0未审核 1审核中 2审核不通过 3审核已通过) */
 	private Integer auditFlag;
+	/** 审核状态(0未审核 1审核中 2审核不通过 3审核已通过) */
+	private String auditFlagText;
 	
 	private String remark;
 	
@@ -131,6 +133,27 @@ public class EmpAttendAudit extends BaseEntity
 	public Integer getAuditFlag() 
 	{
 		return auditFlag;
+	}
+	/** 审核状态文本(0未审核 1审核中 2审核不通过 3审核已通过) */
+	public String getAuditFlagText() 
+	{
+		if(auditFlag!=null){
+			switch (auditFlag) {
+			case 0:
+				auditFlagText = "未审核";
+				break;
+			case 1:
+				auditFlagText = "审核中";
+				break;
+			case 2:
+				auditFlagText = "审核不通过";
+				break;
+			case 3:
+				auditFlagText = "审核已通过";
+				break;
+			}
+		}
+		return auditFlagText;
 	}
 	
 

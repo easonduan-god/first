@@ -522,4 +522,73 @@
     from emp_attend_bill
     where attend_bill_id = (select attend_bill_id from emp_attend_audit where attend_audit_id=#{attendAuditId})
   </select>
+  
+  <select id="selectAttendBillOfMine" parameterType="empAttendBill" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from emp_attend_bill
+    where user_id = #{userId}
+    <if test="auditFlag != null">
+	  AND audit_flag = #{auditFlag}
+	</if>
+	<if test="completeFlag != null">
+	  AND complete_flag = #{completeFlag}
+	</if>
+	<if test="theme != null and theme != ''">
+	   AND theme like concat('%',#{theme},'%')
+	</if>
+	<!-- 交集  startDate <= end_date or end_date >= start_date -->
+	<if test="startDate != null and endDate != null">
+			AND NOT (
+				date_format(end_date,'%y%m%d') &lt; date_format(#{startDate},'%y%m%d')
+				OR date_format(start_date,'%y%m%d') &gt; date_format(#{endDate},'%y%m%d')
+			)
+	</if>
+	<if test="startDate != null and endDate == null"><!-- 开始日期检索小于申请单结束日期   &gt;大于-->
+		AND date_format(end_date,'%y%m%d') &gt;= date_format(#{startDate},'%y%m%d')
+	</if>
+	<if test="endDate != null and startDate == null"><!-- 结束日期检索大于申请单开始日期  &lt;小于 -->
+		AND date_format(start_date,'%y%m%d') &lt;= date_format(#{endDate},'%y%m%d')
+	</if>
+  </select>
+  <!-- 查询考勤根据考勤单id -->
+  <select id="selectAttendBillById" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from emp_attend_bill
+    where attend_bill_id = #{attendBillId}
+  </select>
+  <!-- 查看与自己相关的考勤单详情 根据考勤单id-->
+  <select id="selectAttendBillByIdAndRelationMine"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from emp_attend_bill
+    where attend_bill_id = #{attendBillId}
+    and (
+	    user_id = #{userId} 
+	    or user_id in 
+	    (select audit_user_id from emp_attend_audit where  attend_bill_id = #{attendBillId})
+    )
+  </select>
+  
+  <!-- 查询审核是否结束 完成状态是否为已完成 -->
+  <select id="selectAttendAuditIsEnd" parameterType="java.lang.String" resultType="int">
+    select count(1) 
+    from emp_attend_bill
+    where complete_flag = 1 and attend_bill_id = #{attendBillId}
+  </select>
+  
+  <!-- 查询usernames，依据userid数组，开始时间 -->
+  <select id="selectUsernamesByUserIdsAndStartDate" resultType="string">
+  	select distinct u.user_name
+	from emp_attend_bill ab join sys_user u
+	on ab.user_id = u.user_id 
+	where 1=1
+	and date_format(#{startDate},'%y%m%d') between date_format(ab.start_date,'%y%m%d')
+	and date_format(ab.end_date,'%y%m%d')
+	and u.user_id in
+	<foreach item="userId" collection="userIds" open="(" separator="," close=")">
+           #{userId}
+	</foreach>
+  </select>
 </mapper>

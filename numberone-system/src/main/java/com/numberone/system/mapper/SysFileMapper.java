@@ -1,13 +1,14 @@
 package com.numberone.system.mapper;
 
-import com.numberone.system.domain.SysFileBean;
-import java.util.List;	
+import java.util.List;
+
+import com.numberone.system.domain.SysFileBean;	
 
 /**
  * 文件 数据层
  * 
  * @author eason
- * @date 2020-03-22
+ * @date 2020-04-21
  */
 public interface SysFileMapper 
 {

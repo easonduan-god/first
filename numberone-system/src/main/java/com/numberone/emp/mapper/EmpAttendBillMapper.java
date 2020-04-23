@@ -1,5 +1,6 @@
 package com.numberone.emp.mapper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -82,5 +83,50 @@ public interface EmpAttendBillMapper {
 	 * @return: EmpAttendBill
 	*/
 	EmpAttendBill selectAttendBillByAuditId(String attendAuditId);
+
+	/**
+	 * 查询自己的考勤单
+	 * @param: @param empAttendBill
+	 * @param: @return
+	 * @return: List<EmpAttendBill>
+	*/
+	List<EmpAttendBill> selectAttendBillOfMine(EmpAttendBill empAttendBill);
+	
+	/**
+	 * @param userId 
+	 * 查询考勤单根据考勤单id
+	 * @param: @param attendBillId
+	 * @param: @return      
+	 * @return: EmpAttendBill      
+	 * @throws
+	 */
+	EmpAttendBill selectAttendBillById(String attendBillId);
+	/**
+	 * 查看与自己相关的考勤单详情
+	 * @param: @param attendBillId
+	 * @param: @param userId
+	 * @param: @return
+	 * @return: EmpAttendBill
+	 */
+	EmpAttendBill selectAttendBillByIdAndRelationMine(@Param("attendBillId") String attendBillId,@Param("userId") Long userId);
+
+	/**
+	 * 查询审核是否结束 完成状态是否为已完成
+	 * @param: @param attendBillId
+	 * @param: @return
+	 * @return: int
+	 */
+	int selectAttendAuditIsEnd(String attendBillId);
+
+	/**
+	 * 查询usernames，依据userid数组，开始时间
+	 * @param: @param idArr
+	 * @param: @return
+	 * @return: List<String>
+	 */
+	List<String> selectUsernamesByUserIdsAndStartDate(@Param("userIds") String[] userIds,@Param("startDate") Date startDate);
+
+
+	
 	
 }

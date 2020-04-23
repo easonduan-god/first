@@ -9,17 +9,17 @@ public interface IAttendYearVacationService {
 	/**
 	 * 条件查询年假列表
 	 * @param: @param empYearVacation
-	 * @param: @return 参数说明
-	 * @return: List<EmpYearVacation> 返回类型
-	 * @throws
+	 * @param: @return
+	 * @return: List<EmpYearVacation>
 	 */
 	List<EmpYearVacation> selectYearVacationList(EmpYearVacation empYearVacation);
 	
 	/**
 	 * 条件查询年假列表 其中用户未所有可操作用户
-	 * @param: @param empAttendAudit
-	 * @param: @return 所有可操作用户的id
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @param empYearVacation
+	 * @param: @param operableUserIds
+	 * @param: @return
+	 * @return: List<EmpYearVacation>
 	 */
 	List<EmpYearVacation> selectListByOperableUserIds(EmpYearVacation empYearVacation, List<Long> operableUserIds);
 

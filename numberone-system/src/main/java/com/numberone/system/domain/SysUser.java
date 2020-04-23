@@ -29,9 +29,11 @@ public class SysUser extends BaseEntity
     @Excel(name = "员工号")
     private String empId;
     /** 部门ID */
+
     @Excel(name = "部门编号", type = Type.IMPORT)
     private Long deptId;
-
+    @Excel(name = "部门名称", type = Type.IMPORT)
+    private String deptName;
     /** 部门父ID */
     private Long parentId;
 
@@ -277,11 +279,22 @@ public class SysUser extends BaseEntity
 
     public SysDept getDept()
     {
-        if (dept == null)
-        {
-            dept = new SysDept();
-        }
-        return dept;
+    	SysDept newDept = null;
+    	if(dept != null){ 
+    		if(dept instanceof SysDept) {
+    			return dept;
+            } else {
+            	try {
+            		newDept = JSON.unmarshal(JSON.marshal(dept), SysDept.class);
+            		this.dept = newDept;
+    			} catch (Exception e) {
+    				e.printStackTrace();
+    			}
+            }
+    	}else{
+    		newDept = new SysDept();
+    	}
+    	return newDept;
     }
 
     public void setDept(SysDept dept)
@@ -291,7 +304,24 @@ public class SysUser extends BaseEntity
 
     public List<SysRole> getRoles()
     {
-        return roles;
+    	SysRole role = null;
+    	List<SysRole> newRoles = new ArrayList<SysRole>();
+    	if(roles != null && roles.size() != 0){ 
+	    	for (Object obj : roles) {
+	    		if(obj instanceof SysRole) {
+	    			return roles;
+	            } else {
+	            	try {
+	            		role = JSON.unmarshal(JSON.marshal(obj), SysRole.class);
+	            		newRoles.add(role);
+	    			} catch (Exception e) {
+	    				e.printStackTrace();
+	    			}
+	            }
+			}
+    	}
+    	this.roles = newRoles;
+    	return newRoles;
     }
     public String getRolesName()
     {
@@ -314,6 +344,30 @@ public class SysUser extends BaseEntity
 	    	if(length!=0)
 				sb.deleteCharAt(length-1);
 	    	this.rolesName = sb.toString();
+    	}
+    	return rolesName;
+    }
+    public String getRolesKey()
+    {
+    	StringBuffer sb = new StringBuffer();
+    	SysRole role = null;
+    	if(roles != null && roles.size() != 0){ 
+    		for (Object obj : roles) {
+    			if(obj instanceof SysRole) {
+    				role = (SysRole) obj;
+    			} else {
+    				try {
+    					role = JSON.unmarshal(JSON.marshal(obj), SysRole.class);
+    				} catch (Exception e) {
+    					e.printStackTrace();
+    				}
+    			}
+    			sb.append(role.getRoleKey()+",");
+    		}
+    		int length = sb.length();
+    		if(length!=0)
+    			sb.deleteCharAt(length-1);
+    		this.rolesName = sb.toString();
     	}
     	return rolesName;
     }
@@ -400,7 +454,13 @@ public class SysUser extends BaseEntity
 	public void setOperableUserList(List<SysUser> operableUserList) {
 		this.operableUserList = operableUserList;
 	}
-
+	
+	public String getDeptName() {
+		return deptName;
+	}
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
 	@Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)

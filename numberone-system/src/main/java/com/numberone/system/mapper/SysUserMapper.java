@@ -3,6 +3,8 @@ package com.numberone.system.mapper;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.numberone.system.domain.SysUser;
 
 /**
@@ -102,44 +104,41 @@ public interface SysUserMapper
 
     /**
      * 校验email是否唯一
-     *
-     * @param email 用户邮箱
-     * @return 结果
+     * @param: @param email
+     * @param: @return
+     * @return: SysUser
      */
     public SysUser checkEmailUnique(String email);
     
     /**
      * 新增员工id
-     * @param: @param user 参数说明
-     * @return: void 返回类型
-     * @throws
+     * @param: @param user
+     * @param: @return
+     * @return: int
      */
 	public int updateEmpIdOfUser(SysUser user);
 	
 	/**
 	 * 根据部门编号查询用户
 	 * @param: @param deptId
-	 * @param: @return 参数说明
-	 * @return: List<SysUser> 返回类型
-	 * @throws
+	 * @param: @return
+	 * @return: List<SysUser>
 	 */
 	public List<SysUser> selectUserListByDeptId(Long deptId);
 	
 	/**
 	 * 查询部门领导
 	 * @param: @param sysUser
-	 * @param: @return 参数说明
-	 * @return: SysUser 返回类型
-	 * @throws
+	 * @param: @return
+	 * @return: SysUser
 	 */
 	public SysUser selectLeaderByDeptId(SysUser sysUser);
 	
 	/**
-	 * @param deptId 
 	 * 查询CEO
-	 * @param: @return 参数说明
-	 * @return: SysUser 返回类型
-	 * @throws
+	 * @param: @param deptId
+	 * @param: @return
+	 * @return: SysUser
 	 */
 	public SysUser selectCEO(Long deptId);
 
@@ -151,5 +150,67 @@ public interface SysUserMapper
 	 * @return List<EmpAttendAudit> 返回类型
 	 */
 	public List<Map<String, Object>> selectUserByKey(SysUser user);
+
+	/**
+	 * 加载用户列表树 也包括期所在部分 根据部门id
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @return: List<Map<String,Object>>
+	 */
+	public List<Map<String, Object>> selectUserTreeDataByDeptId(SysUser sysUser);
+	
+	/**
+	 * 管理员查询全部
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @return: List<Map<String,Object>>
+	 */
+	public List<Map<String, Object>> selectAllUserTreeData(SysUser sysUser);
+
+	/** 
+	 * 查询员工总数
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @return: Long
+	 */
+	public Integer selectAllUserCount(SysUser sysUser);
+
+	/**
+	 * 查询自己部门人数
+	 * @param: @param sysUser
+	 * @param: @return
+	 * @return: Long
+	 */
+	public Integer selectAllCountByDeptId(SysUser sysUser);
+
+	/**
+	 * 根据userid数组查询usernames
+	 * @param: @param array
+	 * @return: void
+	 */
+	public List<String> selectUsernamesByUserIds(Object[] idArr);
+
+	/**
+	 * 根据userid数组和部门查询符合的用户数
+	 * @param: @param idArr
+	 * @param: @param deptId
+	 * @return: void
+	 */
+	public Integer selectCountByUserIdsAndDeptId(@Param("userIds") String[] userIds,@Param("deptId") Long deptId);
+
+	/**
+	 * 查询所有 得到字段id userid text username
+	 * @param: @return
+	 * @return: List<Map<String,String>>
+	 */
+	public List<Map<String, String>> selectUserListForQuery();
+
+	/**
+	 * 查询部门员工 得到字段id userid text username
+	 * @param deptId 
+	 * @param: @return
+	 * @return: List<Map<String,String>>
+	 */
+	public List<Map<String, String>> selectUserListByDeptIdForQuery(Long deptId);
 	
 }
