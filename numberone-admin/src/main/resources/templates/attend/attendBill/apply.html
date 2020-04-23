@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
 <link th:href="@{/numberone/css/ry-ui.css}" rel="stylesheet" />
+<style type="text/css">
+	.form-control[readonly]  {
+		background-color: white;
+	}
+</style>
 <style>
 </style>
 <body class="gray-bg">
@@ -67,7 +72,7 @@
 								<div class="form-group draggable">
 									<label class="col-sm-3 control-label">开始日期：</label>
 									<div class="col-sm-9">
-										<input type="text" class="form-control select-time" id="startDate" name="startDate">
+										<input type="text" class="form-control select-time" id="startDate" name="startDate"  th:value="${currDate}">
 									</div>
 								</div>
 							</div>
@@ -75,7 +80,7 @@
 								<div class="form-group draggable">
 									<label class="col-sm-3 control-label">结束日期：</label>
 									<div class="col-sm-9">
-										<input type="text" class="form-control select-time" id="endDate" name="endDate" autocomplete="off">
+										<input type="text" class="form-control select-time" id="endDate" name="endDate" autocomplete="off" th:value="${currDate}">
 									</div>
 								</div>
 							</div>
@@ -163,7 +168,7 @@
 				done: function(value, date) {
 				}
 			});
-			laydate.render({
+			var endTime = laydate.render({
 				elem: '#endTimeShow',
 				type: 'time',
 				value: offWorkTime,
@@ -224,7 +229,10 @@
 			$("#attendTypeText").val($("#attendType :selected").text());
 			var newFormDate = $("#attendBill-apply-form").serialize();
 			if(formDate!=newFormDate) form_change = false;
-			if(form_change) return;
+			if(form_change){
+				$.modal.msgError('未作修改');
+				return;
+			} 
 			//提交到后台计算工时
 			$.modal.loading("计算中。。。");
 			$.post(prefix+"/calcWorkdays", newFormDate,function(data){
@@ -235,7 +243,7 @@
 					$("#applyWorkdayTimes").val(data.workdayHours);
 					$("#attendBillTempId").val(data.attendBillTempId);
 					$("#theme").val(data.theme);
-					formDate = newFormDate;
+					formDate = $("#attendBill-apply-form").serialize();
 					form_change = true;
 					calculate_flag = true;
 				}else{
@@ -253,6 +261,7 @@
 				return;
 			}
 			if(!$.validate.form()){
+				$(".error").css('background-color','white');
 				return;
 			}
 			$.modal.loading("提交中。。。");

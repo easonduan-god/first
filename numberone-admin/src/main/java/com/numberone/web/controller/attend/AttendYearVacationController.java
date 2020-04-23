@@ -1,5 +1,6 @@
 package com.numberone.web.controller.attend;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import com.numberone.common.base.AjaxResult;
 import com.numberone.common.enums.BusinessType;
 import com.numberone.common.exception.BusinessException;
 import com.numberone.common.page.TableDataInfo;
+import com.numberone.common.utils.DateUtils;
 import com.numberone.common.utils.StringUtils;
 import com.numberone.common.utils.poi.ExcelUtil;
 import com.numberone.emp.domain.EmpYearVacation;
@@ -58,6 +60,7 @@ public class AttendYearVacationController  extends BaseController{
     	List<SysUser> list = getSysUser().getOperableUserList();
     	mmap.put("userList", list);
     	mmap.put("user", getSysUser());
+    	mmap.put("currYear", DateUtils.parseDateToStr(DateUtils.YYYY, new Date()));
         return prefix + "/yearVacation";
     }
     /**
@@ -75,14 +78,14 @@ public class AttendYearVacationController  extends BaseController{
     	startPage();
     	Map<String, Object> params = empYearVacation.getParams();
     	List<EmpYearVacation> list = null;
-    	if(params.get("userId")!=null && params.get("userId").equals("0")){//查询全部用户
+    	if(StringUtils.isEmpty((String)params.get("userIds"))){//查询全部用户
     		list = attendYearVacationService.selectListByOperableUserIds(empYearVacation,getSysUser().getOperableUserIds());
     	}else{
-    		if(StringUtils.isEmpty((String)params.get("userId"))){
-    			params.put("userId", getUserId());//默认查询自己
+    		if("1".equals("2")){
+    			params.put("userIds", getUserId()+"");//默认查询自己
     		}else{
 	    		//若查询的用户id不包括在可操作列表中
-	    		if(!getSysUser().getOperableUserIds().contains(Long.parseLong((String)params.get("userId")))){
+	    		if(!getSysUser().getOperableUserIds().contains(Long.parseLong((String)params.get("userIds")))){
 	    			throw new BusinessException("异常操作");
 	    		}
     		}
@@ -98,6 +101,7 @@ public class AttendYearVacationController  extends BaseController{
     @ResponseBody
     public AjaxResult export(EmpYearVacation empYearVacation)
     {
+    	startPage();
     	Map<String, Object> params = empYearVacation.getParams();
     	List<EmpYearVacation> list = null;
     	if(params.get("userId")!=null && params.get("userId").equals("0")){//查询全部用户

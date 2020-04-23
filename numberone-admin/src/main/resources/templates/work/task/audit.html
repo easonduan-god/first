@@ -1,0 +1,445 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style type="text/css">
+	.form-control[readonly]  {
+		background-color: white;
+	}
+	a{
+		color: blue;
+	}
+	a:hover, a:focus, a:active {
+	    color: #FFFFFF;
+	    background-color: #437cae!important;
+	}
+	
+</style>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse" style="padding-top: 20px">
+				<form id="task-audit-form" class="form-horizontal">
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">处理部门：</label>
+							<div class="col-sm-9">
+								<select name="params[dealDeptId]" class="form-control" th:with="type=${@dict.getTypeByUserId('sys_dept')}" id="deptInput">
+									<option value="">全部</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">处理人：</label>
+							<div class="col-sm-9">
+								<select class="form-control" id="userInput" name="userInput">
+								</select>
+								<input type="hidden" name="params[userIds]" id="userIds">
+								<input type="hidden" name="params[placeholder]" id="placeholder" value="placeholder">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">审核类型：</label>
+							<div class="col-sm-9">
+								<select name="auditType" id="auditType" class="form-control noselect2" th:with="type=${@dict.getType('work_task_audit_type')}">
+									<option value="">全部</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" ></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">处理状态：</label>
+							<div class="col-sm-9">
+								<input type="hidden" name="params[placeholder]" id="placeholder" value="placeholder">
+								<select name="params[auditStatus]" id="auditStatus" class="form-control noselect2">
+									<option value="0">未审核</option>
+									<option value="1">已审核</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">任务编号：</label>
+							<div class="col-sm-9" >
+								<input type="text" name="taskId" class="form-control">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">发起时间：</label>
+							<div class="col-sm-4">
+								<input type="text" class="time-input form-control" id="startTime"  placeholder="开始时间" name="params[launchStartDate]"/>
+							</div>
+							<div class="col-sm-1"><hr style="background-color:black;height: 1px;border: none; margin-top: 15px"></div>
+							<div class="col-sm-4">
+								<input type="text" class="time-input form-control" id="endTime" placeholder="结束时间" name="params[launchEndDate]"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 ">
+						<div class="form-group draggable">
+							<div class="col-sm-12">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+					    		<a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-danger btn-del disabled" id="auditRefuse" onclick="auditRefuse()" shiro:hasPermission="work:task:audit">
+					<i class="fa fa-remove"></i> 批量审核不通过
+				</a>
+	        </div>
+			<div class="col-sm-12 select-table">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:src="@{/ajax/libs/select/select2.js}"></script>
+    <script th:inline="javascript">
+        var prefix = ctx + "work/task";
+        var auditTypes = [[${@dict.getType('work_task_audit_type')}]];
+        var flags = [[${@dict.getType('work_task_flag')}]];
+        var auditFlags = [[${@dict.getType('emp_attend_audit_flag')}]];
+        $(function() {
+        	
+        	/* userInput deptInput初始化select2 */
+        	$("#userInput").select2({
+        		placeholder : "请输入人员工号或名称或名称首字母...",
+        		minimumInputLength : 1,//最小需要输入多少个字符才进行查询
+        		multiple : true,//支持多选
+        		allowClear : true,//允许清空
+        		ajax : {
+        			url : "/system/user/searchUser",
+        			dataType : 'json',
+        			type : "post",
+        			delay : 100,
+        			data : function(userName, page) {//向后台发送参数
+        				return {
+        					userName : userName.term
+        				};
+        			},
+        			results : function(data, page) {//处理结果
+        				return {
+        					data
+        				};
+        			}
+        		},
+        		formatResult : function(result, container, query, escapeMarkup) {
+        			return result.userName;
+        		},
+        		formatSelection : function(result, container, query, escapeMarkup) {
+        			return result.userName;
+        		},
+        		formatInputTooShort : function() {
+        			return "请输入人员工号或名称或名称首字母...";
+        		},
+        		escapeMarkup : function(m) {
+        			return m;
+        		}
+        	});
+        	$("#userInput").change(function(){
+        		$("#userIds").val($.form.selectSelects("userInput"));
+        	});
+        	$("#auditStatus").change(function(){
+        		
+        	});
+            var options = {
+            		url: prefix + "/auditList",
+                    detailUrl: prefix + "/detail/{id}",
+                    auditUrl: prefix + "/batchAudit",
+                    sortable: true,                     // 是否启用排序
+    				search: false,
+    				pagination: true,   // 是否显示分页（*）
+                    pageNumber: 1,      // 初始化加载第一页，默认第一页
+                    pageSize: 5,         // 每页的记录行数（*） 
+                    pageList: [5,10, 25, 50],    // 可供选择的每页的行数（*）
+                    showSearch: false,   // 是否显示检索信息
+                    showRefresh: true, // 是否显示刷新按钮
+                    showColumns: false, // 是否显示隐藏某列下拉框
+                    showToggle: false,   // 是否显示详细视图和列表视图的切换按钮
+                    showFooter : false,
+                    modalName: "任务",
+    		        showExport: true,
+    		        uniqueId : "taskAuditId",
+                    columns: [
+    				{
+    					field : 'taskAuditId', 
+    					visible: false
+    				},
+    				{
+    					field : 'taskRecordId', 
+    					visible: false
+    				},
+					{
+					    checkbox: true
+					},
+                    {
+    		            title: '操作',
+    		            align: 'center',
+    		            formatter: function(value, row, index) {
+    		                var actions = [];
+    		                if(row.task.taskFlag=='6'){//变更审核
+    		                	actions.push('<a class="btn btn-warning btn-xs" href="#" onclick="alterDetail(\'' + row.taskRecordId + '\')"><i class="fa fa-search"></i>变更详情</a> ');
+    		                	actions.push('<a class="btn btn-primary btn-xs" href="#" onclick="auditPass(\'' + row.taskRecordId + '\',\'alter\')"><i class="fa fa-plus"></i>同意变更</a> ');
+    		                }
+    		                if(row.task.taskFlag=='3'){//任务提交审核
+    		                	actions.push('<a class="btn btn-primary btn-xs" href="#" onclick="auditPass(\'' + row.taskRecordId + '\',\'submit\')"><i class="fa fa-plus"></i>通过</a> ');
+    		                }
+    		                if(row.taskFlag=='5'){//返工原因
+	    		                actions.push('<a class="btn btn-danger btn-xs" href="#" onclick="reworkDetail(\'' + row.taskRecordId + '\')"><i class="fa fa-search"></i>返工详情</a> ');
+    		                }
+    		                return actions.join('');
+    		            }
+    		        },
+    				{
+    					field : 'taskId', 
+    					align: 'center',
+    					title : '任务编号',
+    		            formatter: function(value, row, index) {
+    		            	var actions = [];
+    		                if(row.task.taskFlag=='6'){//变更审核
+    		                	actions.push('<a href="#"  onclick="$.operate.auditFull(\'' + row.taskRecordId + '\',\'alter\')">' + value + '</a>');
+    		                }else if(row.task.taskFlag=='3'){//任务提交审核
+    		                	actions.push('<a href="#"  onclick="$.operate.auditFull(\'' + row.taskRecordId + '\',\'submit\')">' + value + '</a>');
+    		                }else{
+    		                	actions.push('<a href="#"  onclick="$.operate.detailFull(\'' + row.taskRecordId + '\')">' + value + '</a>');
+    		                }
+    		                return actions.join('');
+    		            }
+    				},
+    				{
+    					field : 'auditType', 
+    					align: 'center',
+    					title : '审核类型',
+    					formatter: function(value, row, index) {
+    						return $.table.selectDictLabel(auditTypes, value);
+    		            }
+    				},
+    				{
+    					field : 'task.taskFlag',
+    					align: 'center',
+    					title : '任务状态',
+    					formatter: function(value, row, index) {
+    						return $.table.selectDictLabel(flags, value);
+    		            }
+    				},
+    				{
+    					field : 'auditFlag',
+    					align: 'center',
+    					title : '审核状态',
+    					formatter: function(value, row, index) {
+    						return $.table.selectDictLabel(auditFlags, value);
+    		            }
+    				},
+    				{
+    					field : 'launchUserName', 
+    					align: 'center',
+    					title : '发起人'
+    				},
+    				{
+    					field : 'launchTime',
+    					align: 'center',
+    					title : '发起时间',
+    					sortable: true,
+    		            formatter: function(value, row, index) {
+    						return value;
+    		            }
+    				},
+    				{
+    					field : 'auditTime', 
+    					align: 'center',
+    					title : '审核时间',
+    					sortable: true,
+    		            formatter: function(value, row, index) {
+    						return value;
+    		            }
+    				}]
+            };
+            $.table.init(options);
+        });
+        //驳回
+        function auditRefuse(){
+        	var rows = $.table.selectColumns("taskRecordId");
+    		$.modal.confirm("确认要驳回选中的" + rows.length + "条记录吗?", function() {
+	    		//submit 提交审批1  alter 变更审批2
+    			layer.prompt({
+    				formType: 2,
+    				value: '',
+    				title: '请输入驳回原因'
+    				//area: ['800px', '350px'] //自定义文本域宽高
+    				}, function(value, index, elem){
+	        			var url = $.table._option.auditUrl;
+	        			var data = { "taskRecordId": rows.join(','),"auditFlag" : 0 ,"params[auditTypeText]" : "0" ,"remark":value};
+	            		$.post(url,data,function(result){
+	            			$.operate.ajaxSuccess(result);
+	            		});
+    			});
+	    		
+    		}); 
+        }
+        
+        //审核通过
+        function auditPass(taskRecordId,auditType){
+        	var rows = [];
+        	if($.common.isEmpty(taskRecordId)){
+        		rows = $.table.selectColumns($.table._option.uniqueId);
+        	}else{
+        		rows.push(taskRecordId);
+        	}
+    		if (rows.length == 0) {
+    			$.modal.alertWarning("请至少选择一条记录");
+    			return;
+    		}
+    		$("#task-submit-form input[name=taskRecordId]").val(taskRecordId);
+    		$("#task-alter-form input[name=taskRecordId]").val(taskRecordId);
+    		$.modal.openDiv("审批", "#"+auditType+"Dlg");
+    		
+        }
+        //审核方法
+    	function audit(auditType){
+    		var auditHours = $("#auditHours").val();
+    		if(auditType=="submit"){
+    			if($.common.isEmpty(auditHours) || !$.common.isNumber(auditHours)){
+    				$.modal.tips("#auditHours","审核工时不能为空,且只能输入正整数");
+    				return;
+    			}
+    		}
+    		$.post(prefix+"/batchAudit",$("#task-"+auditType+"-form").serialize(),function(result){
+    			$.modal.closeAll();
+    			$.operate.ajaxSuccess(result);
+    		});
+    	}
+        function reset(){
+			$("#task-audit-form")[0].reset();
+			$('#deptInput').val("").trigger('change');
+			$('#userInput').val("").trigger('change');
+		    $('#taskFlag').val("").trigger('change');
+		}
+        function alterDetail(taskRecordId){
+    		$.post(prefix+"/alterDetail",{"taskRecordId":taskRecordId},function(result){
+    			$("#task-alterDetail-form").find("input[name=dealUserName]").val(result.data.alterUserName);
+    			$("#task-alterDetail-form").find("textarea[name=remark]").val(result.data.remark);
+	    		$.modal.openDiv("指派", "#detailDiv");
+    		},"json");
+        }
+        function reworkDetail(taskRecordId){
+    		$.post(prefix+"/reworkDetail",{"taskRecordId":taskRecordId},function(result){
+    			$("#task-reworkDetail-form").find("input[name=auditUserName]").val(result.data.auditUserName);
+    			$("#task-reworkDetail-form").find("textarea[name=remark]").val(result.data.remark);
+	    		$.modal.openDiv("指派", "#reworkDiv");
+    		},"json");
+        }
+    	function cancelAudit(auditType){
+    		$("#task-"+auditType+"-form")[0].reset();
+    		$.modal.closeAll();
+    	}
+    </script>
+</body>
+<div class="col-sm-12 search-collapse" id="detailDiv" style="display: none;">
+	<form id="task-alterDetail-form" class="form-horizontal">					
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">处理人：</label>
+			<div class="col-sm-9" >
+				<input type="text" name="dealUserName" class="form-control" readonly="readonly">
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">备注：</label>
+			<div class="col-sm-9" >
+				<textarea name="remark" rows="5" class="form-control" readonly="readonly"></textarea>
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+<div class="col-sm-12 search-collapse" id="submitDlg" style="display: none;">
+	<form id="task-submit-form" class="form-horizontal">					
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">审核工时：</label>
+			<div class="col-sm-9" >
+				<input type="hidden" name="params[auditTypeText]" value="submit"/>
+				<input type="hidden" name="auditFlag" value="1"/>
+				<input type="hidden" name="taskRecordId"/>
+				<input type="text" name="params[auditHours]" id="auditHours" class="form-control">
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">备注：</label>
+			<div class="col-sm-9" >
+				<textarea name="remark" rows="5" class="form-control"></textarea>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6 ">
+		<div class="form-group draggable">
+			<div class="col-sm-12">
+				<a class="btn btn-primary btn-rounded btn-sm" onclick="audit('submit')"><i class="fa fa-search"></i>&nbsp;保存</a>
+	    		<a class="btn btn-warning btn-rounded btn-sm" onclick="cancelAudit('submit');"><i class="fa fa-refresh"></i>&nbsp;取消</a>
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+<div class="col-sm-12 search-collapse" id="alterDlg" style="display: none;">
+	<form id="task-alter-form" class="form-horizontal">					
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">备注：</label>
+			<div class="col-sm-9" >
+				<input type="hidden" name="params[auditTypeText]" value="alter"/>
+				<input type="hidden" name="taskRecordId"/>
+				<input type="hidden" name="auditFlag" value="1"/>
+				<textarea name="remark" rows="5" class="form-control"></textarea>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6 ">
+		<div class="form-group draggable">
+			<div class="col-sm-12">
+				<a class="btn btn-primary btn-rounded btn-sm" onclick="audit('alter')"><i class="fa fa-search"></i>&nbsp;保存</a>
+	    		<a class="btn btn-warning btn-rounded btn-sm" onclick="cancelAudit('alter');"><i class="fa fa-refresh"></i>&nbsp;取消</a>
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+<div class="col-sm-12 search-collapse" id="reworkDiv" style="display: none;">
+	<form id="task-reworkDetail-form" class="form-horizontal">					
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">审核人：</label>
+			<div class="col-sm-9" >
+				<input type="text" name="auditUserName" class="form-control" readonly="readonly">
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">返工原因：</label>
+			<div class="col-sm-9" >
+				<textarea name="remark" rows="5" class="form-control" readonly="readonly"></textarea>
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+</html>

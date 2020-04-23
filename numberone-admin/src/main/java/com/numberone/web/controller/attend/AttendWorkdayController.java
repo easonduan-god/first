@@ -50,10 +50,9 @@ public class AttendWorkdayController extends BaseController
     }
     /**
      * 查询工作日列表
-     * @param: @param empAttendday
-     * @param: @return 参数说明
-     * @return: TableDataInfo 返回类型
-     * @throws
+     * @param: @param empNonworkday
+     * @param: @return
+     * @return: TableDataInfo
      */
     @RequiresPermissions("attend:workday:list")
     @PostMapping("/list")
@@ -66,11 +65,9 @@ public class AttendWorkdayController extends BaseController
         return getDataTable(list);
     }
     /**
-     * 新增
-     * @param: @param mmap
-     * @param: @return 参数说明
-     * @return: String 返回类型
-     * @throws
+     * 新增页面
+     * @param: @return
+     * @return: String
      */
     @GetMapping("/add")
     public String add()
@@ -79,7 +76,23 @@ public class AttendWorkdayController extends BaseController
         return prefix + "/add";
     }
     /**
+     * 批量删除
+     * @param: @return
+     * @return: String
+     */
+    @PostMapping("/remove")
+    @RequiresPermissions("attend:workday:list")
+    @Transactional(rollbackFor = Exception.class)
+    @ResponseBody
+    public AjaxResult remove(String ids)
+    {
+    	return toAjax(attendWorkdayService.deleteWorkdayByIds(ids));
+    }
+    /**
      * 新增保存
+     * @param: @param empNonworkday
+     * @param: @return
+     * @return: AjaxResult
      */
     @Log(title = "日程管理", businessType = BusinessType.INSERT)
     @PostMapping("/add")
@@ -92,12 +105,11 @@ public class AttendWorkdayController extends BaseController
     }
     
     /**
-     * 修改日程
-     * @param: @param userId
+     * 修改日程页面
+     * @param: @param id
      * @param: @param mmap
-     * @param: @return 参数说明
-     * @return: String 返回类型
-     * @throws
+     * @param: @return
+     * @return: String
      */
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable("id") String id, ModelMap mmap)
@@ -109,11 +121,10 @@ public class AttendWorkdayController extends BaseController
     }
 
     /**
-     * 保存修改日程
-     * @param: @param user
-     * @param: @return 参数说明
-     * @return: AjaxResult 返回类型
-     * @throws
+     * 
+     * @param: @param empNonworkday
+     * @param: @return
+     * @return: AjaxResult
      */
     @Log(title = "日程管理", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
@@ -124,23 +135,12 @@ public class AttendWorkdayController extends BaseController
         return toAjax(attendWorkdayService.updateWorkday(empNonworkday));
     }
     
-    @Log(title = "日程管理", businessType = BusinessType.DELETE)
-    @PostMapping("/remove")
-    @ResponseBody
-    public AjaxResult remove(String ids)
-    {
-        try
-        {
-            return toAjax(attendWorkdayService.deleteWorkdayByIds(ids));
-        }
-        catch (Exception e)
-        {
-            return error(e.getMessage());
-        }
-    }
     
     /**
      * 校验日程唯一
+     * @param: @param workdate
+     * @param: @return
+     * @return: String
      */
     @PostMapping("/checkWorkdateUnique")
     @ResponseBody
@@ -151,6 +151,9 @@ public class AttendWorkdayController extends BaseController
     
     /**
      * 更新时校验日程唯一
+     * @param: @param empNonworkday
+     * @param: @return
+     * @return: String
      */
     @PostMapping("/checkWorkdateUniqueForUpdate")
     @ResponseBody
@@ -161,6 +164,9 @@ public class AttendWorkdayController extends BaseController
     
     /**
      * 查询时间日程
+     * @param: @param workdate
+     * @param: @return
+     * @return: Map<String,String>
      */
     @PostMapping("/dateJson")
     @ResponseBody

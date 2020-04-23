@@ -1,0 +1,201 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+
+
+							<li>
+								开始日期：<input type="text" id="startDate" name="startDate"/>
+							</li>
+
+							<li>
+								结束日期：<input type="text" id="endDate" name="endDate"/>
+							</li>
+
+							<li>
+								主          题：<input type="text" name="theme"/>
+							</li>
+
+
+							<li>
+								审核状态：<select id="auditFlag" name="auditFlag " th:with="type=${@dict.getType('emp_attend_audit_flag')}">
+									<option value="">所有</option>
+				                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+				                </select>
+							</li>
+							<li>
+								完成状态：<select id="completeFlag" name="completeFlag" th:with="type=${@dict.getType('emp_attend_complete_flag')}">
+									<option value="">所有</option>
+				                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+				                </select>
+							</li>
+
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="attend:attendBill:mine">
+						<i class="fa fa-download"></i> 导出
+				 </a>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var detailFlag = [[${@permission.hasPermi('attend:attendBill:mine')}]];
+        var traceFlag = [[${@permission.hasPermi('attend:attendBill:mine')}]];
+        var removeFlag = [[${@permission.hasPermi('attend:attendBill:mine')}]];
+        var prefix = ctx + "attend/attendBill";
+		var auditFlags = [[${@dict.getType('emp_attend_audit_flag')}]];
+        var completeFlags = [[${@dict.getType('emp_attend_complete_flag')}]];
+        var offsets = [[${@dict.getType('emp_attend_is_offet')}]];
+        $(function() {
+        	
+            var options = {
+                url: prefix + "/mineList",
+				exportUrl: prefix + "/export",
+				detailUrl: prefix + "/detailMine/{id}",
+				traceUrl: prefix + "/trace/{id}",
+				removeUrl: prefix + "/removeMine/{id}",
+                modalName: "考勤申请单",
+				search: false,
+		        showExport: true,
+                columns: [
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-primary btn-xs ' + detailFlag + '" href="#" onclick="$.operate.detailFull(\'' + row.attendBillId + '\')"><i class="fa fa-edit"></i>详情</a> ');
+                        actions.push(' <a class="btn btn-info btn-xs ' + traceFlag + '" href="#" onclick="$.operate.traceFull(\'' + row.attendBillId + '\')"><i class="fa fa-search"></i>追踪</a> ');
+                        /* actions.push(' <a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.attendBillId + '\')"><i class="fa fa-remove"></i>删除</a> '); */
+						return actions.join('');
+		            }
+		        },
+				{
+					field : 'theme', 
+					align: 'center',
+					title : '考勤单主题'
+				},
+				{
+					field : 'startDate', 
+					title : '开始日期',
+					align: 'center',
+					sortable: true,
+		            formatter: function(value, row, index) {
+						return value.split(' ')[0];
+		            }
+				},
+				{
+					field : 'endDate', 
+					title : '结束日期',
+					align: 'center',
+					sortable: true,
+		            formatter: function(value, row, index) {
+						return value.split(' ')[0];
+		            }
+				},
+				{
+					field : 'applyWorkdays', 
+					title : '申请天数（工作日）',
+					align: 'center',
+					sortable: true
+				},
+				{
+					field : 'applyWorkdays', 
+					title : '实际申请天数',
+					align: 'center',
+					sortable: true
+				},
+				{
+					field : 'matter', 
+					align: 'center',
+					title : '事由'
+				},
+				{
+					field : 'isOffet', 
+					align: 'center',
+					title : '是否销假',//(0否 1是)
+					formatter: function(value, row, index) {
+						return $.table.selectDictLabel(offsets, value);
+		            }
+				},
+				{
+					field : 'completeFlag', 
+					align: 'center',
+					title : '完成状态',//(0未完成 1已完成)
+					formatter: function(value, row, index) {
+						return $.table.selectDictLabel(completeFlags, value);
+		            }
+				},
+				{
+					field : 'auditFlag', 
+					align: 'center',
+					title : '审核状态',//请查询字典表，这样比较优雅 (0未审核 1审核中 2审核不通过 3审核已通过)
+					formatter: function(value, row, index) {
+						return $.table.selectDictLabel(auditFlags, value);
+		            }
+				}]
+            };
+            $.table.init(options);
+            
+            /* 时间选择插件 */
+	        layui.use('laydate', function() {
+			    var laydate = layui.laydate;
+			    var startDate = laydate.render({
+			    	elem: '#startDate',
+			    	theme: 'molv',
+			    	trigger: 'click',
+			    	done: function(value, date) {
+			    		// 结束时间大于开始时间
+			    		if (value !== '') {
+			    			endDate.config.min.year = date.year;
+			    			endDate.config.min.month = date.month - 1;
+			    			endDate.config.min.date = date.date;
+			    		} else {
+			    			endDate.config.min.year = '';
+			    			endDate.config.min.month = '';
+			    			endDate.config.min.date = '';
+			    		}
+			    	}
+			    });
+			    var endDate = laydate.render({
+			    	elem: '#endDate',
+			    	theme: 'molv',
+			    	trigger: 'click',
+			    	done: function(value, date) {
+			    		// 开始时间小于结束时间
+			    		if (value !== '') {
+			    			startDate.config.max.year = date.year;
+			    			startDate.config.max.month = date.month - 1;
+			    			startDate.config.max.date = date.date;
+			    		} else {
+			    			startDate.config.max.year = '';
+			    			startDate.config.max.month = '';
+			    			startDate.config.max.date = '';
+			    		}
+			    	}
+			    });
+			});
+        });
+        
+    </script>
+</body>
+</html>

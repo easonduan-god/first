@@ -1,6 +1,7 @@
 package com.numberone.framework.web.service;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,10 @@ public class DictService
     	if("admin".equals(ShiroUtils.getLoginName())){
     		return getType(dictType);
     	}
+    	String keys = ShiroUtils.getSysUser().getRolesKey();
+		if("ceo".equals(keys) || "hr".equals(keys) ){
+			return getType(dictType);
+		}
     	SysDictData sysDictData = new SysDictData();
     	sysDictData.setDictType(dictType);
     	sysDictData.getParams().put("userId", ShiroUtils.getUserId());

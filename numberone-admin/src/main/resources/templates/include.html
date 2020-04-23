@@ -43,6 +43,14 @@
 	<script th:src="@{/ajax/libs/oaui/layui/layui.js}"></script>
 	<script th:src="@{/numberone/js/common.js?v=3.2.0}"></script>
 	<script th:src="@{/numberone/js/ry-ui.js?v=3.2.0}"></script>
+	
+	<!-- 复制到剪切板插件 -->
+	<script th:src="@{/ajax/libs/clipboard.js}"></script>
+	
 	<!-- <script src="http://tajs.qq.com/stats?sId=62048022"></script> -->
-	<script th:inline="javascript"> var ctx = [[@{/}]]; </script>
+	<script th:inline="javascript"> 
+		var ctx = [[@{/}]]; 
+		var currDate = [[${#dates.format(new java.util.Date().getTime(), 'yyyy-MM-dd')}]]
+		var currDateTime = [[${#dates.format(new java.util.Date().getTime(), 'yyyy-MM-dd hh:mm:ss')}]]
+	</script>
 </div>

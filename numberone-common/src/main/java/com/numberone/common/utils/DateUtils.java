@@ -22,6 +22,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     public static String YYYY = "yyyy";
 
     public static String YYYY_MM = "yyyy-MM";
+    public static String YYYYMMDD = "yyyyMMdd";
 
     public static String YYYY_MM_DD = "yyyy-MM-dd";
 
@@ -180,9 +181,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
     /**
      * 计算两个时间差,返回天数
-     * @param: @param empAttendAudit
-     * @param: @return 参数说明
-     * @return List<EmpAttendAudit> 返回类型
+     * @param: @param startDate
+     * @param: @param endDate
+     * @param: @return
+     * @return: double
      */
     public static double getDateIntervalInDays(Date startDate, Date endDate)
     {
@@ -190,16 +192,16 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     	// 获得两个时间的毫秒时间差异
     	long diff = endDate.getTime() - startDate.getTime();
     	// 计算差多少天
-        long day = diff / nd;
+        double day = diff*1.0 / nd;
     	// 计算差多少分钟
     	return day;
     }
     /**
      * 获取24小时制的小时数以及分钟数，并转换为以小时为单位的数值类型
      * eg：2020-02-01 13:32:21 to 13.53
-     * @param: @param empAttendAudit
-     * @param: @return 参数说明
-     * @return List<EmpAttendAudit> 返回类型
+     * @param: @param date
+     * @param: @return
+     * @return: double
      */
     public static double getHourAndMminutesDoubleValue(Date date){
     	long hours = DateUtils.getFragmentInHours(date, Calendar.DAY_OF_YEAR);
@@ -209,9 +211,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     
     /**
      * 获取周围时间
-     * @param: @param empAttendAudit
-     * @param: @return 参数说明
-     * @return List<EmpAttendAudit> 返回类型
+     * @param: @param date
+     * @param: @param amount
+     * @param: @return
+     * @return: Date
      */
     public static Date getAroundDate(Date date,int amount){
     	if(date!=null){
@@ -223,9 +226,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
     /**
      * 获取星期
-     * @param: @param empAttendAudit
-     * @param: @return 参数说明
-     * @return List<EmpAttendAudit> 返回类型
+     * @param: @param attendDate
+     * @param: @return
+     * @return: Integer
      */
 	public static Integer dayOfWeek(Date attendDate) {
 		Calendar calendar = initCalendar(attendDate);
@@ -239,9 +242,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 	}
 	/**
 	 * 截取日期
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @param date
+	 * @param: @return
+	 * @return: Date
 	 */
 	public static Date getOnlyDate(Date date){
 		SimpleDateFormat format = new SimpleDateFormat(YYYY_MM_DD);
@@ -254,9 +257,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 	}
 	/**
 	 * 按指定格式解析日期 并返回解析后的日期
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @param date
+	 * @param: @param formatStr
+	 * @param: @return
+	 * @return: Date
 	 */
 	public static Date formatDateToDate(Date date,String formatStr){
 		SimpleDateFormat format = new SimpleDateFormat(formatStr);
@@ -270,9 +274,12 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 	
 	/**
 	 * 获取指定日期的指定时间
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @param date
+	 * @param: @param hourOfDay
+	 * @param: @param minute
+	 * @param: @param second
+	 * @param: @return
+	 * @return: Date
 	 */
 	public static Date getDateSomeTime(Date date, int hourOfDay, int minute, int second){
 		Calendar calendar = initCalendar(date);
@@ -282,9 +289,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 	
 	/**
 	 * 获取当前上班时间
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @return
+	 * @return: Date
 	 */
 	public static Date getGoWorkTime(){
 		Date date = getNowDate();
@@ -295,9 +301,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 	
 	/**
 	 * 获取当前下班时间
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @return
+	 * @return: Date
 	 */
 	public static Date getOffWorkTime(){
 		Date date = getNowDate();
@@ -306,9 +311,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 	}
 	/**
 	 * 当前日期是周末
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @param date
+	 * @param: @return
+	 * @return: Boolean
 	 */
 	public static Boolean isWeekend(Date date){
 		Boolean isWeekend = false;
@@ -322,9 +327,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 	
 	/**
 	 * 将一段日期区间拆分为有区间内每一天组成的map
-	 * @param: @param empAttendAudit
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @param startDate
+	 * @param: @param endDate
+	 * @param: @return
+	 * @return: List<String>
 	 */
 	public static List<String> splitDate(Date startDate,Date endDate){
 		//获取两个日期的间隔天数

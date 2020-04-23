@@ -8,6 +8,9 @@ layer.config({
 });
 
 $(function() {
+	$('#side-menu')[0].addEventListener('touchmove', function(){console.info(1)}, { passive: false })
+	$('#page-wrapper')[0].addEventListener('touchmove', function(){console.info(1)}, { passive: false })
+	
     // MetsiMenu
     $('#side-menu').metisMenu();
 
@@ -244,7 +247,16 @@ $(function() {
     }
 
     $('.menuItem').on('click', menuItem);
-
+    
+    //200403 点击鼠标中键 关闭当前选项卡
+	$('.menuTabs').on('mousedown', '.menuTab', middleMouseDownCloseTab);
+    //200403 点击鼠标中键 关闭当前选项卡
+    function middleMouseDownCloseTab(event){
+		if (event.button == 1) {
+			$(this).find('i').trigger('click');//当点击鼠标中键后，触发x按钮的点击关闭事件
+		}
+    }
+    
     // 关闭选项卡菜单
     function closeTab() {
         var closeTabId = $(this).parents('.menuTab').data('id');

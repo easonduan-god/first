@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.emp.mapper.EmpOvertimeBillMapper">
+    
+    <resultMap type="EmpOvertimeBill" id="EmpOvertimeBillResult">
+        <result property="overtimeBillId"    column="overtime_bill_id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="theme"    column="theme"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="applyDate"    column="apply_date"    />
+        <result property="startDate"    column="start_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="workPersons"    column="work_persons"    />
+        <result property="workPersonNames"    column="work_person_names"    />
+        <result property="applyWorktimes"    column="apply_worktimes"    />
+        <result property="matter"    column="matter"    />
+        <result property="completeFlag"    column="complete_flag"    />
+        <result property="auditFlag"    column="audit_flag"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+	
+	<sql id="selectEmpOvertimeBillVo">
+        select overtime_bill_id, emp_id, user_id, theme, dept_name, dept_id, user_name, apply_date, start_date, end_date, work_persons, work_person_names, apply_worktimes, matter, complete_flag, audit_flag, del_flag from emp_overtime_bill
+    </sql>
+	
+    <select id="selectEmpOvertimeBillList" parameterType="EmpOvertimeBill" resultMap="EmpOvertimeBillResult">
+        <include refid="selectEmpOvertimeBillVo"/>
+        <where>  
+            <if test="overtimeBillId != null  and overtimeBillId != '' "> and overtime_bill_id = #{overtimeBillId}</if>
+             <if test="empId != null  and empId != '' "> and emp_id = #{empId}</if>
+             <if test="userId != null "> and user_id = #{userId}</if>
+             <if test="theme != null  and theme != '' "> and theme = #{theme}</if>
+             <if test="deptName != null  and deptName != '' "> and dept_name = #{deptName}</if>
+             <if test="deptId != null "> and dept_id = #{deptId}</if>
+             <if test="userName != null  and userName != '' "> and user_name = #{userName}</if>
+             <if test="applyDate != null "> and apply_date = #{applyDate}</if>
+             <if test="startDate != null "> and start_date = #{startDate}</if>
+             <if test="endDate != null "> and end_date = #{endDate}</if>
+             <if test="workPersons != null  and workPersons != '' "> and workPersons = #{workPersons}</if>
+             <if test="applyWorktimes != null "> and apply_worktimes = #{applyWorktimes}</if>
+             <if test="matter != null  and matter != '' "> and matter = #{matter}</if>
+             <if test="completeFlag != null "> and complete_flag = #{completeFlag}</if>
+             <if test="auditFlag != null "> and audit_flag = #{auditFlag}</if>
+             <if test="delFlag != null "> and del_flag = #{delFlag}</if>
+         </where>
+    </select>
+    
+    <select id="selectEmpOvertimeBillById" parameterType="String" resultMap="EmpOvertimeBillResult">
+        <include refid="selectEmpOvertimeBillVo"/>
+        where overtime_bill_id = #{overtimeBillId}
+    </select>
+        
+    <insert id="insertEmpOvertimeBill" parameterType="EmpOvertimeBill">
+        insert into emp_overtime_bill
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="overtimeBillId != null  and overtimeBillId != ''  ">overtime_bill_id,</if>
+			<if test="empId != null  and empId != ''  ">emp_id,</if>
+			<if test="userId != null  ">user_id,</if>
+			<if test="theme != null  and theme != ''  ">theme,</if>
+			<if test="deptName != null  and deptName != ''  ">dept_name,</if>
+			<if test="deptId != null  ">dept_id,</if>
+			<if test="userName != null  and userName != ''  ">user_name,</if>
+			<if test="applyDate != null  ">apply_date,</if>
+			<if test="startDate != null  ">start_date,</if>
+			<if test="endDate != null  ">end_date,</if>
+			<if test="workPersonNames != null  and workPersonNames != ''  ">work_person_names,</if>
+			<if test="workPersons != null  and workPersons != ''  ">work_persons,</if>
+			<if test="applyWorktimes != null  ">apply_worktimes,</if>
+			<if test="matter != null  and matter != ''  ">matter,</if>
+			<if test="completeFlag != null  ">complete_flag,</if>
+			<if test="auditFlag != null  ">audit_flag,</if>
+			<if test="delFlag != null  ">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="overtimeBillId != null  and overtimeBillId != ''  ">#{overtimeBillId},</if>
+			<if test="empId != null  and empId != ''  ">#{empId},</if>
+			<if test="userId != null  ">#{userId},</if>
+			<if test="theme != null  and theme != ''  ">#{theme},</if>
+			<if test="deptName != null  and deptName != ''  ">#{deptName},</if>
+			<if test="deptId != null  ">#{deptId},</if>
+			<if test="userName != null  and userName != ''  ">#{userName},</if>
+			<if test="applyDate != null  ">#{applyDate},</if>
+			<if test="startDate != null  ">#{startDate},</if>
+			<if test="endDate != null  ">#{endDate},</if>
+			<if test="workPersonNames != null  and workPersonNames != ''  ">#{workPersonNames},</if>
+			<if test="workPersons != null  and workPersons != ''  ">#{workPersons},</if>
+			<if test="applyWorktimes != null  ">#{applyWorktimes},</if>
+			<if test="matter != null  and matter != ''  ">#{matter},</if>
+			<if test="completeFlag != null  ">#{completeFlag},</if>
+			<if test="auditFlag != null  ">#{auditFlag},</if>
+			<if test="delFlag != null  ">#{delFlag},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateEmpOvertimeBill" parameterType="EmpOvertimeBill">
+        update emp_overtime_bill
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="empId != null  and empId != ''  ">emp_id = #{empId},</if>
+            <if test="userId != null  ">user_id = #{userId},</if>
+            <if test="theme != null  and theme != ''  ">theme = #{theme},</if>
+            <if test="deptName != null  and deptName != ''  ">dept_name = #{deptName},</if>
+            <if test="deptId != null  ">dept_id = #{deptId},</if>
+            <if test="userName != null  and userName != ''  ">user_name = #{userName},</if>
+            <if test="applyDate != null  ">apply_date = #{applyDate},</if>
+            <if test="startDate != null  ">start_date = #{startDate},</if>
+            <if test="endDate != null  ">end_date = #{endDate},</if>
+            <if test="workPersonNames != null  and workPersonNames != ''  ">work_person_names = #{workPersonNames},</if>
+            <if test="workPersons != null  and workPersons != ''  ">work_persons = #{workPersons},</if>
+            <if test="applyWorktimes != null  ">apply_worktimes = #{applyWorktimes},</if>
+            <if test="matter != null  and matter != ''  ">matter = #{matter},</if>
+            <if test="completeFlag != null  ">complete_flag = #{completeFlag},</if>
+            <if test="auditFlag != null  ">audit_flag = #{auditFlag},</if>
+            <if test="delFlag != null  ">del_flag = #{delFlag},</if>
+        </trim>
+        where overtime_bill_id = #{overtimeBillId}
+    </update>
+
+	<delete id="deleteEmpOvertimeBillById" parameterType="String">
+        delete from emp_overtime_bill where overtime_bill_id = #{overtimeBillId}
+    </delete>
+	
+    <delete id="deleteEmpOvertimeBillByIds" parameterType="String">
+        delete from emp_overtime_bill where overtime_bill_id in 
+        <foreach item="overtimeBillId" collection="array" open="(" separator="," close=")">
+            #{overtimeBillId}
+        </foreach>
+    </delete>
+    <!-- 据id数组和startDate查询延时工作单数量 -->
+    <select id="selectOvertimeBillCountByUserIdsAndStartDate" resultType="int">
+		select count(1) 
+		from emp_overtime_bill ob join emp_overtime_user ou
+		on ob.overtime_bill_id = ou.overtime_bill_id 
+		where 1=1
+		and date_format(ob.start_date,'%y%m%d') = date_format(#{startDate},'%y%m%d')
+		and ou.user_id in
+		<foreach item="userId" collection="userIds" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </select>
+    <!-- 根据userid和开始时间查询延时工单数 -->
+    <select id="selectOvertimeBillCountByUserIdAndStartDate" resultType="int">
+		select count(1) 
+		from emp_overtime_bill ob join emp_overtime_user ou
+		on ob.overtime_bill_id = ou.overtime_bill_id 
+		where 1=1
+		and date_format(ob.start_date,'%y%m%d') = date_format(#{startDate},'%y%m%d')
+		and ou.user_id = #{userId}
+    </select>
+    
+    <!-- 查询usernames，依据userids，延时工单开始时间查询延时工单，已得到相关username -->
+    <select id="selectUsernamesByUserIdsAndStartDate" resultType="string">
+		select distinct u.user_name
+		from emp_overtime_bill ob join emp_overtime_user ou
+		on ob.overtime_bill_id = ou.overtime_bill_id 
+		join sys_user u
+		on ou.user_id = u.user_id
+		where 1=1
+		and date_format(ob.start_date,'%y%m%d') = date_format(#{startDate},'%y%m%d')
+		and ou.user_id in
+		<foreach item="userId" collection="userIds" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </select>
+    
+    <!-- 关联中间表 overtime_user -->
+    <insert id="relateMiddleTable">
+    	insert into emp_overtime_user(overtime_bill_id,user_id)
+    	<foreach item="userId" collection="userIds" open=" " separator="union all" close=" ">
+	    	 select #{overtimeBillId},#{userId} from dual 
+        </foreach>
+    </insert>
+    
+    <!-- 查询我的延时工单 包括我发起，或者我参与 -->
+	<select id="selectOvertimeBillOfMine" parameterType="EmpOvertimeBill" resultMap="EmpOvertimeBillResult">
+        <include refid="selectEmpOvertimeBillVo"/>
+		<where>
+			<if test="params.queryType == 'launch'">
+				AND user_id = #{userId}
+			</if>
+			<if test="params.queryType == 'part'">
+				AND overtime_bill_id in (select overtime_bill_id from emp_overtime_bill where user_id = #{userId}) 
+			</if>
+			
+			<if test="theme != null  and theme != '' "> and theme like concat('%',#{theme},'%')</if>
+			<!-- 交集  startDate <= end_date or end_date >= start_date -->
+			<if test="startDate != null and endDate != null">
+					AND NOT (
+						date_format(end_date,'%y%m%d') &lt; date_format(#{startDate},'%y%m%d')
+						OR date_format(start_date,'%y%m%d') &gt; date_format(#{endDate},'%y%m%d')
+					)
+			</if>
+			<if test="startDate != null and endDate == null"><!-- 开始日期检索小于申请单结束日期   &gt;大于-->
+				AND date_format(end_date,'%y%m%d') &gt;= date_format(#{startDate},'%y%m%d')
+			</if>
+			<if test="endDate != null and startDate == null"><!-- 结束日期检索大于申请单开始日期  &lt;小于 -->
+				AND date_format(start_date,'%y%m%d') &lt;= date_format(#{endDate},'%y%m%d')
+			</if>
+			<if test="completeFlag != null "> and complete_flag = #{completeFlag}</if>
+			<if test="auditFlag != null "> and audit_flag = #{auditFlag}</if>
+         </where>
+    </select>
+	<!-- 我的延时工单详情 只能查看自己发起或参与延时工单/交由自己审核的延时工单详情 管理员除外-->
+	 <select id="selectByIdAndRelationMine"  resultMap="EmpOvertimeBillResult">
+		<include refid="selectEmpOvertimeBillVo" />
+		where overtime_bill_id = #{overtimeBillId}
+		and (
+		 user_id = #{userId}
+		 or AND overtime_bill_id in (select overtime_bill_id from emp_overtime_bill where user_id = #{userId})
+		 or user_id in 
+		 (select audit_user_id from emp_overtime_audit where  overtime_bill_id = #{overtimeBillId})
+		)
+	 </select>
+	 
+	<!-- 查询审核是否结束 完成状态是否为已完成 -->
+	 <select id="selectOvertimeAuditIsEnd" parameterType="String" resultType="int">
+	 	select count(1) from emp_overtime_bill
+	 	where del_flag = 0
+	 	and overtime_bill_id = #{overtimeBillId}
+	 	and complete_flag = 1
+	 </select>
+</mapper>

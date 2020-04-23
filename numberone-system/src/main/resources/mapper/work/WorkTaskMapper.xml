@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.work.mapper.WorkTaskMapper">
+    
+    <resultMap type="WorkTask" id="WorkTaskResult">
+        <result property="taskRecordId"    column="task_record_id"    />
+        <result property="taskId"    column="task_id"    />
+        <result property="taskTitle"    column="task_title"    />
+        <result property="taskFlag"    column="task_flag"    />
+        <result property="taskType"    column="task_type"    />
+        <result property="taskTypeText"    column="task_type_text" />
+        <result property="diffLevel"    column="diff_level"    />
+        <result property="priority"    column="priority"    />
+        <result property="planStartDate"    column="plan_start_date"    />
+        <result property="planEndDate"    column="plan_end_date"    />
+        <result property="realStartDate"    column="real_start_date"    />
+        <result property="realEndDate"    column="real_end_date"    />
+        <result property="planHours"    column="plan_hours"    />
+        <result property="dealHours"    column="deal_hours"    />
+        <result property="auditHours"    column="audit_hours"    />
+        <result property="taskDesc"    column="task_desc"    />
+        <result property="taskAppendix"    column="task_appendix"    />
+        <result property="dealDeptId"    column="deal_dept_id"    />
+        <result property="dealDeptName"    column="deal_dept_name"    />
+        <result property="createUserId"    column="create_user_id"    />
+        <result property="createEmpId"    column="create_emp_id"    />
+        <result property="createUserName"    column="create_user_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="dealUserId"    column="deal_user_id"    />
+        <result property="dealEmpId"    column="deal_emp_id"    />
+        <result property="dealUserName"    column="deal_user_name"    />
+        <result property="dealTime"    column="deal_time"    />
+        <result property="auditUserId"    column="audit_user_id"    />
+        <result property="auditEmpId"    column="audit_emp_id"    />
+        <result property="auditUserName"    column="audit_user_name"    />
+        <result property="auditTime"    column="audit_time"    />
+        <result property="delFlag"    column="del_flag"    />
+		<result property="taskPerformId"    column="task_perform_id"    />
+		<result property="taskAuditId"    column="task_audit_id"    />
+        <association property="appendix" column="task_appendix"  javaType="SysFileBean" resultMap="SysFileResult"></association>
+        <association property="workTaskPerform" column="task_perform_id"  javaType="WorkTaskPerform" resultMap="WorkTaskPerformResult"></association>
+    </resultMap>
+	<resultMap type="SysFileBean" id="SysFileResult">
+        <result property="fileId"    column="file_id"    />
+        <result property="originalFileName"    column="original_file_name"    />
+        <result property="filePath"    column="file_path"    />
+        <result property="fileSize"    column="file_size"    />
+    </resultMap>
+        <resultMap type="WorkTaskPerform" id="WorkTaskPerformResult">
+        <result property="taskPerformId"    column="task_perform_id"    />
+        <result property="taskRecordId"    column="task_record_id"    />
+        <result property="taskId"    column="task_id"    />
+        <result property="performUserId"    column="perform_user_id"    />
+        <result property="performEmpId"    column="perform_emp_id"    />
+        <result property="performTime"    column="perform_time"    />
+        <result property="dealDeptId"    column="deal_dept_id"    />
+        <result property="dealDeptName"    column="deal_dept_name"    />
+        <result property="alterUserId"    column="alter_user_id"    />
+        <result property="alterEmpId"    column="alter_emp_id"    />
+        <result property="alterTime"    column="alter_time"    />
+        <result property="dealDesc"    column="deal_desc"    />
+        <result property="performAppendix"    column="perform_appendix"    />
+        <result property="taskFlag"    column="task_flag"    />
+        <result property="alterPerformFlag"    column="alter_perform_flag"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+	<sql id="selectWorkTaskVo">
+        SELECT t.task_record_id, t.task_id, task_title, t.task_flag,(SELECT dict_label FROM sys_dict_data WHERE dict_type='work_task_type' AND dict_value=t.task_type) AS task_type_text, task_type, diff_level, 
+        priority, plan_start_date,real_start_date,real_end_date, plan_end_date, plan_hours, deal_hours, audit_hours, task_desc, 
+        task_appendix, t.deal_dept_id, t.deal_dept_name, create_user_id, create_emp_id, create_user_name, t.task_perform_id,t.task_audit_id,
+        create_time, deal_user_id, deal_emp_id, deal_user_name, deal_time, audit_user_id, audit_emp_id, 
+        audit_user_name, audit_time, t.del_flag, file_id, original_file_name,file_path,f.file_size,tp.remark
+        FROM work_task t 
+        LEFT JOIN sys_file f
+        ON t.task_appendix = f.file_id
+        LEFT JOIN (SELECT * FROM work_task_perform WHERE del_flag=0 AND alter_perform_flag=0) tp
+        ON t.task_record_id = tp.task_record_id
+    </sql>
+	
+    <select id="selectWorkTaskList" parameterType="WorkTask" resultMap="WorkTaskResult">
+        <include refid="selectWorkTaskVo"/>
+        where del_flag=0 
+        <if test="taskId != null  and taskId != '' "> and t.task_id = #{taskId}</if>
+        <if test="taskTitle != null  and taskTitle != '' "> and t.task_title like CONCAT('%',#{taskTitle},'%')</if>
+        <if test="taskFlag != null "> and t.task_flag = #{taskFlag}</if>
+        <if test="dealDeptId != null "> and t.deal_dept_id = #{dealDeptId}</if>
+        <if test="params != null">
+	        <if test="params.createStartDate != null and params.createStartDate != ''"><!-- 开始时间检索 -->
+				AND date_format(t.create_time,'%y%m%d') &gt;= date_format(#{params.createStartDate},'%y%m%d')
+			</if>
+			<if test="params.createEndDate != null and params.createEndDate != ''"><!-- 结束时间检索 -->
+				AND date_format(t.create_time,'%y%m%d') &lt;= date_format(#{params.createEndDate},'%y%m%d')
+			</if>
+			
+	        <if test="params.dealStartDate != null and params.dealStartDate != ''"><!-- 开始时间检索 -->
+				AND date_format(t.deal_time,'%y%m%d') &gt;= date_format(#{params.dealStartDate},'%y%m%d')
+			</if>
+			<if test="params.dealEndDate != null and params.dealEndDate != ''"><!-- 结束时间检索 -->
+				AND date_format(t.deal_time,'%y%m%d') &lt;= date_format(#{params.dealEndDate},'%y%m%d')
+			</if>
+	        <if test="params.userIds != null"> 
+		        and t.deal_user_id in
+				<foreach item="userId" collection="params.userIds" open="(" separator="," close=")">
+		            #{userId}
+		        </foreach>
+	        </if>
+       	</if>
+    </select>
+    
+    <select id="selectWorkTaskById" parameterType="String" resultMap="WorkTaskResult">
+        <include refid="selectWorkTaskVo"/>
+        where t.task_record_id = #{taskRecordId} and t.del_flag = 0 
+    </select>
+        
+    <insert id="insertWorkTask" parameterType="WorkTask">
+        insert into work_task
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="taskRecordId != null  and taskRecordId != ''  ">task_record_id,</if>
+			<if test="taskId != null  and taskId != ''  ">task_id,</if>
+			<if test="taskTitle != null  and taskTitle != ''  ">task_title,</if>
+			<if test="taskFlag != null  ">task_flag,</if>
+			<if test="taskType != null  ">task_type,</if>
+			<if test="diffLevel != null  and diffLevel != ''  ">diff_level,</if>
+			<if test="priority != null  ">priority,</if>
+			<if test="planStartDate != null  ">plan_start_date,</if>
+			<if test="planEndDate != null  ">plan_end_date,</if>
+			<if test="planHours != null  ">plan_hours,</if>
+			<if test="realStartDate != null  ">real_start_date,</if>
+			<if test="realEndDate != null  ">real_end_date,</if>
+			<if test="dealHours != null  ">deal_hours,</if>
+			<if test="auditHours != null  ">audit_hours,</if>
+			<if test="taskDesc != null  and taskDesc != ''  ">task_desc,</if>
+			<if test="taskAppendix != null  and taskAppendix != ''  ">task_appendix,</if>
+			<if test="dealDeptId != null  ">deal_dept_id,</if>
+			<if test="dealDeptName != null  and dealDeptName != ''  ">deal_dept_name,</if>
+			<if test="createUserId != null  ">create_user_id,</if>
+			<if test="createEmpId != null  and createEmpId != ''  ">create_emp_id,</if>
+			<if test="createUserName != null  and createUserName != ''  ">create_user_name,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="dealUserId != null  ">deal_user_id,</if>
+			<if test="dealEmpId != null  and dealEmpId != ''  ">deal_emp_id,</if>
+			<if test="dealUserName != null  and dealUserName != ''  ">deal_user_name,</if>
+			<if test="dealTime != null  ">deal_time,</if>
+			<if test="auditUserId != null  ">audit_user_id,</if>
+			<if test="auditEmpId != null  and auditEmpId != ''  ">audit_emp_id,</if>
+			<if test="auditUserName != null  and auditUserName != ''  ">audit_user_name,</if>
+			<if test="auditTime != null  ">audit_time,</if>
+			<if test="delFlag != null  ">del_flag,</if>
+			<if test="taskPerformId != null  ">task_perform_id,</if>
+			<if test="taskAuditId != null  ">task_auditId,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="taskRecordId != null  and taskRecordId != ''  ">#{taskRecordId},</if>
+			<if test="taskId != null  and taskId != ''  ">#{taskId},</if>
+			<if test="taskTitle != null  and taskTitle != ''  ">#{taskTitle},</if>
+			<if test="taskFlag != null  ">#{taskFlag},</if>
+			<if test="taskType != null  ">#{taskType},</if>
+			<if test="diffLevel != null  and diffLevel != ''  ">#{diffLevel},</if>
+			<if test="priority != null  ">#{priority},</if>
+			<if test="planStartDate != null  ">#{planStartDate},</if>
+			<if test="planEndDate != null  ">#{planEndDate},</if>
+			<if test="realStartDate != null  ">#{realStartDate},</if>
+			<if test="realEndDate != null  ">#{realEndDate},</if>
+			<if test="planHours != null  ">#{planHours},</if>
+			<if test="dealHours != null  ">#{dealHours},</if>
+			<if test="auditHours != null  ">#{auditHours},</if>
+			<if test="taskDesc != null  and taskDesc != ''  ">#{taskDesc},</if>
+			<if test="taskAppendix != null  and taskAppendix != ''  ">#{taskAppendix},</if>
+			<if test="dealDeptId != null  ">#{dealDeptId},</if>
+			<if test="dealDeptName != null  and dealDeptName != ''  ">#{dealDeptName},</if>
+			<if test="createUserId != null  ">#{createUserId},</if>
+			<if test="createEmpId != null  and createEmpId != ''  ">#{createEmpId},</if>
+			<if test="createUserName != null  and createUserName != ''  ">#{createUserName},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="dealUserId != null  ">#{dealUserId},</if>
+			<if test="dealEmpId != null  and dealEmpId != ''  ">#{dealEmpId},</if>
+			<if test="dealUserName != null  and dealUserName != ''  ">#{dealUserName},</if>
+			<if test="dealTime != null  ">#{dealTime},</if>
+			<if test="auditUserId != null  ">#{auditUserId},</if>
+			<if test="auditEmpId != null  and auditEmpId != ''  ">#{auditEmpId},</if>
+			<if test="auditUserName != null  and auditUserName != ''  ">#{auditUserName},</if>
+			<if test="auditTime != null  ">#{auditTime},</if>
+			<if test="delFlag != null  ">#{delFlag},</if>
+			<if test="taskPerformId != null  ">#{taskPerformId},</if>
+			<if test="taskAuditId != null  ">#{taskAuditId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateWorkTask" parameterType="WorkTask">
+        update work_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskId != null  and taskId != ''  ">task_id = #{taskId},</if>
+            <if test="taskTitle != null  and taskTitle != ''  ">task_title = #{taskTitle},</if>
+            <if test="taskFlag != null  ">task_flag = #{taskFlag},</if>
+            <if test="taskType != null  ">task_type = #{taskType},</if>
+            <if test="diffLevel != null  and diffLevel != ''  ">diff_level = #{diffLevel},</if>
+            <if test="priority != null  ">priority = #{priority},</if>
+            <if test="planStartDate != null  ">plan_start_date = #{planStartDate},</if>
+            <if test="planEndDate != null  ">plan_end_date = #{planEndDate},</if>
+            <if test="realStartDate != null  ">real_start_date = #{realStartDate},</if>
+            <if test="realEndDate != null  ">real_end_date = #{realEndDate},</if>
+            <if test="planHours != null  ">plan_hours = #{planHours},</if>
+            <if test="dealHours != null  ">deal_hours = #{dealHours},</if>
+            <if test="auditHours != null  ">audit_hours = #{auditHours},</if>
+            <if test="taskDesc != null  and taskDesc != ''  ">task_desc = #{taskDesc},</if>
+            <if test="taskAppendix != null  and taskAppendix != ''  ">task_appendix = #{taskAppendix},</if>
+            <if test="dealDeptId != null  ">deal_dept_id = #{dealDeptId},</if>
+            <if test="dealDeptName != null  and dealDeptName != ''  ">deal_dept_name = #{dealDeptName},</if>
+            <if test="createUserId != null  ">create_user_id = #{createUserId},</if>
+            <if test="createEmpId != null  and createEmpId != ''  ">create_emp_id = #{createEmpId},</if>
+            <if test="createUserName != null  and createUserName != ''  ">create_user_name = #{createUserName},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="dealUserId != null  ">deal_user_id = #{dealUserId},</if>
+            <if test="dealEmpId != null  and dealEmpId != ''  ">deal_emp_id = #{dealEmpId},</if>
+            <if test="dealUserName != null  and dealUserName != ''  ">deal_user_name = #{dealUserName},</if>
+            <if test="dealTime != null  ">deal_time = #{dealTime},</if>
+            <if test="auditUserId != null  ">audit_user_id = #{auditUserId},</if>
+            <if test="auditEmpId != null  and auditEmpId != ''  ">audit_emp_id = #{auditEmpId},</if>
+            <if test="auditUserName != null  and auditUserName != ''  ">audit_user_name = #{auditUserName},</if>
+            <if test="auditTime != null  ">audit_time = #{auditTime},</if>
+            <if test="delFlag != null  ">del_flag = #{delFlag},</if>
+            <if test="taskPerformId != null  ">task_perform_id = #{taskPerformId},</if>
+            <if test="taskAuditId != null  ">task_audit_id = #{taskAuditId},</if>
+        </trim>
+        where task_record_id = #{taskRecordId}
+    </update>
+
+	<delete id="deleteWorkTaskById" parameterType="String">
+        delete from work_task where task_record_id = #{taskRecordId}
+    </delete>
+	
+    <delete id="deleteWorkTaskByIds" parameterType="String">
+        delete from work_task where task_record_id in 
+        <foreach item="taskRecordId" collection="array" open="(" separator="," close=")">
+            #{taskRecordId}
+        </foreach>
+    </delete>
+    
+    <!-- 查询当前用户已分配未完成任务 -->
+	<select id="selectNoCompleteByUserId" parameterType="Long" resultMap="WorkTaskResult">
+        <include refid="selectWorkTaskVo"/>
+        where t.del_flag=0
+        and t.create_user_id = #{user_id}
+        and t.task_flag != 4
+    </select>
+    <!-- 查询本部门任务待办 -->
+    <select id="selectListByDeptId" resultMap="WorkTaskResult">
+        <include refid="selectWorkTaskVo"/>
+        where t.del_flag=0 and t.deal_dept_id = #{deptId}
+        <if test="workTask.taskId != null  and workTask.taskId != '' "> and t.task_id = #{workTask.taskId}</if>
+        <if test="workTask.taskTitle != null  and workTask.taskTitle != '' "> and t.task_title like CONCAT('%',#{workTask.taskTitle},'%')</if>
+        <if test="workTask.taskFlag == 1 "> and t.task_flag in (1,2,5)</if>
+        <if test="workTask.taskFlag != 1 "> and t.task_flag = #{workTask.taskFlag}</if>
+        <if test="workTask.dealDeptId != null "> and t.deal_dept_id = #{workTask.dealDeptId}</if>
+        <if test="workTask.params != null">
+	        <if test="workTask.params.createStartDate != null and workTask.params.createStartDate != ''"><!-- 开始时间检索 -->
+				AND date_format(t.create_time,'%y%m%d') &gt;= date_format(#{workTask.params.createStartDate},'%y%m%d')
+			</if>
+			<if test="workTask.params.createEndDate != null and workTask.params.createEndDate != ''"><!-- 结束时间检索 -->
+				AND date_format(t.create_time,'%y%m%d') &lt;= date_format(#{workTask.params.createEndDate},'%y%m%d')
+			</if>
+			
+	        <if test="workTask.params.dealStartDate != null and workTask.params.dealStartDate != ''"><!-- 开始时间检索 -->
+				AND date_format(t.deal_time,'%y%m%d') &gt;= date_format(#{workTask.params.dealStartDate},'%y%m%d')
+			</if>
+			<if test="workTask.params.dealEndDate != null and workTask.params.dealEndDate != ''"><!-- 结束时间检索 -->
+				AND date_format(t.deal_time,'%y%m%d') &lt;= date_format(#{workTask.params.dealEndDate},'%y%m%d')
+			</if>
+	        <if test="workTask.params.userIds != null"> 
+		        and t.deal_user_id in
+				<foreach item="userId" collection="workTask.params.userIds" open="(" separator="," close=")">
+		            #{userId}
+		        </foreach>
+	        </if>
+       	</if>
+    </select>
+    
+    <!-- 查询个人任务待办 -->
+    <select id="selectListOfMine" resultMap="WorkTaskResult">
+        <include refid="selectWorkTaskVo"/>
+        where t.del_flag=0 and t.deal_user_id = #{userId}
+        <if test="workTask.taskId != null  and workTask.taskId != '' "> and t.task_id = #{workTask.taskId}</if>
+        <if test="workTask.taskTitle != null  and workTask.taskTitle != '' "> and t.task_title like CONCAT('%',#{workTask.taskTitle},'%')</if>
+        <if test="workTask.taskFlag == 1 "> and t.task_flag in (1,2,5)</if>
+        <if test="workTask.taskFlag == 0 "> </if>
+        <if test="workTask.taskFlag != 1 and workTask.taskFlag != 0 "> and t.task_flag = #{workTask.taskFlag}</if>
+        <if test="workTask.dealDeptId != null "> and t.deal_dept_id = #{workTask.dealDeptId}</if>
+        <if test="workTask.params != null">
+	        <if test="workTask.params.createStartDate != null and workTask.params.createStartDate != ''"><!-- 开始时间检索 -->
+				AND date_format(t.create_time,'%y%m%d') &gt;= date_format(#{workTask.params.createStartDate},'%y%m%d')
+			</if>
+			<if test="workTask.params.createEndDate != null and workTask.params.createEndDate != ''"><!-- 结束时间检索 -->
+				AND date_format(t.create_time,'%y%m%d') &lt;= date_format(#{workTask.params.createEndDate},'%y%m%d')
+			</if>
+			
+	        <if test="workTask.params.dealStartDate != null and workTask.params.dealStartDate != ''"><!-- 开始时间检索 -->
+				AND date_format(t.deal_time,'%y%m%d') &gt;= date_format(#{workTask.params.dealStartDate},'%y%m%d')
+			</if>
+			<if test="workTask.params.dealEndDate != null and workTask.params.dealEndDate != ''"><!-- 结束时间检索 -->
+				AND date_format(t.deal_time,'%y%m%d') &lt;= date_format(#{workTask.params.dealEndDate},'%y%m%d')
+			</if>
+       	</if>
+    </select>
+    
+    <!-- 查询任务状态为 待处理1/处理中2/返工5 因为只有这两个才可以执行 -->
+	<select id="selectFlag1And2And5" parameterType="String" resultMap="WorkTaskResult">
+        <include refid="selectWorkTaskVo"/>
+        where t.task_record_id = #{taskRecordId} and t.del_flag = 0 and t.task_flag in (1,2,5)
+    </select>
+    
+    <!-- 查询任务状态为 待处理1 因为只有这两个才可以执行 -->
+	<select id="selectTaskNoEditByIds" parameterType="string" resultType="int">
+	select count(1) from work_task where del_flag=0 and task_flag != 1
+	and task_record_id in
+        <foreach item="taskRecordId" collection="array" open="(" separator="," close=")">
+            #{taskRecordId}
+        </foreach>
+    </select>
+    
+    <!-- 此更新用于更改执行人 -->
+	<update id="updateWorkTaskForAlter" parameterType="WorkTask">
+        update work_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskId != null  and taskId != ''  ">task_id = #{taskId},</if>
+            <if test="taskTitle != null  and taskTitle != ''  ">task_title = #{taskTitle},</if>
+            <if test="taskFlag != null  ">task_flag = #{taskFlag},</if>
+            <if test="taskType != null  ">task_type = #{taskType},</if>
+            <if test="diffLevel != null  and diffLevel != ''  ">diff_level = #{diffLevel},</if>
+            <if test="priority != null  ">priority = #{priority},</if>
+            <if test="planStartDate != null  ">plan_start_date = #{planStartDate},</if>
+            <if test="planEndDate != null  ">plan_end_date = #{planEndDate},</if>
+            <if test="planHours != null  ">plan_hours = #{planHours},</if>
+            real_start_date = #{realStartDate},
+            real_end_date = #{realEndDate},
+            deal_hours = #{dealHours},
+            <if test="auditHours != null  ">audit_hours = #{auditHours},</if>
+            <if test="taskDesc != null  and taskDesc != ''  ">task_desc = #{taskDesc},</if>
+            <if test="taskAppendix != null  and taskAppendix != ''  ">task_appendix = #{taskAppendix},</if>
+            <if test="dealDeptId != null  ">deal_dept_id = #{dealDeptId},</if>
+            <if test="dealDeptName != null  and dealDeptName != ''  ">deal_dept_name = #{dealDeptName},</if>
+            <if test="createUserId != null  ">create_user_id = #{createUserId},</if>
+            <if test="createEmpId != null  and createEmpId != ''  ">create_emp_id = #{createEmpId},</if>
+            <if test="createUserName != null  and createUserName != ''  ">create_user_name = #{createUserName},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="dealUserId != null  ">deal_user_id = #{dealUserId},</if>
+            <if test="dealEmpId != null  and dealEmpId != ''  ">deal_emp_id = #{dealEmpId},</if>
+            <if test="dealUserName != null  and dealUserName != ''  ">deal_user_name = #{dealUserName},</if>
+            deal_time = #{dealTime},
+            audit_user_id = #{auditUserId},
+            audit_emp_id = #{auditEmpId},
+            audit_user_name = #{auditUserName},
+            audit_time = #{auditTime},
+            <if test="delFlag != null  ">del_flag = #{delFlag},</if>
+            <if test="taskPerformId != null  and taskPerformId != ''  ">task_perform_id = #{taskPerformId},</if>
+            task_audit_id = #{taskAuditId},
+        </trim>
+        where task_record_id = #{taskRecordId}
+    </update>
+</mapper>

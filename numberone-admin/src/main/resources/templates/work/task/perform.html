@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"> </head>
+<link th:href="@{/numberone/css/ry-ui.css}" rel="stylesheet" />
+<link th:href="@{/ajax/libs/jquery-ztree/3.5/css/metro/zTreeStyle.css}"
+	rel="stylesheet" />
+<link th:href="@{/css/webui-2.7.5.min.css}" rel="stylesheet" />
+<link th:href="@{/ajax/libs/datapicker/bootstrap-datetimepicker.min.css}" rel="stylesheet" />
+<style>
+	
+    
+    [class*="col-"] {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .row {
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .container-fluid {
+      margin: 0;
+      padding: 0;
+    }
+	
+</style>
+	<body class="gray-bg" style="padding: 0px">
+		<div class="col-sm-12 " style="height: 50px">
+	        <div class="ibox-title">
+	            <h3><i class="fa fa-space-shuttle"></i> 任务：[[${task.taskId+" - 【"+task.taskTypeText+"】"+task.taskTitle}]]
+	            <a href="#" style="color:blue" class="copyBtn" data-clipboard-text="" >&nbsp;&nbsp;复制</a>
+	            <hr>
+	            </h3>
+	        </div>
+		</div>
+		<div class="col-sm-12" >
+	        <div class="ibox-title" style="">
+				<button type="button" onclick="doResolved();" class="btn btn-success">解决</button>
+				<button type="button" onclick="doAlter();" class="btn btn-success">分配</button><br>
+	            <h4 style="color: #303f9f">任务详情</h4>
+	        </div>
+		</div>
+		<div class="col-sm-10">
+				<div class="ibox-content"  style="height: 330px">
+					<form id="task-allocate-form"  th:object="${task}">
+						<table class="tableEditor">
+							<colgroup>
+								<col width="10%" />
+								<col width="15%" />
+								<col width="10%" />
+								<col width="15%" />
+								<col width="10%" />
+								<col width="15%" />
+								<col width="10%" />
+								<col width="15%" />
+							</colgroup>
+							<tbody>
+								<tr>
+									<input type="hidden" name="taskRecordId" th:field="*{taskRecordId}"/>
+									<input type="hidden" name="taskId" th:field="*{taskId}" id="taskId" />
+								</tr>
+								<tr>
+									<td class="tdLabel"><span>任务标题</span></label></td>
+									<td class="tdInput" colspan="7">
+			                        	<input type="text" readonly="readonly" name="taskTitle" th:field="*{taskTitle}" />
+									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel"><span>任务状态</span></label></td>
+									<td class="tdInput">
+										<select name="taskFlag" id="taskFlag" th:field="*{taskFlag}" disabled="disabled"
+											th:with="type=${@dict.getType('work_task_flag')}">
+											<option value="" >请选择...</option>
+											<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+												th:value="${dict.dictValue}" ></option>
+										</select>
+									</td>
+									<td class="tdLabel"><span>任务类型</span></label></td>
+									<td class="tdInput">
+										<select name="taskType" id="taskType" th:field="*{taskType}" disabled="disabled"
+											th:with="type=${@dict.getType('work_task_type')}">
+											<option value="" >请选择...</option>
+											<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+												th:value="${dict.dictValue}"></option>
+										</select>
+									</td>
+									<td class="tdLabel"><span>难易程度</span></label></td>
+									<td class="tdInput">
+										<select name="diffLevel" id="diffLevel" th:field="*{diffLevel}" disabled="disabled"
+											th:with="type=${@dict.getType('work_task_diff_level')}">
+											<option value="" >请选择...</option>
+											<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+												th:value="${dict.dictValue}"></option>
+										</select>
+									</td>
+									<td class="tdLabel"><span>优先级</span></label></td>
+									<td class="tdInput">
+										<select name="priority" id="priority" th:field="*{priority}" disabled="disabled"
+											th:with="type=${@dict.getType('work_task_diff_priority')}">
+											<option value="" >请选择...</option>
+											<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+												th:value="${dict.dictValue}"></option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel"><span>计划开始时间</span></label></td>
+									<td class="tdInput">
+			                        	<input type="text" name="planStartDate" th:value="${#dates.format(task.planStartDate, 'yyyy-MM-dd')}" readonly="readonly"/>
+			                        </div>
+									</td>
+									<td class="tdLabel"><span>计划完成时间</span></label></td>
+									<td class="tdInput">
+										<input type="text" name="planEndDate" th:value="${#dates.format(task.planEndDate, 'yyyy-MM-dd')}" readonly="readonly"/>
+									</td>
+									<td class="tdLabel"><span>预计工时</span></label></td>
+									<td class="tdInput" colspan="3">
+										<input type="text" name="planHours" th:value="${task.planHours}" readonly="readonly"/>
+									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel"><span>实际开始时间</span></label></td>
+									<td class="tdInput">
+										<input type="text" name="realEndDate" th:value="${#dates.format(task.realStartDate, 'yyyy-MM-dd')}" readonly="readonly"/>
+									</td>
+									<td class="tdLabel"><span>实际完成时间</span></label></td>
+									<td class="tdInput">
+										<input type="text" name="realEndDate" th:value="${#dates.format(task.realEndDate, 'yyyy-MM-dd')}" readonly="readonly"/>
+									</td>
+									<td class="tdLabel"><span>处理工时</span></label></td>
+									<td class="tdInput">
+										<input type="text" name="dealHours" th:value="${task.dealHours}" readonly="readonly"/>
+									</td>
+									<td class="tdLabel"><span>审核工时</span></label></td>
+									<td class="tdInput">
+										<input type="text" name="auditHours" th:value="${task.auditHours}" readonly="readonly">
+									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel"><label for="task_desc" class="textLabel"><span>任务描述</span></label></td>
+									<td class="tdInput" colspan="7">
+									<textarea name="taskDesc" cols="" rows="6" id="taskDesc" th:value="${task.taskDesc}" readonly="readonly" maxlength="1000">[[${task.taskDesc}]]</textarea>
+ 									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel" style="height:33px;">任务说明附件&nbsp;</td>
+									<td colspan="4">
+										<a id="appendixLink" >[[${task.appendix.originalFileName}]]</a>
+									</td>
+									<td>
+										<!-- <button type="button" class="button" disabled="disabled"><i class="fa fa-cloud-upload"></i> 添加</button> -->
+									</td>
+									<td colspan="2"></td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+		</div>
+		<div class="col-sm-2">
+				<div class="ibox-content" style="height: 330px">
+					<form role="form" id="task-person-form" th:object="${task}">
+						<table class="tableEditor">
+							<colgroup>
+								<col width="40%" />
+								<col width="60%" />
+							</colgroup>
+							<tbody>
+								<tr>
+									<td class="tdLabel"><span>创建人</span></label></td>
+									<td class="tdInput" >
+			                        	<input type="text" name="createUserName" th:field="*{createUserName}" readonly="readonly">
+									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel"><span>创建时间</span></label></td>
+									<td class="tdInput" >
+			                        	<input type="text" name="createTime" th:value="${#dates.format(task.createTime, 'yyyy-MM-dd HH:mm:ss')}" readonly="readonly">
+									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel"><span>处理人</span></label></td>
+									<td class="tdInput" >
+			                        	<input type="text" name="dealUserName" th:field="*{dealUserName}" readonly="readonly">
+									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel"><span>处理时间</span></label></td>
+									<td class="tdInput" >
+			                        	<input type="text" name="dealTime" th:value="${#dates.format(task.dealTime, 'yyyy-MM-dd HH:mm:ss')}" readonly="readonly">
+									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel"><span>审核人</span></label></td>
+									<td class="tdInput" >
+			                        	<input type="text" name="auditUserName" th:field="*{auditUserName}" readonly="readonly">
+									</td>
+								</tr>
+								<tr>
+									<td class="tdLabel"><span>审核时间</span></label></td>
+									<td class="tdInput" >
+			                        	<input type="text" name="auditTime" th:value="${#dates.format(task.auditTime, 'yyyy-MM-dd HH:mm:ss')}" readonly="readonly">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+		</div>
+		<div class="col-sm-12">
+                    <div class="ibox-title">
+                        <h4 style="color: #303f9f">任务执行</h4>
+                    </div>
+		</div>
+		<div class="col-sm-12">
+				<div class="ibox-content">
+					<form role="form" id="task-perform-form">
+						<table class="tableEditor">
+							<colgroup>
+								<col width="10%" />
+								<col width="80%" />
+								<col width="10%" />
+							</colgroup>
+							<tbody>
+								<tr>
+								<input type="hidden" name="taskRecordId" th:value="${task.taskRecordId}"/>
+								<input type="hidden" name="taskId" th:value="${task.taskId}"/>
+								<input type="hidden" name="taskPerformId" th:value="${taskPerform.taskPerformId}" id="taskPerformId"/>
+								<td class="tdLabel" style="height:32px;">工作提交物&nbsp;</td>
+								<td >
+									<button type="button" class="layui-btn" id="taskAppendix" lay-data="{ accept: 'file'}">
+										<i class="layui-icon">&#xe67c;</i>上传附件
+									</button>
+									<a id="appendixLink2" >[[${taskPerform.appendix.originalFileName}]]</a>
+									<input type="hidden" name="appendix.originalFileName" id="originalFileName" th:value="${taskPerform.appendix.originalFileName}">
+									<input type="hidden" name="appendix.fileId" id="fileId" th:value="${taskPerform.appendix.fileId}">
+									<input type="hidden" name="appendix.filePath" id="filePath" th:value="${taskPerform.appendix.filePath}">
+								</td>
+								<td>
+									<!-- <button type="button" class="button" disabled="disabled"><i class="fa fa-cloud-upload"></i> 添加</button> -->
+								</td>
+							</tr>
+							<tr>
+								<td class="tdLabel" style="height:254px;" ><label for="remark" class="textLabel"><span>说明&nbsp;</span><span class="required requiredLabel">*</span></label></td>
+								<td class="tdInput" colspan="2">
+									<textarea rows="17" id="dealDesc" name="dealDesc" class="textarea" readonly="readonly" placeholder="[更新程序说明]：说明本任务涉及到哪些业务模块的调整，具体修改思路和方法是什么？
+
+
+[更新程序列表]：如果“更新列表”能包含就可以为空不填，如果有附件的请说明sql语句更新点，如果有说明文档也请说明用来做什么的？
+
+
+[更新表及说明]：如果涉及到表结构更新，数据配置等请列举涉及到的表名；
+
+
+[前置后续任务说明]：如果本任务需要在前置任务更新或者测试后才能测试的，请说明前置任务。如果本任务需要在后续任务进行检测，请说明后续任务号及任务标题。
+
+
+[测试要点]： 说明测试的重点，如果担心测试人员只测这些，可以多写一些可能需要测试的方面。
+
+
+" maxlength="2000" required="true">[[${taskPerform.dealDesc}]]</textarea>
+									<div id="submission_btn" style="margin:5px;">
+										<button type="button" class="button" onclick="submission_edit()">编辑</button>
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+		</div>
+		<div th:include="include :: footer"></div>
+	<script th:src="@{/js/jquery-ui-1.10.4.min.js}"></script>
+    <script th:src="@{/ajax/libs/select/select2.js}"></script>
+	<script th:src="@{/ajax/libs//datapicker/bootstrap-datetimepicker.min.js}"></script>
+	<script type="text/javascript">
+	var prefix = ctx + "work/task";
+	$(function(){
+		/* 初始化日期选择插件 */
+		$(".input-group.date").datetimepicker({
+		format: "yyyy-mm-dd",
+		minView: "month",
+		autoclose: true
+	 	 });
+		//初始化复制插件
+		initCopyBtn();
+		//初始化上传控件
+		initUpload();
+		
+		//初始化select2
+		initSelect2();
+		
+		var param = "[[${task.appendix.downloadParam}]]".replace("&amp;","&");
+    	$("#appendixLink").click(function(){
+    		downloadFile(param);
+    	});
+    	$("#appendixLink2").click(function(){
+    		downloadFile(param);
+    	});
+	});
+	var copyText = "[[${task.taskId+" - 【"+task.taskTypeText+"】"+task.taskTitle}]]";
+	function initCopyBtn() {
+		//实例化 ClipboardJS对象;
+        var copyBtn = new ClipboardJS('.copyBtn', {
+            text: function () {
+                return copyText;
+            }
+        });
+        copyBtn.on("success",function(e){
+            // 复制成功
+            layer.msg("【复制成功】"+e.text);
+            e.clearSelection();
+        });
+        copyBtn.on("error",function(e){
+            //复制失败；
+            console.log( e.action )
+        });
+	}
+	function submission_edit(){
+		setEnabled("#dealDesc");
+		$("#submission_btn").html('');
+		$("#submission_btn").append('<button type="button" class="button" onclick="submission_save()">保存</button>');
+		$("#submission_btn").append('<button type="button" class="btn" onclick="submission_cancel()">取消</button>');
+	}
+	var _submission = $("#dealDesc").val();
+	function submission_save(){
+		var content = $("#dealDesc").val();
+		//编辑说明后 保存一下
+		savePerform();
+		_submission = content;
+		submission_cancel();
+	}
+	function submission_cancel(){
+		$("#dealDesc").val(_submission);
+		setDisabled("#dealDesc");
+		$("#submission_btn").html('');
+		$("#submission_btn").append('<button type="button" class="button" onclick="submission_edit()">编辑</button>');
+	}
+	function setDisabled(obj){
+		$(obj).attr("disabled",true);
+		$(obj).attr("readonly",true);
+	}
+	function setEnabled(obj){
+		$(obj).attr("disabled",false);
+		$(obj).attr("readonly",false);
+	}
+	
+	
+	//下载附件
+	function downloadFile(downloadParam){
+	    window.location.href = ctx + "common/download" + downloadParam;
+	    
+	}
+	function initUpload(){
+		//layui上传附件
+	    layui.use('upload', function(){
+	      var upload = layui.upload;
+	       
+	      //执行实例
+	      var uploadInit = upload.render({
+	        elem: '#taskAppendix' //绑定元素
+	        ,size: 1024*10
+	        ,url: ctx + "common/upload" //上传接口
+	        ,done: function(res){
+				//上传完毕回调
+				$.modal.msgSuccess("上传成功");
+				var downloadParam = "?fileName="+res.fileName+"&originalFileName="+res.originalFileName;
+				$("#appendixLink2").text(res.originalFileName).attr("onclick","downloadFile('"+downloadParam+"')");
+				$("#originalFileName").val(res.originalFileName);
+				$("#filePath").val(res.fileName);
+				$("#fileId").val('');
+				savePerform();
+	        }
+	        ,error: function(){
+	          $.modal.msgError("上传失败");
+	        }
+	      });
+	    });
+	}
+	//保存任务处理信息 
+	function savePerform(){
+		$.operate.noAnimatePost(prefix + "/savePerform", $('#task-perform-form').serialize());
+	}
+	function initLaydate(){
+		layui.use('laydate', function() {
+			var laydate = layui.laydate;
+			var startDate = laydate.render({
+		    	elem: '#startDate',
+		    	value: currDate,
+		    	theme: 'molv',
+		    	trigger: 'click',
+		    	done: function(value, date) {
+		    		// 结束时间大于开始时间
+		    		if (value !== '') {
+		    			endDate.config.min.year = date.year;
+		    			endDate.config.min.month = date.month - 1;
+		    			endDate.config.min.date = date.date;
+		    		} else {
+		    			endDate.config.min.year = '';
+		    			endDate.config.min.month = '';
+		    			endDate.config.min.date = '';
+		    		}
+		    	}
+		    });
+		    var endDate = laydate.render({
+		    	elem: '#endDate',
+		    	min: $('#startDate').val(),
+		    	theme: 'molv',
+		    	value: currDate,
+		    	trigger: 'click',
+		    	done: function(value, date) {
+		    		// 开始时间小于结束时间
+		    		if (value !== '') {
+		    			startDate.config.max.year = date.year;
+		    			startDate.config.max.month = date.month - 1;
+		    			startDate.config.max.date = date.date;
+		    		} else {
+		    			startDate.config.max.year = '';
+		    			startDate.config.max.month = '';
+		    			startDate.config.max.date = '';
+		    		}
+		    	}
+		    });
+		});
+	}
+	function doResolved(){
+		//首先判断是否填写任务执行信息
+		var taskPerformId = $("#task-perform-form input[name=taskPerformId]").val();
+		var dealDesc = $("#task-perform-form textarea[name=dealDesc]").val();
+		if(taskPerformId==null || taskPerformId==''){
+			$.modal.msgError("请先填写任务执行信息");
+			return;
+		}
+		if(dealDesc==null || dealDesc==''){
+			layer.tips('任务说明不能为空', '#task-perform-form textarea[name=dealDesc]');
+			return;
+		}
+		$.modal.openDiv("解决", "#operDlg");
+	}
+	function doAlter(){
+		$.modal.openDiv("指派", "#alterDlg", function(){
+			
+		});
+	}
+	//重置表格
+	function cancelOpe(){
+		$.modal.closeAll();
+		$("#operForm").find('input[type=text],select,input[type=hidden],textarea').each(function() {
+				$(this).val('');
+			}
+		);
+		$("#realStartDate").val(currDate);
+		$("#realEndDate").val(currDate);
+	}
+	//重置表格
+	function cancelAlter(){
+		$.modal.closeAll();
+		document.getElementById("alterForm").reset();
+		$("#alterForm").find('input[type=text],select,input[type=hidden],textarea').each(function() {
+				$(this).val('');
+			}
+		);
+	    $('#userInput').val("").trigger('change');
+	}
+	
+	function initSelect2(){
+    	$("#userInput").change(function(){
+    		$("#alterUserId").val($.form.selectSelects("userInput"));
+    	});
+    	$("#userInput").select2({
+    		placeholder : "请输入人员工号或名称或名称首字母...",
+    		minimumInputLength : 1,//最小需要输入多少个字符才进行查询
+    		multiple : false,//支持多选
+    		allowClear : false,//允许清空
+    		ajax : {
+    			url : "/system/user/searchUser",
+    			dataType : 'json',
+    			type : "post",
+    			delay : 100,
+    			data : function(userName, page) {//向后台发送参数
+    				return {
+    					userName : userName.term
+    				};
+    			},
+    			results : function(data, page) {//处理结果
+    				return {
+    					data
+    				};
+    			}
+    		},
+    		formatResult : function(result, container, query, escapeMarkup) {
+    			return result.userName;
+    		},
+    		formatSelection : function(result, container, query, escapeMarkup) {
+    			return result.userName;
+    		},
+    		formatInputTooShort : function() {
+    			return "请输入人员工号或名称或名称首字母...";
+    		},
+    		escapeMarkup : function(m) {
+    			return m;
+    		}
+    	});
+	}
+
+	function compareDate(startTime, endTime) {
+	    var arys1 = new Array();
+	    var arys2 = new Array();
+	    if (startTime != null && endTime != null) {
+	        arys1 = startTime.split('-');
+	        var startDate = new Date(arys1[0], parseInt(arys1[1] - 1), arys1[2]);
+	        arys2 = endTime.split('-');
+	        var endDate = new Date(arys2[0], parseInt(arys2[1] - 1), arys2[2]);
+	        if (startDate > endDate) {
+	            return false;
+	        } else {
+	            return true;
+	        }
+	    }
+	}
+	//成功解决任务
+	function resolved(){
+		var realStartDate = $("#realStartDate").val();
+		var realEndDate = $("#realEndDate").val();
+		var dealHours = $("#dealHours").val();
+		if(realStartDate==null || realStartDate==''){
+			layer.tips('实际开始时间不能为空', '#realStartDate', {tips: 1});
+			return;
+		}
+		if(realEndDate==null || realEndDate==''){
+			layer.tips('实际完成时间不能为空', '#realEndDate', {tips: 1});
+			return;
+		}
+		if(!compareDate(realStartDate,realEndDate)){
+			layer.tips('实际完开始时间不能小于完成时间', '#realStartDate', {tips: 1});
+			return;
+		}
+		if(!compareDate(realEndDate,'[[${currDate}]]')){
+			layer.tips('实际完成时间不能晚于当前日期', '#realEndDate', {tips: 1});
+			return;
+		}
+		if(dealHours==null || dealHours=='' || !/^[0-9]*$/.test(dealHours)){
+			layer.tips('处理工时不能为空，且只能为正整数', '#dealHours', {tips: 1});
+			return;
+		}
+		
+		$.operate.callbackPost(prefix + "/resolved", $('#operForm').serialize());
+	}
+	var currUserId = "[[${currUserId}]]";
+	//任务移交给他人
+	function alter(){
+		var alterUserId = $("#alterUserId").val();
+		if(alterUserId==null || alterUserId==''){
+			$.modal.tips("#userInput",'请先选择处理人');
+			return;
+		}
+		if(alterUserId==currUserId){
+			$.modal.tips("#userInput",'变更前后处理人为同一人');
+			return;
+		}
+		
+		$.operate.callbackPost(prefix + "/alter", $('#alterForm').serialize());
+	}
+	</script>
+
+
+</body>
+<div id="operDlg" style="display: none;">
+	<form id="operForm" name="operForm" method="post" >
+		<table class="tableEditor"><colgroup><col width="20%" /><col width="80%" /></colgroup>
+			<tbody>
+				<tr>
+					<td class="tdLabel">
+						<input type="hidden" name="taskRecordId" th:value="${task.taskRecordId}"/>
+						<input type="hidden" name="taskPerformId" th:value="${task.taskPerformId}"/>
+						<label for="realStartDate" class="textLabel"><span>实际开始日期</span><span class="required requiredLabel">*</span></label>
+					</td>
+					<td class="tdInput">
+						<div class="input-group date">
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						<input type="text" name="realStartDate" maxlength="10" th:value="${currDate}" id="realStartDate" />
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="tdLabel">
+						<label for="realEndDate" class="textLabel"><span>实际完成日期</span><span class="required requiredLabel">*</span></label>
+					</td>
+					<td class="tdInput date">
+						<div class="input-group date">
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						<input type="text" name="realEndDate" maxlength="10" th:value="${currDate}" id="realEndDate" />
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="tdLabel">
+						<label for="dealHours" class="textLabel"><span>处理工时</span><span class="required requiredLabel">*</span></label></td>
+					<td class="tdInput">
+						<input type="text" name="dealHours" maxlength="5" value="" id="dealHours" />
+					</td>
+				</tr>
+				<tr>
+					<td class="tdLabel">
+						<label for="remark" class="textLabel"><span>备注</span><span class="requiredLabel">&nbsp;</span></label>
+					</td>
+					<td class="tdInput">
+					<textarea name="remark" cols="" rows="5" class="textarea" maxlength="2000"></textarea></td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="tableEditor"><colgroup><col width="20%" /><col width="30%" /><col width="20%" /><col width="30%" /></colgroup>
+			<tbody>
+				<td class="tdButton" colspan="6">									
+					<button type="button" id="saveResolvedBtn" onclick="resolved();" class="button" >保  存</button>
+					<button type="button" id="cancel" class="button" onclick="cancelOpe();">取  消</button>							
+				</td>
+			</tbody>
+		</table>
+	</form>
+</div>
+<div id="alterDlg" style="display: none;">
+	<form id="alterForm" name="alterForm" method="post" >
+		<table class="tableEditor"><colgroup><col width="20%" /><col width="80%" /></colgroup>
+			<tbody>
+				<tr>
+					<td class="tdLabel">
+						<input type="hidden" name="taskRecordId" th:value="${task.taskRecordId}"/>
+						<input type="hidden" name="taskPerformId" th:value="${task.taskPerformId}"/>
+						<label for="userInput" class="textLabel"><span>处理人</span><span class="required requiredLabel">*</span></label>
+					</td>
+					<td class="tdInput">
+						<select class="form-control" id="userInput" name="userInput">
+						</select>
+						<input type="hidden" name="alterUserId" id="alterUserId">
+					</td>
+				</tr>
+				<tr>
+					<td class="tdLabel">
+						<label for="remark" class="textLabel"><span>备注</span><span class="requiredLabel">&nbsp;</span></label>
+					</td>
+					<td class="tdInput">
+					<textarea name="remark" cols="" rows="5" class="textarea" maxlength="2000"></textarea></td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="tableEditor"><colgroup><col width="20%" /><col width="30%" /><col width="20%" /><col width="30%" /></colgroup>
+			<tbody>
+				<td class="tdButton" colspan="6">									
+					<button type="button" class="button" onclick="alter();">保  存</button>
+					<button type="button" class="button" onclick="cancelAlter();">取  消</button>							
+				</td>
+			</tbody>
+		</table>
+	</form>
+</div>
+</html>

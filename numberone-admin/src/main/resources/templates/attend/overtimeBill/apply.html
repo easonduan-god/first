@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/numberone/css/ry-ui.css}" rel="stylesheet" />
+  <style type="text/css">
+  	.form-control[readonly]  {
+	    background-color: white;
+	}
+  </style>
+<style>
+</style>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form role="form" id="overtimeBill-apply-form" class="form-horizontal m-t">
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">所属部门：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control"
+											readonly="readonly" th:value="${sysUser.deptName}">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">申请人：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control"
+											readonly="readonly" th:value="${sysUser.userName}">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">开始日期：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control" id="startDate" name="startDate" autocomplete="off">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">结束日期：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control" id="endDate" name="endDate" autocomplete="off">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">每日申请时长：</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control" id="applyWorktimes" name="applyWorktimes">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3  control-label">工作人员：</label>
+									<div class="col-sm-8">
+									    <input id="usernames" name="params[usernames]" readonly="readonly" style="background-color: white;" class="form-control" ></input>
+									    <input name="params[ids]" id="ids" type="hidden" ></input>
+									</div>
+									<div class="col-sm-1">
+										<a class="btn btn-default" onclick="$.operate.choosePerson();">选择</a>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group draggable">
+									<label class="col-sm-3 control-label">事由：</label>
+									<div class="col-md-9" >
+									    <textarea name="matter" class="form-control" ></textarea>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="hr-line-dashed"></div>
+								<div class="form-group draggable">
+									<div style="width: 145px;margin: 0 auto;">
+										<button type="button" class="btn btn-primary" onclick="launchAudit()">发起审批</button>
+										<a  class="btn btn-danger"
+											type="reset" onclick="reset()">重置</a>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script th:src="@{/js/jquery-ui-1.10.4.min.js}"></script>
+	<script th:inline="javascript">
+	var prefix = ctx + "attend/overtimeBill";
+	$(function(){
+		$("#startDate,#endDate,usernames").change(function(){
+			if(!$.validate.form()){
+				$(".error").css('background-color','white');
+			}
+		});
+		layui.use('laydate', function() {
+			var laydate = layui.laydate;
+			var startDate = laydate.render({
+		    	elem: '#startDate',
+		    	value: currDate,
+		    	theme: 'molv',
+		    	trigger: 'click',
+		    	done: function(value, date) {
+		    		// 结束时间大于开始时间
+		    		if (value !== '') {
+		    			endDate.config.min.year = date.year;
+		    			endDate.config.min.month = date.month - 1;
+		    			endDate.config.min.date = date.date;
+		    		} else {
+		    			endDate.config.min.year = '';
+		    			endDate.config.min.month = '';
+		    			endDate.config.min.date = '';
+		    		}
+		    	}
+		    });
+		    var endDate = laydate.render({
+		    	elem: '#endDate',
+		    	min: $('#startDate').val(),
+		    	theme: 'molv',
+		    	value: currDate,
+		    	trigger: 'click',
+		    	done: function(value, date) {
+		    		// 开始时间小于结束时间
+		    		if (value !== '') {
+		    			startDate.config.max.year = date.year;
+		    			startDate.config.max.month = date.month - 1;
+		    			startDate.config.max.date = date.date;
+		    		} else {
+		    			startDate.config.max.year = '';
+		    			startDate.config.max.month = '';
+		    			startDate.config.max.date = '';
+		    		}
+		    	}
+		    });
+		});
+		
+		
+		$("#overtimeBill-apply-form").validate({
+        	rules:{
+        		startDate:{
+        			required:true
+        		},
+        		endDate:{
+        			required:true
+        		},
+        		matter:{
+        			required:true
+        		},
+        		applyWorktimes:{
+        			required:true,
+        			digits:true
+        			
+        		},
+        		usernames:{
+        			required:true
+        		}
+            },	
+        	messages: {
+        		applyWorktimes:{
+	        		digits:"只能输入正整数"
+        		}
+            }
+        });
+		
+	});
+		function reset(){
+			ids.value = '';
+			idAndUsername = {};
+			document.getElementById("overtimeBill-apply-form").reset();
+		}
+		/* 发起审批 */
+		function launchAudit(){
+			if(!$.validate.form()){
+				$(".error").css('background-color','white');
+				return;
+			}
+			if(applyWorktimes.value>17 || applyWorktimes.value<=0){
+				$.modal.msgError("每日申请工时请勿大于17，小于等于0");
+				return;
+			}
+			$.modal.loading("提交中。。。");
+			$.post(prefix+"/launchAudit", $("#overtimeBill-apply-form").serialize(),function(data){
+				//0是成功
+				if(data.code==0){
+					$.modal.closeLoading();
+					reset();
+					$.modal.msg(data.msg);
+				}else{
+					$.modal.closeLoading();
+					$.modal.msgError(data.msg);
+				}
+			});
+		}
+		var idAndUsername = {};
+		//选择人员后的回调函数 result为 key：用户id， value：用户名username
+		function afterChoose(result){
+			//赋值给全局变量 以便更新 防止重复
+			var idArr = [],usernameArr = [];
+			for(var key in result){
+				if(key!='ids' && key!='usernames')
+					idAndUsername[key] = result[key];
+			}
+			
+			//复制后的idAndUsername 遍历以更新ids 和usernames
+			for(var key in idAndUsername){
+				if(key!='ids' && key!='usernames'){
+					idArr.push(key);
+					usernameArr.push(idAndUsername[key]);
+				}
+			}
+			
+			
+			idAndUsername["ids"] = idArr.join(',');
+			idAndUsername["usernames"] = usernameArr.join(',');
+			
+			//更新到input
+			$(usernames).val(idAndUsername.usernames);
+    		//先聚焦后离焦 触发form校验
+    		$(usernames).trigger("focus");
+    		$(usernames).trigger("blur");
+    		$(ids).val(idAndUsername.ids);
+		}
+	</script>
+</body>
+</html>

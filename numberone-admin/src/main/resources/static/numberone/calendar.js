@@ -1,6 +1,6 @@
-//var ats = [{"id":"01","text":"出差"},{"id":"02","text":"公事外出"},{"id":"03","text":"年假"},{"id":"04","text":"事假"},{"id":"05","text":"婚假"},{"id":"06","text":"产假"},{"id":"07","text":"病假"},{"id":"08","text":"丧假"},{"id":"09","text":"其他"},{"id":"10","text":"产检假"},{"id":"11","text":"陪产假"},{"id":"12","text":"哺乳假"},{"id":"13","text":"忘记打卡"},{"id":"14","text":"身体调养假"},{"id":"15","text":"工伤假"},{"id":"16","text":"调休假"},{"id":"17","text":"年度体检"},{"id":"18","text":"结转年假"}];
 
 var codes = {};
+//从数据库中获取的考勤代码数据
 function initattendCode(attendCode){
 	$.each(attendCode, function(i, code){
 		codes[code['dictValue']] = {"text":code['dictLabel'],"css":code['cssClass']};
@@ -45,7 +45,7 @@ function initEson(divId) {
 	var width = $('#'+divId).width();
 	//alert(width);
 	Eson('inputtext_n', {
-		set_up_date: sdate,
+		date: sdate,
 		width : width,
 		cell_height : 50,
 		onselect : function(y, M, d){
@@ -137,32 +137,34 @@ function initEson(divId) {
 					spec = codes[work_flag].css || '';
 					
 				}
+				//日期颜色考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日
+				var random = Math.ceil(Math.random()*10); 
+				
+				//随机生成考勤
+				if(random%3==0){
+					var randomKey = Math.ceil(Math.random()*10); 
+					if(randomKey!=8){ 
+						spec = codes[randomKey].css || '';
+						//console.info(spec);
+					}
+				}
 				
 				var bunch = [];
-				var dateclass = 'data-y='+ y.toString() + ' data-m=' + m.toString() + ' data-d=' + d.toString() + ' class="date"';
-				bunch.push(dateclass);
+				bunch.push('<div class="date" data-y="'+ y.toString() + '" data-m="' + m.toString() + '" data-d="' + d.toString() + '">');
+				bunch.push('<span class="number">');
+				bunch.push(d);
+				bunch.push("</span>");
+				bunch.push("<br />");
+				bunch.push("<span "+(cls_name ? ' class="' + cls_name + '"' : '')+' >');
+				bunch.push(show);
+				bunch.push("</span>");
 				
-				var html =  '</br><span '+   (cls_name ? ' class="' + cls_name + '"' : ' ') + '>' + maxWord(show) + '</span>';
-				var tempd = d;
-				//日期颜色考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日
-				//10 工作日
-				if(work_flag==9){
-					d = redWord(d);
+				if (spec != "") {
+					bunch.push(spec);
 				}
-				if(work_flag==10){
-					d = blackWord(d);
-				}
+				bunch.push("</div>");
+				return bunch.join('');
 				
-				
-				//return '<div class="date" data-y="'+ y.toString() + '" data-m="' + m.toString() + '" data-d="' + d.toString() + '">
-				if (spec != "") {//d长度为1补一个空,为2不补
-					var reg=/./g;
-					html = lpad(tempd,2,' ').replace(reg,' ')+''+ d + spec + html; 
-				}else{
-					html = d+ html;
-				}
-				html = '<i '+ dateclass +'>'+ html+'</i>'
-				return html;
 			}catch(ex){}
 		}
 	});

@@ -19,6 +19,18 @@
     <style type="text/css">label.error { position:inherit;  }</style>
     <script>
         if(window.top!==window.self){window.top.location=window.location};
+        
+        //生成从minNum到maxNum的随机数
+		function randomNum(minNum,maxNum){ 
+		    switch(arguments.length){ 
+		        case 1: 
+		            return parseInt(Math.random()*minNum+1,10); 
+		        case 2: 
+		            return parseInt(Math.random()*(maxNum-minNum+1)+minNum,10); 
+		            default: 
+		                return 0; 
+		    } 
+		}
     </script>
 </head>
 
@@ -29,7 +41,7 @@
             <div class="col-sm-7">
                 <div class="signin-info">
                     <div class="logopanel m-b">
-                        <h1><img alt="[ NumberOne ]" src="../static/numberone.png" th:src="@{/numberone.png}"></h1>
+                        <h1><img alt="[ OA ]" src="../static/oa.png" th:src="@{/oa.png}"></h1>
                     </div>
                     <div class="m-b"></div>
                     <h4>欢迎使用 <strong>OA 管理系统</strong></h4>
@@ -76,6 +88,8 @@
 <script th:inline="javascript"> var ctx = [[@{/}]]; var captchaType = [[${captchaType}]]; </script>
 <!-- 全局js -->
 <script src="../static/js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+<!-- 背景图片平滑切换 -->
+<script src="../static/ajax/libs/jquery.backstretch.js" th:src="@{/ajax/libs/jquery.backstretch.js}"></script>
 <script src="../static/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
 <!-- 验证插件 -->
 <script src="../static/ajax/libs/validate/jquery.validate.min.js" th:src="@{/ajax/libs/validate/jquery.validate.min.js}"></script>
@@ -85,5 +99,23 @@
 <!-- <script src="http://tajs.qq.com/stats?sId=62048022"></script> -->
 <script src="../static/numberone/js/ry-ui.js" th:src="@{/numberone/js/ry-ui.js?v=3.2.0}"></script>
 <script src="../static/numberone/login.js" th:src="@{/numberone/login.js}"></script>
+<script type="text/javascript">
+$(function(){
+	$(".signin").backstretch([ 
+		"/img/login-background-2.jpg",
+		"/img/login-background-3.jpg",
+		"/img/login-background-4.jpg",
+		"/img/login-background-5.jpg",
+		"/img/login-background-6.jpg",
+		"/img/login-background-7.jpg",
+		"/img/login-background-8.jpg",
+		"/img/login-background-1.jpg"
+		], { 
+		fade: 1000, 
+		duration: 8000 
+		} 
+	);
+});
+</script>
 </body>
 </html>

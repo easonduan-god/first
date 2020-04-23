@@ -1,0 +1,352 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								任务号：task_id组成 TS+年月日+四位数序号：<input type="text" name="taskId"/>
+							</li>
+
+							<li>
+								任务标题：<input type="text" name="taskTitle"/>
+							</li>
+
+							<li>
+								任务状态：task_flag待处理1/处理中2/处理完成3/已审核4/返工5：<input type="text" name="taskFlag"/>
+							</li>
+
+							<li>
+								任务类型：task_type需求设计0/需求开发1/需求测试2/缺陷修复3/其他4：<input type="text" name="taskType"/>
+							</li>
+
+							<li>
+								难易程度：diff_level 简单任务（0.7/0.8/0.9）/一般难度（1.0）/较高难度（1.1）/次高难度（1.2）/最高难度（1.3）
+            ：<input type="text" name="diffLevel"/>
+							</li>
+
+							<li>
+								优先级：priority重要且紧急1/重要2/紧急3/普通4/基金相关：<input type="text" name="priority"/>
+							</li>
+
+							<li>
+								计划开始时间：plan_start_date 年月日：<input type="text" name="planStartDate"/>
+							</li>
+
+							<li>
+								计划完成时间：<input type="text" name="planEndDate"/>
+							</li>
+
+							<li>
+								预计工时：<input type="text" name="planHours"/>
+							</li>
+
+							<li>
+								实际处理工时：<input type="text" name="realStartDate"/>
+							</li>
+
+							<li>
+								实际处理工时：<input type="text" name="realEndDate"/>
+							</li>
+
+							<li>
+								处理工时：<input type="text" name="dealHours"/>
+							</li>
+
+							<li>
+								审核工时：<input type="text" name="auditHours"/>
+							</li>
+
+							<li>
+								任务描述：<input type="text" name="taskDesc"/>
+							</li>
+
+							<li>
+								任务说明附件：<input type="text" name="taskAppendix"/>
+							</li>
+
+							<li>
+								处理部门id：<input type="text" name="dealDeptId"/>
+							</li>
+
+							<li>
+								处理部门名：<input type="text" name="dealDeptName"/>
+							</li>
+
+							<li>
+								创建人用户id：<input type="text" name="createUserId"/>
+							</li>
+
+							<li>
+								创建人工号：<input type="text" name="createEmpId"/>
+							</li>
+
+							<li>
+								创建人姓名：<input type="text" name="createUserName"/>
+							</li>
+
+							<li>
+								创建时间 精确到时分秒：<input type="text" name="createTime"/>
+							</li>
+
+							<li>
+								处理人用户id：<input type="text" name="dealUserId"/>
+							</li>
+
+							<li>
+								处理人工号：<input type="text" name="dealEmpId"/>
+							</li>
+
+							<li>
+								处理人姓名：<input type="text" name="dealUserName"/>
+							</li>
+
+							<li>
+								处理时间：<input type="text" name="dealTime"/>
+							</li>
+
+							<li>
+								审核人用户id：<input type="text" name="auditUserId"/>
+							</li>
+
+							<li>
+								审核人工号：<input type="text" name="auditEmpId"/>
+							</li>
+
+							<li>
+								审核人姓名：<input type="text" name="auditUserName"/>
+							</li>
+
+							<li>
+								审核时间：<input type="text" name="auditTime"/>
+							</li>
+
+							<li>
+								删除标志 0正常/1删除：<input type="text" name="delFlag"/>
+							</li>
+
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="sys:workTask:add">
+					<i class="fa fa-plus"></i> 添加
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="sys:workTask:edit">
+					<i class="fa fa-edit"></i> 修改
+				</a>
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="sys:workTask:remove">
+					<i class="fa fa-remove"></i> 删除
+				</a>
+				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="sys:workTask:export">
+						<i class="fa fa-download"></i> 导出
+				 </a>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('sys:workTask:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('sys:workTask:remove')}]];
+        var prefix = ctx + "sys/workTask";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "任务分配，执行，审核",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'taskRecordId', 
+					title : '记录id',
+					visible: false
+				},
+				{
+					field : 'taskId', 
+					title : '任务号：task_id组成 TS+年月日+四位数序号',
+					sortable: true
+				},
+				{
+					field : 'taskTitle', 
+					title : '任务标题',
+					sortable: true
+				},
+				{
+					field : 'taskFlag', 
+					title : '任务状态：task_flag待处理1/处理中2/处理完成3/已审核4/返工5',
+					sortable: true
+				},
+				{
+					field : 'taskType', 
+					title : '任务类型：task_type需求设计0/需求开发1/需求测试2/缺陷修复3/其他4',
+					sortable: true
+				},
+				{
+					field : 'diffLevel', 
+					title : '难易程度：diff_level 简单任务（0.7/0.8/0.9）/一般难度（1.0）/较高难度（1.1）/次高难度（1.2）/最高难度（1.3）
+            ',
+					sortable: true
+				},
+				{
+					field : 'priority', 
+					title : '优先级：priority重要且紧急1/重要2/紧急3/普通4/基金相关',
+					sortable: true
+				},
+				{
+					field : 'planStartDate', 
+					title : '计划开始时间：plan_start_date 年月日',
+					sortable: true
+				},
+				{
+					field : 'planEndDate', 
+					title : '计划完成时间',
+					sortable: true
+				},
+				{
+					field : 'planHours', 
+					title : '预计工时',
+					sortable: true
+				},
+				{
+					field : 'realStartDate', 
+					title : '实际处理工时',
+					sortable: true
+				},
+				{
+					field : 'realEndDate', 
+					title : '实际处理工时',
+					sortable: true
+				},
+				{
+					field : 'dealHours', 
+					title : '处理工时',
+					sortable: true
+				},
+				{
+					field : 'auditHours', 
+					title : '审核工时',
+					sortable: true
+				},
+				{
+					field : 'taskDesc', 
+					title : '任务描述',
+					sortable: true
+				},
+				{
+					field : 'taskAppendix', 
+					title : '任务说明附件',
+					sortable: true
+				},
+				{
+					field : 'dealDeptId', 
+					title : '处理部门id',
+					sortable: true
+				},
+				{
+					field : 'dealDeptName', 
+					title : '处理部门名',
+					sortable: true
+				},
+				{
+					field : 'createUserId', 
+					title : '创建人用户id',
+					sortable: true
+				},
+				{
+					field : 'createEmpId', 
+					title : '创建人工号',
+					sortable: true
+				},
+				{
+					field : 'createUserName', 
+					title : '创建人姓名',
+					sortable: true
+				},
+				{
+					field : 'createTime', 
+					title : '创建时间 精确到时分秒',
+					sortable: true
+				},
+				{
+					field : 'dealUserId', 
+					title : '处理人用户id',
+					sortable: true
+				},
+				{
+					field : 'dealEmpId', 
+					title : '处理人工号',
+					sortable: true
+				},
+				{
+					field : 'dealUserName', 
+					title : '处理人姓名',
+					sortable: true
+				},
+				{
+					field : 'dealTime', 
+					title : '处理时间',
+					sortable: true
+				},
+				{
+					field : 'auditUserId', 
+					title : '审核人用户id',
+					sortable: true
+				},
+				{
+					field : 'auditEmpId', 
+					title : '审核人工号',
+					sortable: true
+				},
+				{
+					field : 'auditUserName', 
+					title : '审核人姓名',
+					sortable: true
+				},
+				{
+					field : 'auditTime', 
+					title : '审核时间',
+					sortable: true
+				},
+				{
+					field : 'delFlag', 
+					title : '删除标志 0正常/1删除',
+					sortable: true
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.taskRecordId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.taskRecordId + '\')"><i class="fa fa-remove"></i>删除</a>');
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

@@ -1,9 +1,14 @@
 package com.numberone.web.controller.system;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -241,7 +246,14 @@ public class SysUserController extends BaseController
     {
         return toAjax(userService.changeStatus(user));
     }
-    
+    @Autowired
+    private CacheManager cacheManager;
+
+    private Cache<String, List<Map<String,String>>> cache;
+    @PostConstruct
+    private void init(){
+    	cache = cacheManager.getCache("querableCache");
+    }
     /**
      * 返回select2需要的用户名 和id 根据员工号或名称或名称首字母搜索
      * @param: @param empAttendAudit
@@ -253,10 +265,46 @@ public class SysUserController extends BaseController
 	@ResponseBody
 	public AjaxResult searchUser(SysUser user){
     	user.setUserName(StringUtils.lowerCase(user.getUserName()));
-    	List<Map<String, Object>> list = userService.selectUserByKey(user);
-    	AjaxResult result = new AjaxResult();
+    	
+    	List<Map<String,String>> querableList = cache.get("querableMap");
+		List<Map<String,String>> list = new ArrayList<Map<String,String>>();
+		
+		if(querableList!=null){
+			for (Map<String, String> item : querableList) {
+				if (item.get("searchText").contains(user.getUserName()) || item.get("loginName").startsWith(user.getUserName())) {
+					list.add(item);
+				}
+			}
+		}
+		AjaxResult result = new AjaxResult();
     	result.put("code", "0");
     	result.put("results", list);
 		return result;
 	}
+    
+    /**
+     * 选择用户页面
+     * @param: @param mmap
+     * @param: @return
+     * @return: String
+     */
+    @RequestMapping("/choosePerson")
+    public String choosePerson(ModelMap mmap){
+    	//查询用户数
+    	mmap.put("userCount", userService.selectUserCount(getSysUser()));
+    	return prefix + "/choosePerson";
+    }
+    
+    /**
+     * 加载用户列表树 也包括期所在部分
+     * @param: @return
+     * @return: List<Map<String,Object>>
+     */
+    @GetMapping("/treeData")
+    @ResponseBody
+    public List<Map<String, Object>> treeData()
+    {
+        List<Map<String, Object>> tree = userService.selectUserTree(getSysUser());
+        return tree;
+    }
 }

@@ -98,20 +98,54 @@ public class SysIndexController extends BaseController
 	    	List<String> itemList4 = new ArrayList<String>();
 	    	itemList4.add("10");
 	    	itemList4.add("工作日");
+	    	List<String> itemList5 = new ArrayList<String>();
+	    	itemList5.add("1");
+	    	itemList5.add("年假");
 	    	itemMap.put("2020-03-23",itemList2);
 	    	itemMap.put("2020-03-25",itemList3);
 	    	itemMap.put("2020-03-15",itemList4);
+	    	itemMap.put("2020-03-30",itemList5);
 	    map.put("data", itemMap);
 	    return map;
     }
 
-    // 系统介绍
+    // 控制台
     @GetMapping("/system/main")
     public String main(ModelMap mmap)
     {
         List<SysNotice> noticeList = noticeService.selectMainNotice();
         mmap.put("version", Global.getVersion());
         mmap.put("noticeList", noticeList);
+        
+        //待办事项
+        
         return "main";
     }
+
+    // test页面
+    @GetMapping("/system/test")
+    public String test(ModelMap mmap)
+    {
+    	return "test";
+    }
+    // 预览页面
+    @GetMapping("/system/preview")
+    public String preview(ModelMap mmap)
+    {
+    	return "preview";
+    }
+    /*@GetMapping("/system/json/{jsonName}")
+    @ResponseBody
+    public String animationJson(@PathVariable(name="jsonName") String jsonName){
+    	
+    	Resource res = null;
+    	String json = "";
+		try {
+			res = new ClassPathResource("static/json/"+jsonName+".json");
+			json = IOUtils.toString(res.getInputStream(), Charset.forName("UTF-8"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	return json;
+    }*/
 }

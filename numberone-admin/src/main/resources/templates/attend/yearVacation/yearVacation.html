@@ -8,30 +8,45 @@
 	<div class="container-div">
 		<div class="row">
 			<div class="col-sm-12 search-collapse">
-				<form id="yearVacation-form">
-					<div class="select-list">
-						<ul>
-							<li>
-								所属部门：<select name="params[deptId]" th:with="type=${@dict.getTypeByUserId('sys_dept')}">
-									<option value="">所有</option>
+				<form role="form" id="yearVacation-search-form" class="form-horizontal">
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">部&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;门：</label>
+							<div class="col-sm-9">
+								<select name="params[deptId]" class="form-control" th:with="type=${@dict.getTypeByUserId('sys_dept')}" id="deptInput">
+									<option value=""></option>
 									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
 								</select>
-							</li>
-							<li>
-								员&nbsp;&nbsp;工：<select form-control select2-hidden-accessible name="params[userId]">
-									<option value="0" th:if="${userList.size()>=1}">所有</option>
-									<option th:each="userItem : ${userList}" th:text="${userItem.userName}+'-'+${userItem.loginName}+'-'+${userItem.empId}" th:value="${userItem.userId}" th:selected="${user.userId==userItem.userId}"></option>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">员&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;工：</label>
+							<div class="col-sm-9">
+								<select class="form-control" id="userInput" name="userInput">
 								</select>
-							</li>
-							<li>
-								年度：<input type="text" class="year-input" name="year" autocomplete="off"/>
-							</li>
-							
-							<li>
+								<input type="hidden" name="params[userIds]" id="userIds">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;度：</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control year-input"  name="year" th:value="${currYear}">
+							</div>
+						</div>
+					</div>
+					
+					
+					<div class="col-md-6 ">
+						<div class="form-group draggable">
+							<div class="col-sm-12">
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
-							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
-							</li>
-						</ul>
+					    		<a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</div>
+						</div>
 					</div>
 				</form>
 			</div>
@@ -48,10 +63,52 @@
 		</div>
 	</div>
 	<div th:include="include :: footer"></div>
+    <script th:src="@{/ajax/libs/select/select2.js}"></script>
 	<script th:inline="javascript">
 		var prefix = ctx + "attend/yearVacation";
 		
 		$(function() {
+			/* userInput deptInput初始化select2 */
+        	$('#deptInput').select2({
+			    placeholder: '请选择'
+			});
+        	$("#userInput").select2({
+        		placeholder : "请输入人员工号或名称或名称首字母...",
+        		minimumInputLength : 1,//最小需要输入多少个字符才进行查询
+        		multiple : true,//支持多选
+        		allowClear : true,//允许清空
+        		ajax : {
+        			url : "/system/user/searchUser",
+        			dataType : 'json',
+        			type : "post",
+        			delay : 100,
+        			data : function(userName, page) {//向后台发送参数
+        				return {
+        					userName : userName.term
+        				};
+        			},
+        			results : function(data, page) {//处理结果
+        				return {
+        					data
+        				};
+        			}
+        		},
+        		formatResult : function(result, container, query, escapeMarkup) {
+        			return result.userName;
+        		},
+        		formatSelection : function(result, container, query, escapeMarkup) {
+        			return result.userName;
+        		},
+        		formatInputTooShort : function() {
+        			return "请输入人员工号或名称或名称首字母...";
+        		},
+        		escapeMarkup : function(m) {
+        			return m;
+        		}
+        	});
+        	$("#userInput").change(function(){
+        		$("#userIds").val($.form.selectSelects("userInput"));
+        	});
 			layui.use('laydate', function(){
 			  var laydate = layui.laydate;
 			  
@@ -115,40 +172,12 @@
 		    };
 		    $.table.init(options);
 		});
-		
-		/* 角色管理-分配数据权限 */
-		function rule(roleId) {
-		    var url = prefix + '/rule/' + roleId;
-		    $.modal.open("分配数据权限", url);
-		}
-		
-		/* 角色状态显示 */
-		function statusTools(row) {
-		    if (row.status == 1) {
-    			return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.roleId + '\')"></i> ';
-    		} else {
-    			return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.roleId + '\')"></i> ';
-    		}
-		}
-		
-		/* 角色管理-停用 */
-		function disable(roleId) {
-			$.modal.confirm("确认要停用角色吗？", function() {
-				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 1 });
-		    })
-		}
-
-		/* 角色管理启用 */
-		function enable(roleId) {
-			$.modal.confirm("确认要启用角色吗？", function() {
-				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 0 });
-		    })
-		}
-		
-		/*字典列表-详细*/
-		function originalData() {
-		    var url = prefix + '/originalData';
-		    createMenuItem(url, "原始数据");
+		//重置表单
+		function reset(){
+			$("#yearVacation-search-form")[0].reset();
+			$('#deptInput').val("").trigger('change');
+		    $('#userInput').val("").trigger('change');
+		    $("#userIds").val("");
 		}
 	</script>
 </body>

@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+			<div class="form-group">	
+				<div class="col-sm-12">
+					<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span><i></i>
+					<span class="text-primary">流程执行过程一览</span>
+					<hr/>
+				</div>
+				<div class="col-sm-12" th:if="${(not rsList.isEmpty())}">
+					<span th:each="itemMap,iterStat : ${rsList}">
+						<button type="button" class="btn btn-info btn-lg" th:if="${iterStat.first}" th:onclick="openAttendBillDetail([[${itemMap['overtimeBillId']}]])">
+						  <span class="glyphicon glyphicon-play" aria-hidden="true"></span> [[${itemMap['userName']}]]
+						</button>
+						<button type="button" class="btn btn-danger btn-lg" th:if="${(not iterStat.last) and (not iterStat.first) and itemMap['auditFlag']==2}" th:onclick="openAuditDetail([[${itemMap['overtimeAuditId']}]])">
+						  <span class="glyphicon glyphicon-user" aria-hidden="true"></span> [[${itemMap['auditName']+'('+itemMap['auditFlagText']+')'}]]
+						</button>
+						<button type="button" class="btn btn-info btn-lg" th:if="${(not iterStat.last) and (not iterStat.first) and (itemMap['auditFlag']!=2)}" th:onclick="openAuditDetail([[${itemMap['overtimeAuditId']}]])">
+						  <span class="glyphicon glyphicon-user" aria-hidden="true"></span> [[${itemMap['auditName']+'('+itemMap['auditFlagText']+')'}]]
+						</button>
+						<button type="button" class="btn btn-warning btn-lg" th:if="${iterStat.last and (itemMap['isComplete']==null)}" th:onclick="openAuditDetail([[${itemMap['overtimeAuditId']}]])">
+						  <span class="glyphicon glyphicon-user" aria-hidden="true"></span> [[${itemMap['auditName']+'('+itemMap['auditFlagText']+')'}]]
+						</button>
+						<button type="button" class="btn btn-success btn-lg" th:if="${iterStat.last and itemMap['isComplete']==1}">
+						  <span class="glyphicon glyphicon-stop" aria-hidden="true"></span> 结束
+						</button>
+						<span class="glyphicon glyphicon-arrow-right" aria-hidden="true" th:if="${not iterStat.last}"></span>
+					</span>
+					
+				</div>
+			</div>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+    	var prefix = ctx + "attend/overtimeBill";
+		function submitHandler() {
+	    }
+		//打开考勤单详情页
+		function openAttendBillDetail(overtimeBillId){
+			openDialog(prefix+"/detailMine/"+overtimeBillId);
+		}
+		//打开考勤审核单详情页
+		function openAuditDetail(overtimeAuditId){
+			openDialog(prefix+"/detailAudit/"+overtimeAuditId);
+		}
+		
+		function openDialog(url){
+			var _url = url;
+            var _width = 400; 
+            var _height = 400;
+        	//如果是移动端，就使用自适应大小弹窗
+        	if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+        	    _width = 'auto';
+        	    _height = 'auto';
+        	}
+        	layer.open({
+        		type: 2,
+        		area: [_width + 'px', _height + 'px'],
+        		fix: false,
+        		//不固定
+        		maxmin: true,
+        		shade: 0.3,
+        		title: "详细",
+        		content: _url,
+        		btn: ['关闭'],
+        	    // 弹层外区域关闭
+        		shadeClose: true,
+        		cancel: function(index){
+        			return true;
+     	        }
+        	});
+		}
+	</script>
+</body>
+</html>

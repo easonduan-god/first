@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-	<property name="log.path" value="workspace/eclipse/home/numberone/logs" />
+	<property name="log.path" value="logs" />
 	<property name="log.pattern" value="%d{HH:mm:ss.SSS} %logger{50} - [%method,%line] - %msg%n" />
 	<!-- <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" /> -->
 
@@ -13,7 +13,7 @@
 	</appender>
 	
 	<!-- 系统日志输出 -->
-	<appender name="file_info"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
 	    <file>${log.path}/sys-info.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- 按天回滚 daily -->
@@ -63,10 +63,10 @@
     </appender>
 	
 	<!-- 显示形成的sql、使用的参数、结果集 -->
-	
-	<!-- <logger name="java.sql" level="debug" />
-	<logger name="org.springframework.jdbc" level="debug" /> -->
-	
+	<!--
+		<logger name="java.sql" level="debug" />
+		<logger name="org.springframework.jdbc" level="debug" />
+	-->
 
 	<logger name="com.numberone" level="info" />
 
@@ -75,13 +75,13 @@
 	</root>
 	
 	<!--系统操作日志-->
-    <root level="off">
+    <root level="info">
         <appender-ref ref="file_info" />
         <appender-ref ref="file_error" />
     </root>
 	
 	<!--系统用户操作日志-->
-    <logger name="sys-user" level="off">
+    <logger name="sys-user" level="info">
         <appender-ref ref="sys-user"/>
     </logger>
 </configuration> 

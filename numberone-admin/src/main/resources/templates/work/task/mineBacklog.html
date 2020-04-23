@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style type="text/css">
+	.form-control[readonly]  {
+		background-color: white;
+	}
+	a{
+		color: blue;
+	}
+	a:hover, a:focus, a:active {
+	    color: #FFFFFF;
+	    background-color: #437cae!important;
+	}
+	
+</style>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse" style="padding-top: 20px">
+				<form id="task-mineBacklog-form" class="form-horizontal">
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">处理部门：</label>
+							<div class="col-sm-9">
+								<select name="dealDeptId" class="form-control" th:with="type=${@dict.getTypeByUserId('sys_dept')}" id="deptInput">
+									<option value=""></option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">处理状态：</label>
+							<div class="col-sm-9">
+								<select name="taskFlag" id="taskFlag" class="form-control" th:with="type=${@dict.getType('work_task_flag')}">
+									<option value='0'>全部</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="${dict.dictValue=='1'}"></option>
+								</select>
+							</div>
+							
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">任务编号：</label>
+							<div class="col-sm-9" >
+								<input type="text" name="taskId" class="form-control">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">任务标题：</label>
+							<div class="col-sm-9" >
+								<input type="text" name="taskTitle" class="form-control">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">创建时间：</label>
+							<div class="col-sm-4">
+								<input type="text" class="time-input form-control" id="startTime"  placeholder="开始时间" name="params[createStartDate]"/>
+							</div>
+							<div class="col-sm-1"><hr style="background-color:black;height: 1px;border: none; margin-top: 15px"></div>
+							<div class="col-sm-4">
+								<input type="text" class="time-input form-control" id="endTime" placeholder="结束时间" name="params[createEndDate]"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">处理时间：</label>
+							<div class="col-sm-4">
+								<input type="text" class="time-input form-control" id="startTime" placeholder="开始时间" name="params[dealStartDate]"/>
+							</div>
+							<div class="col-sm-1"><hr style="background-color:black;height: 1px;border: none; margin-top: 15px"></div>
+							<div class="col-sm-4">
+								<input type="text" class="time-input form-control" id="endTime" placeholder="结束时间" name="params[dealEndDate]"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 ">
+						<div class="form-group draggable">
+							<div class="col-sm-12">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+					    		<a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+	        </div>
+			<div class="col-sm-12 select-table">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:src="@{/ajax/libs/select/select2.js}"></script>
+    <script th:inline="javascript">
+        var prefix = ctx + "work/task";
+        var types = [[${@dict.getType('work_task_type')}]];
+        var flags = [[${@dict.getType('work_task_flag')}]];
+        $(function() {
+        	
+        	/* userInput deptInput初始化select2 */
+        	$('#deptInput').select2({
+			    placeholder: '请选择'
+			});
+
+            var options = {
+            		url: prefix + "/mineBacklogList",
+                    detailUrl: prefix + "/detail/{id}",
+                    performUrl: prefix + "/perform/{id}",
+                    sortable: true,                     // 是否启用排序
+    				search: false,
+    				pagination: true,   // 是否显示分页（*）
+                    pageNumber: 1,      // 初始化加载第一页，默认第一页
+                    pageSize: 5,         // 每页的记录行数（*） 
+                    pageList: [5,10, 25, 50],    // 可供选择的每页的行数（*）
+                    showSearch: false,   // 是否显示检索信息
+                    showRefresh: true, // 是否显示刷新按钮
+                    showColumns: false, // 是否显示隐藏某列下拉框
+                    showToggle: false,   // 是否显示详细视图和列表视图的切换按钮
+                    showFooter : false,
+                    modalName: "部门任务待办",
+    		        showExport: true,
+    		        uniqueId : "taskRecordId",
+                    columns: [
+                    {
+    		            title: '操作',
+    		            align: 'center',
+    		            formatter: function(value, row, index) {
+    		                var actions = [];
+    		                if(row.taskFlag=='1' || row.taskFlag=='2' || row.taskFlag=='5'){
+	    		                actions.push('<a class="btn btn-success btn-xs" href="#" onclick="$.operate.performFull(\'' + row.taskRecordId + '\')"><i class="fa fa-edit"></i>处理任务</a> ');
+    		                }
+    		                if(row.taskFlag=='5'){//返工原因
+	    		                actions.push('<a class="btn btn-danger btn-xs" href="#" onclick="reworkDetail(\'' + row.taskRecordId + '\')"><i class="fa fa-search"></i>返工详情</a> ');
+    		                }
+    		                if(row.taskFlag=='6'){//执行人变更
+	    		                actions.push('<a class="btn btn-warning btn-xs" href="#" onclick="alterDetail(\'' + row.taskRecordId + '\')"><i class="fa fa-search"></i>变更详情</a> ');
+    		                }
+    		                return actions.join('');
+    		            }
+    		        },
+    				{
+    					field : 'taskRecordId', 
+    					visible: false
+    				},
+    				{
+    					field : 'taskId', 
+    					align: 'center',
+    					title : '任务编号',
+    		            formatter: function(value, row, index) {
+    		            	return '<a href="#"  onclick="$.operate.detailFull(\'' + row.taskRecordId + '\')">' + value + '</a>';
+    		            }
+    				},
+    				{
+    					field : 'taskTitle', 
+    					align: 'center',
+    					title : '任务标题'
+    				},
+    				{
+    					field : 'taskType', 
+    					align: 'center',
+    					title : '任务类型',
+    					formatter: function(value, row, index) {
+    						return $.table.selectDictLabel(types, value);
+    		            }
+    				},
+    				{
+    					field : 'taskFlag', 
+    					align: 'center',
+    					title : '任务状态',
+    					formatter: function(value, row, index) {
+    						return $.table.selectDictLabel(flags, value);
+    		            }
+    				},
+    				{
+    					field : 'dealUserName', 
+    					align: 'center',
+    					title : '处理人'
+    				},
+    				{
+    					field : 'planStartDate', 
+    					align: 'center',
+    					title : '计划开始日期',
+    					sortable: true,
+    		            formatter: function(value, row, index) {
+    		            	if(value==null) return value;
+    						return value.split(' ')[0];
+    		            }
+    				},
+    				{
+    					field : 'planEndDate', 
+    					align: 'center',
+    					title : '计划完成日期',
+    					sortable: true,
+    		            formatter: function(value, row, index) {
+    		            	if(value==null) return value;
+    						return value.split(' ')[0];
+    		            }
+    				},
+    				{
+    					field : 'planHours', 
+    					align: 'center',
+    					title : '预计工时',
+    					sortable: true
+    				}]
+            };
+            $.table.init(options);
+        });
+        
+        function reset(){
+			$("#task-mineBacklog-form")[0].reset();
+			$('#deptInput').val("").trigger('change');
+		    $('#taskFlag').val("").trigger('change');
+		}
+        
+        function alterDetail(taskRecordId){
+    		$.post(prefix+"/alterDetail",{"taskRecordId":taskRecordId},function(result){
+    			$("#task-alterDetail-form").find("input[name=alterUserName]").val(result.data.alterUserName);
+    			$("#task-alterDetail-form").find("textarea[name=remark]").val(result.data.remark);
+	    		$.modal.openDiv("指派", "#detailDiv");
+    		},"json");
+        }
+        function reworkDetail(taskRecordId){
+    		$.post(prefix+"/reworkDetail",{"taskRecordId":taskRecordId},function(result){
+    			$("#task-reworkDetail-form").find("input[name=auditUserName]").val(result.data.auditUserName);
+    			$("#task-reworkDetail-form").find("textarea[name=remark]").val(result.data.remark);
+	    		$.modal.openDiv("指派", "#reworkDiv");
+    		},"json");
+        }
+    </script>
+</body>
+<div class="col-sm-12 search-collapse" id="detailDiv" style="display: none;">
+	<form id="task-alterDetail-form" class="form-horizontal">					
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">处理人：</label>
+			<div class="col-sm-9" >
+				<input type="text" name="alterUserName" class="form-control" readonly="readonly">
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">备注：</label>
+			<div class="col-sm-9" >
+				<textarea name="remark" rows="5" class="form-control" readonly="readonly"></textarea>
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+<div class="col-sm-12 search-collapse" id="reworkDiv" style="display: none;">
+	<form id="task-reworkDetail-form" class="form-horizontal">					
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">审核人：</label>
+			<div class="col-sm-9" >
+				<input type="text" name="auditUserName" class="form-control" readonly="readonly">
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">返工原因：</label>
+			<div class="col-sm-9" >
+				<textarea name="remark" rows="5" class="form-control" readonly="readonly"></textarea>
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+</html>

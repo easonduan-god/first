@@ -14,11 +14,12 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 @MapperScan("com.numberone.*.mapper")
 public class NumberoneApplication
 {
-    public static void main(String[] args)
+	
+    public static void main(String[] args) throws Exception
     {
         // System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication.run(NumberoneApplication.class, args);
+    	
         System.out.println("(♥◠‿◠)ﾉﾞ  Numberone启动成功   ლ(´ڡ`ლ)ﾞ  \n");
     }
-    
 }

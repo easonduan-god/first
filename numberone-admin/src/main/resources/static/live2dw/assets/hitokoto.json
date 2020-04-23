@@ -1,0 +1,315 @@
+[
+    {
+    "id": 576,
+    "hitokoto": "“哦,要进画里了,孩子们,走好。”——将被二维化的罗辑",
+    "type": "d",
+    "from": "三体",
+    "from_who": null,
+    "creator": "yeye",
+    "creator_uid": 29,
+    "reviewer": 0,
+    "uuid": "743e535e-4b5d-4ac0-92fb-0909c4722218",
+    "created_at": "1473563523"
+    },
+    {
+  "id": 4622,
+  "hitokoto": "花开如火，也如寂寞。",
+  "type": "f",
+  "from": "——顾城",
+  "from_who": null,
+  "creator": "sahara",
+  "creator_uid": 1423,
+  "reviewer": 0,
+  "uuid": "be5845b8-b91d-476d-b0eb-4907dba5e417",
+  "created_at": "1567795200"
+},
+{
+  "id": 5137,
+  "hitokoto": "髣髴兮若轻云之蔽月，飘飖兮若流风之回雪。",
+  "type": "i",
+  "from": "洛神赋",
+  "from_who": "曹植",
+  "creator": "海心月",
+  "creator_uid": 4416,
+  "reviewer": 1044,
+  "uuid": "9ae0a8af-b362-4812-80d6-33fbbee3e70b",
+  "created_at": "1575595704"
+}
+,{
+  "id": 3848,
+  "hitokoto": "前尘种种，似烟似幻，惟有此人教我深感不负大好春光。",
+  "type": "d",
+  "from": "魔道祖师",
+  "from_who": null,
+  "creator": "我養你啊_",
+  "creator_uid": 2033,
+  "reviewer": 0,
+  "uuid": "77c2ef62-057b-4a61-ac43-4a06f14f99b3",
+  "created_at": "1537446503"
+}
+,{
+  "id": 417,
+  "hitokoto": "别人说的记在脑袋里，而自己的，则放在心里。",
+  "type": "f",
+  "from": "网络",
+  "from_who": null,
+  "creator": "Sai",
+  "creator_uid": 0,
+  "reviewer": 0,
+  "uuid": "870857f7-663f-48aa-87aa-65bf26cd6907",
+  "created_at": "1468949608"
+}
+,{
+  "id": 5334,
+  "hitokoto": "我们的时代还没到来，有的人死后方生。",
+  "type": "d",
+  "from": "在世纪的转折点上",
+  "from_who": "尼采",
+  "creator": "邵素",
+  "creator_uid": 5570,
+  "reviewer": 1,
+  "uuid": "b0462ee5-90f5-4d27-a995-40d97d4a18d8",
+  "created_at": "1584852381"
+}
+,{
+  "id": 4655,
+  "hitokoto": "这个世界有很多置他人与不幸，并幸灾乐祸的人。",
+  "type": "d",
+  "from": "梦幻花",
+  "from_who": null,
+  "creator": "彭小呆",
+  "creator_uid": 3110,
+  "reviewer": 1044,
+  "uuid": "665171d3-f62e-4931-8f5f-7bcfdeae7f45",
+  "created_at": "1569312298"
+}
+,{
+  "id": 5541,
+  "hitokoto": "十年磨一剑，霜刃未曾试。",
+  "type": "i",
+  "from": "剑客 / 述剑",
+  "from_who": "贾岛",
+  "creator": "a632079",
+  "creator_uid": 1044,
+  "reviewer": 1044,
+  "uuid": "0d4ccd01-a095-4d7c-9615-acda3502351e",
+  "created_at": "1586266071"
+}
+,{
+  "id": 4256,
+  "hitokoto": "归期未如佳期至，巴山夜雨留荒词。",
+  "type": "c",
+  "from": "剑网3",
+  "from_who": null,
+  "creator": "斟酒",
+  "creator_uid": 2651,
+  "reviewer": 0,
+  "uuid": "5a3543dc-6483-40d0-81a4-bdb67a5b70c9",
+  "created_at": "1547977215"
+}
+,{
+  "id": 5081,
+  "hitokoto": "悲剧将人生的有价值的东西毁灭给人看，喜剧将那无价值的撕破给人看。",
+  "type": "d",
+  "from": "语丝",
+  "from_who": "鲁迅",
+  "creator": "Ling",
+  "creator_uid": 5012,
+  "reviewer": 4756,
+  "uuid": "b017da94-55f6-4a66-bcca-c4a098da781e",
+  "created_at": "1582284187"
+}
+,{
+  "id": 5328,
+  "hitokoto": "一举一动牵吾魂，一言一语勾吾思。",
+  "type": "e",
+  "from": "只是",
+  "from_who": "只是",
+  "creator": "只是",
+  "creator_uid": 5542,
+  "reviewer": 1,
+  "uuid": "a2ea288b-0c66-41be-8172-e6c3c715b2b3",
+  "created_at": "1584693381"
+}
+,{
+  "id": 523,
+  "hitokoto": "死亡只要在人生的终点尝试一次就够了~",
+  "type": "a",
+  "from": "Re：从零开始的异世界生活",
+  "from_who": null,
+  "creator": "酷儿",
+  "creator_uid": 6,
+  "reviewer": 0,
+  "uuid": "db0a436d-a724-4ae8-ab5b-f190ba21dd6f",
+  "created_at": "1472550150"
+}
+,{
+  "id": 242,
+  "hitokoto": "嗯，一个人也要加油，我是坚强的孩子。",
+  "type": "a",
+  "from": "AIR",
+  "from_who": null,
+  "creator": "cloverxue",
+  "creator_uid": 0,
+  "reviewer": 0,
+  "uuid": "f798e0d0-273a-45c9-bf5a-b93c6093224e",
+  "created_at": "1468605916"
+}
+,{
+  "id": 5043,
+  "hitokoto": "跑得快不一定赢，不跌跟头才是成功",
+  "type": "g",
+  "from": "8848太监手机",
+  "from_who": null,
+  "creator": "泠泫凝",
+  "creator_uid": 4598,
+  "reviewer": 4756,
+  "uuid": "c6af7245-fe16-4290-bc30-d037b94563ce",
+  "created_at": "1578204401"
+}
+,{
+  "id": 5508,
+  "hitokoto": "怕相思，已相思，轮到相思没处辞，眉间露一丝。",
+  "type": "i",
+  "from": "长相思·折花枝",
+  "from_who": "俞彦",
+  "creator": "a632079",
+  "creator_uid": 1044,
+  "reviewer": 1044,
+  "uuid": "4db50f04-4e55-434f-82ea-c843e0d779d5",
+  "created_at": "1586266060"
+}
+,{
+  "id": 941,
+  "hitokoto": "若没有可依靠之处，便也找不到自己的归宿，躲躲藏藏随波逐流，依附于某物，却又一头撞在看不见的墙壁上。",
+  "type": "a",
+  "from": "我的青春恋爱物语果然有问题",
+  "from_who": null,
+  "creator": "hitokoto",
+  "creator_uid": 1775,
+  "reviewer": 0,
+  "uuid": "457f7af9-e77e-477e-a052-d4049a9bc256",
+  "created_at": "1478787580"
+}
+,{
+  "id": 426,
+  "hitokoto": "生活就像超级女生，走到最后的都是纯爷们。",
+  "type": "f",
+  "from": "网络",
+  "from_who": null,
+  "creator": "X",
+  "creator_uid": 0,
+  "reviewer": 0,
+  "uuid": "eb2e8532-b24e-4907-94cd-6dc1e0dc3d51",
+  "created_at": "1468949613"
+}
+,{
+  "id": 720,
+  "hitokoto": "我不要你忘记他 , 我只要你记得我",
+  "type": "f",
+  "from": "网络",
+  "from_who": null,
+  "creator": "hitokoto",
+  "creator_uid": 1775,
+  "reviewer": 0,
+  "uuid": "b86a7a79-9720-492b-9ca4-d0a74ddd3ccc",
+  "created_at": "1478787580"
+}
+,{
+  "id": 4841,
+  "hitokoto": "我会化作人间的风雨陪在你的身边",
+  "type": "a",
+  "from": "大鱼海棠",
+  "from_who": null,
+  "creator": "smallxu",
+  "creator_uid": 2639,
+  "reviewer": 4756,
+  "uuid": "4bfeb20c-8424-47c7-988c-f0a53dec5cfe",
+  "created_at": "1572772766"
+}
+,{
+  "id": 4972,
+  "hitokoto": "我把这几个字写了又删，删了又写。",
+  "type": "e",
+  "from": "原创",
+  "from_who": "叶子",
+  "creator": "Vicky",
+  "creator_uid": 4913,
+  "reviewer": 1044,
+  "uuid": "87ec3ae8-320a-4999-a248-b31e559a87d5",
+  "created_at": "1581654035"
+},
+{"id":4924,"hitokoto":"此剑抚平天下不平事，此剑无愧世间有愧人。","type":"d","from":"雪中悍刀行","from_who":"烽火戏诸侯","creator":"Larry","creator_uid":4073,"reviewer":1,"uuid":"a2a26b36-adbb-4a00-83b1-70209f7a5e15","created_at":"1571145207"}
+,{"id":456,"hitokoto":"有些事情本身我们无法控制，只好控制自己。","type":"f","from":"网络","from_who":null,"creator":"Sai","creator_uid":0,"reviewer":0,"uuid":"b8bc17b5-b94d-407c-a13d-0c34cf721dcd","created_at":"1468949760"}
+,{"id":434,"hitokoto":"生活中若没有朋友，就像生活中没有阳光一样。","type":"f","from":"网络","from_who":null,"creator":"能美","creator_uid":0,"reviewer":0,"uuid":"fb3302c7-d101-441b-96e0-48f3b80ccb5f","created_at":"1468949619"}
+,{"id":4513,"hitokoto":"“喜欢一个人难道就要放弃吗。”","type":"e","from":"可爱猫","from_who":null,"creator":"un","creator_uid":3134,"reviewer":0,"uuid":"a090eac7-a77e-4be9-8c8a-d336a2c88a4b","created_at":"1562663829"}
+,{"id":565,"hitokoto":"我手里拿着刀，没法抱你，我放下刀，没法保护你！","type":"a","from":"死神","from_who":null,"creator":"贝贝","creator_uid":22,"reviewer":0,"uuid":"fc796714-6ab6-4e2e-9f49-ec4fc58a77b0","created_at":"1472978727"}
+,{"id":4264,"hitokoto":"你充满了决心。","type":"c","from":"UNDERTALE","from_who":null,"creator":"abc2237512422","creator_uid":1873,"reviewer":0,"uuid":"66235011-7c74-4da7-bcb9-14f887f8b062","created_at":"1548753213"}
+,{"id":4526,"hitokoto":"你启唇似又要咏遍上邪，说的却是：“我愿与君绝。”","type":"g","from":"上邪","from_who":null,"creator":"Venus","creator_uid":3500,"reviewer":0,"uuid":"0d303426-f760-4135-b653-82b052f89739","created_at":"1562980941"}
+,{"id":1217,"hitokoto":"每个人都曾有一个梦。但最后我们都把它弄丢了，在追逐幻影的路上。","type":"e","from":"西风","from_who":null,"creator":"this4th","creator_uid":467,"reviewer":0,"uuid":"c0bf6ba3-840a-4bec-af8e-985fb41d341a","created_at":"1501080854"}
+,{"id":4636,"hitokoto":"你怎么这么奇奇怪怪怪。。怪可爱的","type":"e","from":"还未找到女朋友的林同学","from_who":null,"creator":"wait.","creator_uid":3905,"reviewer":0,"uuid":"6d9f282c-0c49-4af5-a79e-0051890281f6","created_at":"1568398417"}
+,{"id":803,"hitokoto":"堕入黑暗裏的可怜影子啊，停止伤害他人的行为吧，犯下罪行的灵魂…想死一次么？","type":"a","from":"地狱少女","from_who":null,"creator":"hitokoto","creator_uid":1775,"reviewer":0,"uuid":"ceba8d18-808a-484e-9bc7-ee6e0298108b","created_at":"1478787580"}
+,{"id":3917,"hitokoto":"夷陵老祖，五文一张，十文三张！","type":"d","from":"魔道祖师","from_who":null,"creator":"我養你啊_","creator_uid":2033,"reviewer":0,"uuid":"26a24256-2207-4f3a-9efd-0ff56cd5dcd5","created_at":"1537446472"}
+,{"id":5199,"hitokoto":"只要假以时日，没有什么是不可战胜的。","type":"d","from":"福尔摩斯探案集","from_who":null,"creator":"eqmm","creator_uid":5209,"reviewer":1044,"uuid":"24be7fdc-7ae5-405c-8723-f32084a361e0","created_at":"1583222042"}
+,{"id":350,"hitokoto":"繁花落尽，明月映着谁老去……","type":"e","from":"滿城煙花落","from_who":null,"creator":"滿城煙花落","creator_uid":0,"reviewer":0,"uuid":"e45f1367-30de-47b4-bd9f-b92318c43ecf","created_at":"1468949353"}
+,{"id":1342,"hitokoto":"故人啊 已做了他人嫁","type":"g","from":"一醉南柯","from_who":null,"creator":"玉狐","creator_uid":1000,"reviewer":0,"uuid":"bdba2cf7-d5c8-44ec-bdec-f7c8c09fd5c8","created_at":"1514702738"}
+,{"id":3677,"hitokoto":"只要万事俱备，就能一直保持冷静，无论发生什么事，都不会害怕。","type":"a","from":"银魂","from_who":null,"creator":"逗逼领主","creator_uid":1292,"reviewer":0,"uuid":"48f8afae-120b-4336-bb5c-e8f5ef538244","created_at":"1530238125"}
+,{"id":5172,"hitokoto":"每想拥抱你一次，天空飘落一片雪，至此雪花拥抱撒哈拉！","type":"d","from":"撒哈拉的故事","from_who":"荷西","creator":"辣椒の酱","creator_uid":4270,"reviewer":4756,"uuid":"6e03b66f-1015-4222-ba1b-2ce764dc2b04","created_at":"1582969510"}
+,{"id":4027,"hitokoto":"你不会独属于我，但我心中有你的专属位置。","type":"e","from":"原创","from_who":null,"creator":"世界唯一の勇者","creator_uid":243,"reviewer":0,"uuid":"fbf70bcb-5d25-422e-ae16-5f132a1a4ddf","created_at":"1540464792"}
+,{"id":4981,"hitokoto":"冲动的红色终究是败在了白玫瑰的平淡和冷静上，狠狠的跌了一个大跟头，看着更加刺眼。","type":"j","from":"红玫瑰和白玫瑰","from_who":null,"creator":"我爱的曾经","creator_uid":4897,"reviewer":1044,"uuid":"7d23ea19-b8d9-4b08-ac03-ca28613e5ecb","created_at":"1581589896"}
+,{"id":4206,"hitokoto":"参差荇菜，左右芼之。窈窕淑女，钟鼓乐之。","type":"g","from":"关雎","from_who":null,"creator":"不朽千秋","creator_uid":2571,"reviewer":0,"uuid":"1e0734a1-4869-489b-afd2-d9483cd0806f","created_at":"1545974184"}
+,{"id":655,"hitokoto":"聚拢，成形，捻转，回绕，时而返回，暂歇，再联结。这就是组纽。这就是时间。这就是，联结","type":"a","from":"你的名字","from_who":null,"creator":"酷儿","creator_uid":6,"reviewer":0,"uuid":"b3928418-1530-45b0-b952-840301afe644","created_at":"1475388163"}
+,{"id":5020,"hitokoto":"奇怪的是，当他死去，所有人才开始爱他。","type":"k","from":"哲学","from_who":"崔雪莉","creator":"QIQI","creator_uid":494,"reviewer":1044,"uuid":"8ecd9ac2-8685-4991-a6a6-3c75cbc0e118","created_at":"1580309580"}
+,{"id":4910,"hitokoto":"一个人可以被毁灭，但不能被打败。","type":"d","from":"老人与海","from_who":"海明威","creator":"夕之树","creator_uid":4248,"reviewer":1,"uuid":"145d3487-f367-4bf8-80b1-24d07e622a13","created_at":"1573333725"}
+,{"id":3585,"hitokoto":"我永远在这里，涌着爱面朝沧海","type":"g","from":"第三极","from_who":null,"creator":"泷涯","creator_uid":1291,"reviewer":0,"uuid":"1cc9ce51-824f-4198-bb35-dede61287bed","created_at":"1521366906"}
+,{"id":3829,"hitokoto":"你总是这样轻言放弃的话，无论多久都只会原地踏步","type":"f","from":"Qihoo360","from_who":null,"creator":"Doraemon!","creator_uid":1438,"reviewer":0,"uuid":"62c93a12-96ab-454c-9c95-dc937fb40c31","created_at":"1535071907"}
+,{"id":5506,"hitokoto":"宁可枝头抱香死，何曾吹落北风中。","type":"i","from":"画菊","from_who":"郑思肖","creator":"a632079","creator_uid":1044,"reviewer":1044,"uuid":"82677a36-563a-4641-8713-4f738b61b93a","created_at":"1586266059"}
+,{"id":1000,"hitokoto":"因为世界并不如你想象的那样坏。","type":"a","from":"无头骑士异闻录","from_who":"塞尔提","creator":"1102058350","creator_uid":0,"reviewer":0,"uuid":"d160f69d-ae5a-4d69-af87-7ba723d470f9","created_at":"1481086547"}
+,{"id":4431,"hitokoto":"梦比现实更易侵蚀人的精神，刻意准备的梦是危险的。","type":"c","from":"东方绀珠传 ～ Legacy of Lunatic Kingdom.","from_who":null,"creator":"rvalue","creator_uid":3213,"reviewer":0,"uuid":"399f3506-5071-4f41-946b-0eb50a7dc41f","created_at":"1557547454"}
+,{"id":4352,"hitokoto":"唯有爱与梦想不可辜负","type":"g","from":"爱与梦想","from_who":null,"creator":"执笔乄画倾城","creator_uid":2884,"reviewer":0,"uuid":"361f822b-eea1-4715-b988-474617e35e45","created_at":"1552391113"}
+,{"id":4437,"hitokoto":"不过一介凡人，何必与世纷争。","type":"e","from":"原创","from_who":null,"creator":"Lisaboy","creator_uid":3232,"reviewer":0,"uuid":"9aba379d-4c4b-4805-b7e6-9ce899778065","created_at":"1557838158"}
+,{"id":557,"hitokoto":"人生中有些事你不竭尽所能去做，你永远不知道自己有多出色！","type":"a","from":"海贼王","from_who":null,"creator":"贝贝","creator_uid":22,"reviewer":0,"uuid":"66faec6a-59a1-4493-a7d8-b9bfddb42024","created_at":"1472978097"}
+,{"id":4364,"hitokoto":"手握日月摘星辰，世间无我这般人","type":"d","from":"唐家三少","from_who":null,"creator":"Jason_Lee","creator_uid":3117,"reviewer":0,"uuid":"0bbf1df2-ae3c-47cf-91aa-4fae34162e93","created_at":"1556091902"}
+,{"id":522,"hitokoto":"为了终止绝望的连锁，希望她能化为照亮正确道路的灯火。","type":"a","from":"Re：从零开始的异世界生活","from_who":null,"creator":"酷儿","creator_uid":6,"reviewer":0,"uuid":"d7c0d898-ceaa-480b-9d10-fc4833135c2a","created_at":"1472550070"}
+,{"id":5707,"hitokoto":"故人西辞黄鹤楼，烟花三月下扬州。","type":"i","from":"黄鹤楼送孟浩然之广陵","from_who":"李白","creator":"a632079","creator_uid":1044,"reviewer":4756,"uuid":"ea6a73ce-4a83-4ff8-b749-9657b48d5d9b","created_at":"1586333484"}
+,{"id":5428,"hitokoto":"木叶飞舞之处，火亦生生不息。","type":"a","from":"火影忍者","from_who":"猿飞日斩","creator":"Occam","creator_uid":5716,"reviewer":1044,"uuid":"f9277dda-ae3d-49e7-a24b-917f41031f8a","created_at":"1585649338"}
+,{"id":1245,"hitokoto":"电脑高手,哈哈哈哈哈,你这嘴里蹦的都是几几年的形容词啊","type":"c","from":"三色绘恋","from_who":null,"creator":"papi","creator_uid":7,"reviewer":0,"uuid":"108e9b23-ed80-4622-9574-f0c406e77a34","created_at":"1506085174"}
+,{"id":3599,"hitokoto":"生我何用？不能欢笑。灭我何用？不减狂骄。","type":"d","from":"悟空传","from_who":null,"creator":"a632079","creator_uid":1044,"reviewer":0,"uuid":"aa5e17a9-d8c9-4db0-a593-87fc06af438a","created_at":"1523579163"}
+,{"id":1152,"hitokoto":"即使无法掌握未来，也请不要忘了明天。","type":"f","from":"网络","from_who":null,"creator":"vclike","creator_uid":271,"reviewer":0,"uuid":"fd16e371-0de7-4593-873a-e218512d5e72","created_at":"1490370409"}
+,{"id":4951,"hitokoto":"失去人性，失去很多；失去兽性，失去一切。","type":"d","from":"三体","from_who":null,"creator":"ƒine","creator_uid":4433,"reviewer":4756,"uuid":"2114b5c2-e206-43dd-9219-77ed94bb1389","created_at":"1575717991"}
+,{"id":499,"hitokoto":"祸兮福之所倚，福兮祸之所伏。","type":"g","from":"鵩鸟赋","from_who":null,"creator":"小强","creator_uid":11,"reviewer":0,"uuid":"ebad4462-54d4-4f28-b477-066d18c4f28d","created_at":"1472435232"}
+,{"id":3797,"hitokoto":"继续战斗！为了子子孙孙，你们不能放弃！别让我们的牺牲付诸东流！我们……啊啊啊啊啊啊啊——【信号丢失】","type":"c","from":"Stellaris","from_who":null,"creator":"aziint","creator_uid":1586,"reviewer":0,"uuid":"6f1ecc4f-9cec-4cff-9c90-f5c592ec6d25","created_at":"1533048932"}
+,{"id":1193,"hitokoto":"本是无所谓输赢的，却在一时激发起了斗志。","type":"e","from":"不善","from_who":null,"creator":"不善","creator_uid":433,"reviewer":0,"uuid":"b9fe6313-029f-43da-b125-0eb7e7213c4a","created_at":"1498005929"}
+,{"id":5672,"hitokoto":"劝君更尽一杯酒，西出阳关无故人。","type":"i","from":"渭城曲 / 送元二使安西","from_who":"王维","creator":"a632079","creator_uid":1044,"reviewer":1044,"uuid":"8f0efbb5-6863-4e09-9b9c-5f6b1b257a8d","created_at":"1586271523"}
+,{"id":4335,"hitokoto":"你的所言所行，全都闪烁着光芒，太过刺目，于是我闭上双眼，但内心还是无法停止对你的憧憬。","type":"a","from":"四月是你的谎言","from_who":null,"creator":"AThousandMoon","creator_uid":3063,"reviewer":0,"uuid":"d8dfe679-5dec-4911-9134-cf31134e1773","created_at":"1555756787"}
+,{"id":4688,"hitokoto":"两情若是久长时，又岂在朝朝暮暮？","type":"i","from":"鹊桥仙·纤云弄巧","from_who":"秦观","creator":"smallxu","creator_uid":2639,"reviewer":4756,"uuid":"7e0a0206-ec71-4832-b805-9aa2a2cf8b10","created_at":"1569327478"}
+,{"id":4696,"hitokoto":"忙碌时渴望悠闲，闲暇时却不知道干啥啦。","type":"e","from":"年轻人的颓废","from_who":null,"creator":"萖呓儿","creator_uid":4032,"reviewer":4756,"uuid":"c578b2da-c613-4206-ae17-579e8c7b10f2","created_at":"1570453660"}
+,{"id":3796,"hitokoto":"我对你最深沉的爱，莫过于分开以后，我将自己活成了你的样子。直到今天，再听到你的消息，为你活得越来越精彩而万分开心，虽然在离开你之后，我彻底变成了灰色。","type":"g","from":"这个杀手不太冷","from_who":null,"creator":"zhouzz","creator_uid":1856,"reviewer":0,"uuid":"d970ea61-f10f-4ea5-8cfa-7f5e11735a5f","created_at":"1533106811"}
+,{"id":1379,"hitokoto":"万有引力可无法对坠入爱河的人负责。","type":"g","from":"爱因斯坦","from_who":null,"creator":"Mockaven","creator_uid":701,"reviewer":0,"uuid":"95f5e070-1df4-44ce-b516-ffb620ed903d","created_at":"1519392032"}
+,{"id":841,"hitokoto":"不论生死，好坏，对错；只要载入史册那就代表胜利——历史由胜者书写","type":"f","from":"网络","from_who":null,"creator":"hitokoto","creator_uid":1775,"reviewer":0,"uuid":"56827477-4c50-4eab-bfdc-e21c0f02a59f","created_at":"1478787580"}
+,{"id":4332,"hitokoto":"正因为有了音乐，才有了相遇的瞬间，有了相会的感动，有了相逢的人们，有了邂逅的思念。","type":"a","from":"四月是你的谎言","from_who":null,"creator":"AThousandMoon","creator_uid":3063,"reviewer":0,"uuid":"e8025d13-e419-4e63-b4da-17dddc84884e","created_at":"1555756959"}
+,{"id":4574,"hitokoto":"书上说，如果有一天你梦见了一个很久没见的人，代表他/她正在遗忘你。","type":"f","from":"贫小子","from_who":null,"creator":"贫小子","creator_uid":3646,"reviewer":0,"uuid":"3b995cde-d65d-456e-b67a-1a483a4c6766","created_at":"1565616255"}
+,{"id":5076,"hitokoto":"I will see you in another life, when we are both cats.","type":"h","from":"Vanilla Sky","from_who":null,"creator":"Ali","creator_uid":3642,"reviewer":4756,"uuid":"2ed7c635-b513-4f11-8aa2-18ec6d66c674","created_at":"1582074043"}
+,{"id":4697,"hitokoto":"在末日中，人们总想寻找希望，但要真有希望的话，那还叫希望吗？","type":"a","from":"灵笼","from_who":null,"creator":"xinyun","creator_uid":4039,"reviewer":4756,"uuid":"344d1d8a-9c80-4a83-b0a3-1e5ef3cd2224","created_at":"1570584028"}
+,{"id":746,"hitokoto":"小胖子溜边走~","type":"f","from":"囧的呼唤","from_who":null,"creator":"hitokoto","creator_uid":1775,"reviewer":0,"uuid":"913ae29f-2381-46e8-9301-06b9cbf192bf","created_at":"1478787580"}
+,{"id":3613,"hitokoto":"这短短的一生，我们最终都会失去。你不妨大胆一些，爱一个人，攀一座山，追一个梦。","type":"a","from":"大鱼海棠","from_who":null,"creator":"a632079","creator_uid":1044,"reviewer":0,"uuid":"d9e2cbe1-02b9-460d-9f29-0ee4d13eb3c4","created_at":"1523579782"}
+,{"id":5551,"hitokoto":"多情自古伤离别，更那堪冷落清秋节！","type":"i","from":"雨霖铃·寒蝉凄切","from_who":"柳永","creator":"a632079","creator_uid":1044,"reviewer":1044,"uuid":"2d0df74d-e9df-4000-b0d6-3a58baabf9de","created_at":"1586266394"}
+,{"id":4175,"hitokoto":"这个世界需要更多的英雄！","type":"c","from":"Overwatch","from_who":null,"creator":"頑張って！","creator_uid":2534,"reviewer":0,"uuid":"411866be-e5eb-4388-a26d-6f9be6273864","created_at":"1545476801"}
+,{"id":4345,"hitokoto":"流水线上的量产品迟早退场 我就做我的孤品随心所欲好了","type":"g","from":"最大化+","from_who":null,"creator":"綾音","creator_uid":1570,"reviewer":0,"uuid":"0739442e-4ebf-48c6-a4e4-d80020eeb2f1","created_at":"1551869402"}
+,{"id":4968,"hitokoto":"胸中有丘壑，立马镇山河。","type":"f","from":"热血","from_who":null,"creator":"梵川","creator_uid":4860,"reviewer":1044,"uuid":"febebf41-6b08-4d81-ad73-23dd9b4f6365","created_at":"1581665197"}
+,{"id":5269,"hitokoto":"不是每一个人都能成为伟大的艺术家，但是伟大的艺术家可以来自任何一个地方。","type":"h","from":"料理鼠王","from_who":"小米","creator":"Furley","creator_uid":4386,"reviewer":1044,"uuid":"f8de114f-b98a-4872-ac7b-44b42c47f02c","created_at":"1584030182"}
+,{"id":1304,"hitokoto":"今天是一起养狗，以后就一起遛狗，日久生情，狗又生狗。","type":"f","from":"我的少女时代","from_who":null,"creator":"知你分子","creator_uid":830,"reviewer":0,"uuid":"a9ed50e2-a4a4-4566-b2d5-183da28972ff","created_at":"1512006262"}
+,{"id":1166,"hitokoto":"越是珍惜呆在这里的时间，今后就越是悲伤吧。但是我认为不能称之为「后悔」。","type":"a","from":"小林家的龙女仆","from_who":null,"creator":"酷儿","creator_uid":6,"reviewer":0,"uuid":"57e9aa67-4929-4830-8498-623b0c89b8df","created_at":"1491408446"}
+,{"id":268,"hitokoto":"沒有永远下不停的雨。","type":"a","from":"秋之回憶","from_who":null,"creator":"akirayc","creator_uid":0,"reviewer":0,"uuid":"82ae2f30-5792-4c34-9ff0-54bf7b8dcb60","created_at":"1468606003"}
+,{"id":290,"hitokoto":"只要你还记得我，我就会一直在你的身边。","type":"c","from":"符文工房","from_who":null,"creator":"摇篮の月","creator_uid":0,"reviewer":0,"uuid":"71a50cf7-b07e-4b0e-8ffb-196b92406e4e","created_at":"1468948790"}
+,{"id":3876,"hitokoto":"人，百年一世；龙，百年一岁。君生吾已老，君未变，而吾已老。","type":"b","from":"妖怪名单","from_who":null,"creator":"老猫","creator_uid":2061,"reviewer":0,"uuid":"73e5ccfa-719a-4552-9f62-219e81e15cfa","created_at":"1536884047"}
+,{"id":1093,"hitokoto":"一举一动，都是承诺，会被另一个人看在眼里，记在心上的。","type":"a","from":"悬崖上的金鱼姬","from_who":"宫崎骏","creator":"863885806","creator_uid":0,"reviewer":0,"uuid":"7ad5328b-2a4b-483d-a877-3fa502319aee","created_at":""}
+,{"id":4013,"hitokoto":"果然啊，创造一样东西很开心。让别人享受自己创造的东西，是一种幸福呢。","type":"a","from":"如果有个妹妹就好了","from_who":null,"creator":"Amadeus","creator_uid":2230,"reviewer":0,"uuid":"1a22ca1b-82db-4ddc-a90f-502f4f9d7fc1","created_at":"1540110423"}
+,{"id":423,"hitokoto":"我觉得，我这辈子最灿烂的笑容，大概都奉献给我电脑屏幕了。","type":"f","from":"bilibili","from_who":null,"creator":"萌花残","creator_uid":0,"reviewer":0,"uuid":"3e6db3b0-9b3f-40bf-b652-528c67bfc4ab","created_at":"1468949610"}
+,{"id":4239,"hitokoto":"你们认为没有路，是因为没有学会不择手段。","type":"d","from":"三体","from_who":null,"creator":"smallxu","creator_uid":2639,"reviewer":0,"uuid":"50938440-620c-42dc-b0bc-e9c8874529df","created_at":"1547788674"}
+,{"id":3822,"hitokoto":"该来的回忆总令人回味。不该来的，迟早逝去。","type":"e","from":"终究","from_who":null,"creator":"终究","creator_uid":1784,"reviewer":0,"uuid":"40d2e6f7-11c4-4e08-a317-8306dd570717","created_at":"1535418453"}
+,{"id":244,"hitokoto":"人的记忆本来就是暧昧的，不值得信任。","type":"a","from":"叛逆的鲁鲁修R2","from_who":null,"creator":"奇迹之梦","creator_uid":0,"reviewer":0,"uuid":"1d75d441-898a-4ae1-91b8-c73a7d52f91b","created_at":"1468605917"}
+,{"id":1214,"hitokoto":"每个人都有着不为人知的肮脏。这、就是灵魂。","type":"e","from":"西风","from_who":null,"creator":"this4th","creator_uid":467,"reviewer":0,"uuid":"ecaedf87-e554-4fd4-a74b-24580bdac15d","created_at":"1501208174"}
+,{"id":1342,"hitokoto":"故人啊 已做了他人嫁","type":"g","from":"一醉南柯","from_who":null,"creator":"玉狐","creator_uid":1000,"reviewer":0,"uuid":"bdba2cf7-d5c8-44ec-bdec-f7c8c09fd5c8","created_at":"1514702738"}
+,{"id":4949,"hitokoto":"给岁月以文明，而不是给文明以岁月。","type":"d","from":"三体","from_who":null,"creator":"ƒine","creator_uid":4433,"reviewer":4756,"uuid":"4edc6dac-cc2a-4f73-a0a3-47058c7368ea","created_at":"1575717962"} 
+]

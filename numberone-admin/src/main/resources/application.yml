@@ -1,13 +1,17 @@
 # 项目相关配置
 numberone:
   # 名称
-  name: NumberOne
+  name: OAManage
   # 版本
   version: 3.2.0
   # 版权年份
   copyrightYear: 2020
   # 文件上传路径
   profile: D:/workspace/eclipse/profile/
+  #邮件默认账户
+  defaultAccount: qq2554033105@126.com
+  #邮件默认授权码
+  defaultPwd: qq2554033105
   # 获取ip地址开关
   addressEnabled: true
   
@@ -21,7 +25,7 @@ OAManage:
 # 开发环境配置
 server:
   # 服务端口
-  port: 8888
+  port: 80
   servlet:
     # 项目contextPath
     context-path: /
@@ -134,7 +138,7 @@ gen:
   # 作者
   author: eason
   # 默认生成包路径 system 需改成自己的模块名称 如 system monitor tool
-  packageName: com.numberone.system
+  packageName: com.numberone.sys
   # 自动去除表前缀，默认是true
   autoRemovePre: true
   # 表前缀(类名不会包含表前缀)

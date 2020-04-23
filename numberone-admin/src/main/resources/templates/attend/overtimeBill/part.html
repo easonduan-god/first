@@ -1,0 +1,25 @@
+<div class="col-sm-12 search-collapse" style="padding-top: 20px">
+	<form id="part-form">
+		<div class="select-list">
+			<ul>
+				<li>
+					开始日期：<input type="text" id="startDatePart" name="startDate"/>
+				</li>
+	
+				<li>
+					结束日期：<input type="text" id="endDatePart" name="endDate"/>
+				</li>
+	
+				<li>
+					主          题：<input type="text" name="theme"/>
+					<input type="hidden" name="params[queryType]" value="part"/>
+				</li>
+	
+				<li>
+					<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search('part-form')"><i class="fa fa-search"></i>&nbsp;搜索</a>
+					<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset('part-form')"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+				</li>
+			</ul>
+		</div>
+	</form>
+</div>

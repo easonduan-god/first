@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style type="text/css">
+ 	.form-control[readonly]  {
+    	background-color: white;
+	}
+ </style>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-empOvertimeAudit-detail" th:object="${empOvertimeAudit}">
+			<div class="form-group col-sm-6">	
+				<label class="col-sm-3 control-label">业务名称：</label>
+				<div class="col-sm-9">
+					<input value="延时工单审批" class="form-control" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group col-sm-6">	
+				<label class="col-sm-3 control-label">执行动作：</label>
+				<div class="col-sm-9">
+					<input  th:value="${empOvertimeAudit.auditJob+'审批'}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group col-sm-6">	
+				<label class="col-sm-3 control-label">执行人：</label>
+				<div class="col-sm-9">
+					<input th:field="*{auditName}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group col-sm-6">	
+				<label class="col-sm-3 control-label">执行时间：</label>
+				<div class="col-sm-9">
+					<input th:value="${#dates.format(empOvertimeAudit.auditTime, 'yyyy-MM-dd HH:mm:ss')}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group col-sm-6">	
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-9">
+					<input th:field="*{remark}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		
+		function submitHandler() {
+	    }
+	</script>
+</body>
+</html>

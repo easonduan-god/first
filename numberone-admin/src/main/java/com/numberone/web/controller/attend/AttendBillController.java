@@ -14,14 +14,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.numberone.common.annotation.Log;
 import com.numberone.common.base.AjaxResult;
+import com.numberone.common.enums.BusinessType;
 import com.numberone.common.page.TableDataInfo;
 import com.numberone.common.utils.DateUtils;
+import com.numberone.common.utils.Threads;
 import com.numberone.emp.domain.EmpAttendAudit;
 import com.numberone.emp.domain.EmpAttendBill;
 import com.numberone.emp.service.IAttendBillService;
-import com.numberone.framework.manager.AsyncManager;
-import com.numberone.framework.manager.factory.AsyncFactory;
 import com.numberone.framework.web.base.BaseController;
 import com.numberone.system.domain.SysUser;
 import com.numberone.system.service.ISysUserService;
@@ -57,8 +58,8 @@ public class AttendBillController extends BaseController{
 	/**
 	 * 考勤待办
 	 * @param: @param mmap
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @return
+	 * @return: String
 	 */
 	@RequiresPermissions("attend:attendBill:backlog")
 	@GetMapping("/backlog")
@@ -73,8 +74,9 @@ public class AttendBillController extends BaseController{
 	/**
 	 * 根据考勤审核单id查看考勤单详细信息
 	 * @param: @param attendAuditId
-	 * @param: @return 参数说明
-	 * @return List<EmpAttendAudit> 返回类型
+	 * @param: @param mmap
+	 * @param: @return
+	 * @return: String
 	 */
 	@RequiresPermissions("attend:attendBill:backlog")
     @GetMapping("/detail/{attendAuditId}")
@@ -83,7 +85,12 @@ public class AttendBillController extends BaseController{
         mmap.put("empAttendBill", attendBillService.selectAttendBillByAuditId(attendAuditId));
         return prefix + "/detail";
     }
-	
+	/**
+	 * 考勤代办列表
+	 * @param: @param empAttendAudit
+	 * @param: @return
+	 * @return: TableDataInfo
+	 */
 	@RequiresPermissions("attend:attendBill:backlog")
 	@PostMapping("/backlogList")
 	@ResponseBody
@@ -96,8 +103,11 @@ public class AttendBillController extends BaseController{
 	}
 	
 	/**
-     * 计算申请工时
-     */
+	 * 计算申请工时
+	 * @param: @param empAttendBill
+	 * @param: @return
+	 * @return: AjaxResult
+	 */
 	@RequiresPermissions("attend:attendBill:apply")
     @PostMapping("/calcWorkdays")
     @Transactional(rollbackFor = Exception.class)
@@ -108,12 +118,28 @@ public class AttendBillController extends BaseController{
 		AjaxResult result = attendBillService.calcWorkdays(empAttendBill);
 		//定时删除临时表
 		if("0".equals(result.get("code")+"")){
-			AsyncManager.me().execute(AsyncFactory.deleteAttendTemp((String)result.get("empAttendBillTempId")), 1000*5);
+			//AsyncManager.me().execute(AsyncFactory.deleteAttendTemp((String)result.get("empAttendBillTempId")), 1000*5);
+			Thread thread = new Thread(() -> {
+				//删除存到临时表中数据
+				try {
+					Threads.sleep(1000*5);
+					Long row = attendBillService.deleteAttendBillTempAndLeavedayTemp((String)result.get("empAttendBillTempId"));
+					if(row>=1){
+						System.out.println("删除临时表成功");
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+    		thread.start();
 		}
         return result;
     }
 	/**
 	 * 提交审批
+	 * @param: @param empAttendBill
+	 * @param: @return
+	 * @return: AjaxResult
 	 */
 	@RequiresPermissions("attend:attendBill:apply")
 	@PostMapping("/launchAudit")
@@ -126,8 +152,7 @@ public class AttendBillController extends BaseController{
 	}
 	/**
 	 * 批量审核
-	 * @param: @param auditIds
-	 * @param: @param auditFlag
+	 * @param: @param empAttendAudit
 	 * @param: @return
 	 * @return: AjaxResult
 	 */
@@ -152,5 +177,104 @@ public class AttendBillController extends BaseController{
 		}
 		return row>0?AjaxResult.success("审核成功"):AjaxResult.error("审核失败,请联系管理员！");
 	}
+	
+	/**
+	 * 我的考勤单
+	 * @param: @param mmap
+	 * @param: @return
+	 * @return: String
+	 */
+	@RequiresPermissions("attend:attendBill:mine")
+	@GetMapping("/mine")
+	public String mine(ModelMap mmap)
+	{
+		/*判断是否用户岗位是否是部门领导，部门领导可以加载全部，普通员工角色只能查询自己
+    	ceo和人资可以查询所有员工*/
+    	List<SysUser> list = userService.selectUserByUserIdAndPost(getSysUser());
+    	mmap.put("userList", list);
+		return prefix + "/mine";
+	}
+	
+	/**
+	 * 我的考勤单
+	 * @param: @param empAttendAudit
+	 * @param: @return
+	 * @return: TableDataInfo
+	 */
+	@RequiresPermissions("attend:attendBill:mine")
+	@PostMapping("/mineList")
+	@ResponseBody
+	public TableDataInfo mineList(EmpAttendBill empAttendBill)
+	{
+		startPage();
+		empAttendBill.setUserId(getUserId());
+		return getDataTable(attendBillService.selectAttendBillOfMine(empAttendBill));
+	}
+	/**
+	 * 我的考勤详情 只能查看自己考勤单或者交由自己审核的考勤单详情 管理员除外
+	 * @param: @param attendBillId 考勤单id
+	 * @param: @param mmap
+	 * @param: @return      
+	 * @return: String      
+	 * @throws
+	 */
+	@RequiresPermissions("attend:attendBill:mine")
+    @RequestMapping("/detailMine/{attendBillId}")
+    public String detailMine(@PathVariable("attendBillId") String attendBillId, ModelMap mmap)
+    {
+        mmap.put("empAttendBill", attendBillService.selectAttendBillByIdAndRelationMine(attendBillId,getSysUser()));
+        return prefix + "/detail";
+    }
+	/**
+	 * 查看考勤审核单详情 只能查看与自己相关的 管理员除外
+	 * @param: @param attendBillId
+	 * @param: @param mmap
+	 * @param: @return
+	 * @return: String
+	 */
+	@RequiresPermissions("attend:attendBill:backlog")
+	@RequestMapping("/detailAudit/{attendAuditId}")
+	public String detailAudit(@PathVariable("attendAuditId") String attendAuditId, ModelMap mmap)
+	{
+		mmap.put("empAttendAudit", attendBillService.selectAttendAuditByAuditIdAndRelationMine(attendAuditId,getSysUser()));
+		return prefix + "/detailAudit";
+	}
+	
+	/**
+	 * 考勤单审核追踪
+	 * @param: @param attendBillId 考勤单id
+	 * @param: @param mmap
+	 * @param: @return      
+	 * @return: String      
+	 * @throws
+	 */
+	@RequiresPermissions("attend:attendBill:mine")
+	@RequestMapping("/trace/{attendBillId}")
+	public String trace(@PathVariable("attendBillId") String attendBillId, ModelMap mmap)
+	{
+		mmap.put("rsList", attendBillService.selectAttendBillTrace(attendBillId));
+		return prefix + "/trace";
+	}
+	
+	/**
+	 * 删除考勤单 根据考勤单id
+	 * @param: @param id
+	 * @param: @return
+	 * @return: AjaxResult
+	 */
+    @Log(title = "考勤单管理", businessType = BusinessType.DELETE)
+    @PostMapping("/removeMine/{attendBillId}")
+    @ResponseBody
+    public AjaxResult removeMine(@PathVariable(name="attendBillId") String attendBillId)
+    {
+        try
+        {
+            return toAjax(attendBillService.removeMine(attendBillId,getSysUser()));
+        }
+        catch (Exception e)
+        {
+            return error(e.getMessage());
+        }
+    }
 	
 }

@@ -1,5 +1,4 @@
 $(function(){
-	
 	$(".link-tab").each(function () {
 		var url = $(this).attr("href")
 		var tabName = $(this).attr("title");
@@ -54,7 +53,7 @@ function createMenuItem(dataUrl, menuName) {
         $("#loadingA",topWindow).click();
         setTimeout(function(){
         	$("#closeloadingA",topWindow).click();
-        },700);
+        },300);
         
         // 添加选项卡
         $('.menuTabs .page-tabs-content', topWindow).append(str);

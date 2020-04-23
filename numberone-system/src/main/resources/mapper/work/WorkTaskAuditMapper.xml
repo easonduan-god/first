@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.work.mapper.WorkTaskAuditMapper">
+    
+    <resultMap type="WorkTaskAudit" id="WorkTaskAuditResult">
+        <result property="taskAuditId"    column="task_audit_id"    />
+        <result property="taskRecordId"    column="task_record_id"    />
+        <result property="taskId"    column="task_id"    />
+        <result property="taskPerformId"    column="task_perform_id"    />
+        <result property="auditType"    column="audit_type"    />
+        <result property="launchUserId"    column="launch_user_id"    />
+        <result property="launchUserName"    column="launch_user_name"    />
+        <result property="launchEmpId"    column="launch_emp_id"    />
+        <result property="launchTime"    column="launch_time"    />
+        <result property="auditUserId"    column="audit_user_id"    />
+        <result property="auditUserName"    column="audit_user_name"    />
+        <result property="auditEmpId"    column="audit_emp_id"    />
+        <result property="auditJob"    column="audit_job"    />
+        <result property="auditTime"    column="audit_time"    />
+        <result property="auditFlag"    column="audit_flag"    />
+        <result property="remark"    column="remark"    />
+        <association property="task"    column="task_record_id" javaType="WorkTask" resultMap="WorkTaskResult" />
+        <association property="perform"    column="task_perform_id" javaType="WorkTaskPerform" resultMap="WorkTaskPerformResult" />
+    </resultMap>
+	<resultMap type="WorkTaskPerform" id="WorkTaskPerformResult">
+        <result property="taskPerformId"    column="task_perform_id"    />
+        <result property="taskRecordId"    column="task_record_id"    />
+        <result property="taskId"    column="task_id"    />
+        <result property="performUserId"    column="perform_user_id"    />
+        <result property="performEmpId"    column="perform_emp_id"    />
+        <result property="performTime"    column="perform_time"    />
+        <result property="dealDeptId"    column="deal_dept_id"    />
+        <result property="dealDeptName"    column="deal_dept_name"    />
+        <result property="alterUserId"    column="alter_user_id"    />
+        <result property="alterEmpId"    column="alter_emp_id"    />
+        <result property="alterTime"    column="alter_time"    />
+        <result property="dealDesc"    column="deal_desc"    />
+        <result property="performAppendix"    column="perform_appendix"    />
+        <result property="taskFlag"    column="task_flag"    />
+        <result property="alterPerformFlag"    column="alter_perform_flag"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+    <resultMap type="WorkTask" id="WorkTaskResult">
+        <result property="taskRecordId"    column="task_record_id"    />
+        <result property="taskId"    column="task_id"    />
+        <result property="taskTitle"    column="task_title"    />
+        <result property="taskFlag"    column="task_flag"    />
+        <result property="taskType"    column="task_type"    />
+        <result property="taskTypeText"    column="task_type_text"    />
+        <result property="diffLevel"    column="diff_level"    />
+        <result property="priority"    column="priority"    />
+        <result property="planStartDate"    column="plan_start_date"    />
+        <result property="planEndDate"    column="plan_end_date"    />
+        <result property="realStartDate"    column="real_start_date"    />
+        <result property="realEndDate"    column="real_end_date"    />
+        <result property="planHours"    column="plan_hours"    />
+        <result property="dealHours"    column="deal_hours"    />
+        <result property="auditHours"    column="audit_hours"    />
+        <result property="taskDesc"    column="task_desc"    />
+        <result property="taskAppendix"    column="task_appendix"    />
+        <result property="dealDeptId"    column="deal_dept_id"    />
+        <result property="dealDeptName"    column="deal_dept_name"    />
+        <result property="createUserId"    column="create_user_id"    />
+        <result property="createEmpId"    column="create_emp_id"    />
+        <result property="createUserName"    column="create_user_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="dealUserId"    column="deal_user_id"    />
+        <result property="dealEmpId"    column="deal_emp_id"    />
+        <result property="dealUserName"    column="deal_user_name"    />
+        <result property="dealTime"    column="deal_time"    />
+        <result property="auditUserId"    column="audit_user_id"    />
+        <result property="auditEmpId"    column="audit_emp_id"    />
+        <result property="auditUserName"    column="audit_user_name"    />
+        <result property="auditTime"    column="audit_time"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+	<sql id="selectWorkTaskAuditVo">
+        select ta.task_audit_id, ta.task_record_id, ta.task_id, ta.task_perform_id, ta.audit_type, ta.launch_user_id,ta.launch_user_name,
+        ta.audit_user_name,ta.launch_emp_id, ta.launch_time, ta.audit_user_id, ta.audit_emp_id, ta.audit_job, ta.audit_time, ta.audit_flag, ta.remark,
+        t.task_type,t.task_flag
+        from work_task_audit ta
+        join work_task t
+        on ta.task_record_id = t.task_record_id
+    </sql>
+	<!-- 审核状态 0未审核 1审核中 2审核不通过 3审核已通过 -->
+    <select id="selectWorkTaskAuditList" parameterType="WorkTaskAudit" resultMap="WorkTaskAuditResult">
+        <include refid="selectWorkTaskAuditVo"/>
+        <where>
+            <if test="taskAuditId != null  and taskAuditId != '' "> and ta.task_audit_id = #{taskAuditId}</if>
+             <if test="taskId != null  and taskId != '' "> and ta.task_id = #{taskId}</if>
+             <if test="taskPerformId != null  and taskPerformId != '' "> and ta.task_perform_id = #{taskPerformId}</if>
+             <if test="params.dealDeptId != null  and params.dealDeptId != '' "> and t.deal_dept_id = #{params.dealDeptId}</if>
+             <if test="params.auditStatus == 0 "> and ta.audit_flag in (0,1)</if><!-- 未审核 -->
+             <if test="params.auditStatus == 1 "> and ta.audit_flag in (2,3)</if><!-- 已审核 -->
+             
+             <if test="params.userIds != null"> 
+		        and ta.launch_user_id in
+				<foreach item="userId" collection="params.userIds" open="(" separator="," close=")">
+		            #{userId}
+		        </foreach>
+	        </if>
+             <if test="params.launchStartDate != null and params.launchStartDate != ''"><!-- 开始时间检索 -->
+				AND date_format(ta.launch_time,'%y%m%d') &gt;= date_format(#{params.launchStartDate},'%y%m%d')
+			</if>
+			<if test="params.launchStartDate != null and params.launchStartDate != ''"><!-- 结束时间检索 -->
+				AND date_format(ta.launch_time,'%y%m%d') &lt;= date_format(#{params.launchStartDate},'%y%m%d')
+			</if>
+			AND ta.audit_user_id = #{auditUserId}
+         </where>
+    </select>
+    
+    <select id="selectWorkTaskAuditById" parameterType="String" resultMap="WorkTaskAuditResult">
+        <include refid="selectWorkTaskAuditVo"/>
+        where ta.task_audit_id = #{taskAuditId}
+    </select>
+        
+    <insert id="insertWorkTaskAudit" parameterType="WorkTaskAudit">
+        insert into work_task_audit
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="taskAuditId != null  and taskAuditId != ''  ">task_audit_id,</if>
+			<if test="taskRecordId != null  and taskRecordId != ''  ">task_record_id,</if>
+			<if test="taskId != null  and taskId != ''  ">task_id,</if>
+			<if test="taskPerformId != null  and taskPerformId != ''  ">task_perform_id,</if>
+			<if test="auditType != null  ">audit_type,</if>
+			<if test="launchUserId != null  ">launch_user_id,</if>
+			<if test="launchUserName != null  ">launch_user_name,</if>
+			<if test="auditUserName != null  ">audit_user_name,</if>
+			<if test="launchEmpId != null  and launchEmpId != ''  ">launch_emp_id,</if>
+			<if test="launchTime != null  ">launch_time,</if>
+			<if test="auditUserId != null  ">audit_user_id,</if>
+			<if test="auditEmpId != null  and auditEmpId != ''  ">audit_emp_id,</if>
+			<if test="auditJob != null  and auditJob != ''  ">audit_job,</if>
+			<if test="auditTime != null  ">audit_time,</if>
+			<if test="auditFlag != null  ">audit_flag,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="taskAuditId != null  and taskAuditId != ''  ">#{taskAuditId},</if>
+			<if test="taskRecordId != null  and taskRecordId != ''  ">#{taskRecordId},</if>
+			<if test="taskId != null  and taskId != ''  ">#{taskId},</if>
+			<if test="taskPerformId != null  and taskPerformId != ''  ">#{taskPerformId},</if>
+			<if test="auditType != null  ">#{auditType},</if>
+			<if test="launchUserId != null  ">#{launchUserId},</if>
+			<if test="launchUserName != null  ">#{launchUserName},</if>
+			<if test="auditUserName != null  ">#{auditUserName},</if>
+			<if test="launchEmpId != null  and launchEmpId != ''  ">#{launchEmpId},</if>
+			<if test="launchTime != null  ">#{launchTime},</if>
+			<if test="auditUserId != null  ">#{auditUserId},</if>
+			<if test="auditEmpId != null  and auditEmpId != ''  ">#{auditEmpId},</if>
+			<if test="auditJob != null  and auditJob != ''  ">#{auditJob},</if>
+			<if test="auditTime != null  ">#{auditTime},</if>
+			<if test="auditFlag != null  ">#{auditFlag},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateWorkTaskAudit" parameterType="WorkTaskAudit">
+        update work_task_audit
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskRecordId != null  and taskRecordId != ''  ">task_record_id = #{taskRecordId},</if>
+            <if test="taskId != null  and taskId != ''  ">task_id = #{taskId},</if>
+            <if test="taskPerformId != null  and taskPerformId != ''  ">task_perform_id = #{taskPerformId},</if>
+            <if test="auditType != null  ">audit_type = #{auditType},</if>
+            <if test="launchUserId != null  ">launch_user_id = #{launchUserId},</if>
+            <if test="launchUserName != null  ">launch_user_name= #{launchUserName},</if>
+            <if test="auditUserName != null  ">audit_user_name= #{auditUserName},</if>
+            <if test="launchEmpId != null  and launchEmpId != ''  ">launch_emp_id = #{launchEmpId},</if>
+            <if test="launchTime != null  ">launch_time = #{launchTime},</if>
+            <if test="auditUserId != null  ">audit_user_id = #{auditUserId},</if>
+            <if test="auditEmpId != null  and auditEmpId != ''  ">audit_emp_id = #{auditEmpId},</if>
+            <if test="auditJob != null  and auditJob != ''  ">audit_job = #{auditJob},</if>
+            <if test="auditTime != null  ">audit_time = #{auditTime},</if>
+            <if test="auditFlag != null  ">audit_flag = #{auditFlag},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+        </trim>
+        where task_audit_id = #{taskAuditId}
+    </update>
+
+	<delete id="deleteWorkTaskAuditById" parameterType="String">
+        delete from work_task_audit where task_audit_id = #{taskAuditId}
+    </delete>
+	
+    <delete id="deleteWorkTaskAuditByIds" parameterType="String">
+        delete from work_task_audit where task_audit_id in 
+        <foreach item="taskAuditId" collection="array" open="(" separator="," close=")">
+            #{taskAuditId}
+        </foreach>
+    </delete>
+    
+    <!-- 根据任务记录id查询审核信息 只查询审核状态未完成和审核中的记录 只查询最近的一条 -->
+	<select id="selectAuditByTaskRecordId" parameterType="String" resultMap="WorkTaskAuditResult">
+        <include refid="selectWorkTaskAuditVo"/>
+        where ta.task_record_id= #{taskRecordId}
+        and ta.audit_flag in (0,1)
+        order by ta.launch_time DESC
+        limit 0,1
+    </select>
+    
+    
+    <!-- 从输入的列表中获取为提交审核的记录id 审核类型 任务提交审核submit 1/任务变更审核alter 2-->
+	<select id="selectSubmitRecordIdInRecordIds" parameterType="string" resultType="string">
+        select ta.task_record_id from work_task_audit ta
+        where ta.task_record_id in
+        <foreach item="taskRecordId" collection="array" open="(" separator="," close=")">
+        	#{taskRecordId}
+        </foreach>
+        and ta.audit_flag in (0,1)
+        and ta.audit_type = 1
+    </select>
+    <!-- 从输入的列表中获取为变更审核的记录id -->
+	<select id="selectAlterRecordIdInRecordIds" parameterType="string" resultType="string">
+        select ta.task_record_id from work_task_audit ta
+        where ta.task_record_id in
+        <foreach item="taskRecordId" collection="array" open="(" separator="," close=")">
+        	#{taskRecordId}
+        </foreach>
+        and ta.audit_flag in (0,1)
+        and ta.audit_type = 2
+    </select>
+    
+    <!-- 查询最近的审核不通过的审核单 审核类型为提交审核 submit 1 -->
+	<select id="selectSubmitAuditRecently" parameterType="string" resultType="map">
+        select CONCAT(d.dept_name,'-',ta.audit_user_name) auditUserName,ta.remark
+        from work_task_audit ta, sys_user u, sys_dept d
+        where ta.audit_user_id = u.user_id 
+        and u.dept_id = d.dept_id
+        and ta.audit_type=1
+        and ta.task_record_id = #{taskRecordId}
+        order by ta.audit_time DESC
+        limit 0,1
+    </select>
+    
+
+</mapper>

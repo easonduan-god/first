@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style type="text/css">
+	.form-control[readonly]  {
+		background-color: white;
+	}
+	.form-control[disabled]  {
+		background-color: white;
+	}
+</style>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-workTask-edit" th:object="${task}">
+            <input id="taskRecordId" name="taskRecordId" th:field="*{taskRecordId}"  type="hidden">
+            <div class="col-md-6">
+				<div class="form-group draggable">
+					<label class="col-sm-3 control-label">任务编号：</label>
+					<div class="col-sm-9">
+						<input id="taskId" name="taskId" th:field="*{taskId}" class="form-control" readonly="readonly" type="text">
+					</div>
+				</div>
+			</div>
+            <div class="col-md-6">
+				<div class="form-group draggable">
+					<label class="col-sm-3 control-label">任务标题：</label>
+					<div class="col-sm-9">
+						<input id="taskTitle" name="taskTitle" th:field="*{taskTitle}" class="form-control" type="text" >
+					</div>
+				</div>
+			</div>
+            <div class="col-md-6">
+				<div class="form-group draggable">
+					<label class="col-sm-3 control-label">任务类型：</label>
+					<div class="col-sm-9">
+						<select name="taskType" class="form-control noselect2" th:with="type=${@dict.getType('work_task_type')}" th:field="*{taskType}" >
+							<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" ></option>
+						</select>
+					</div>
+				</div>
+			</div>
+            <div class="col-md-6">
+				<div class="form-group draggable">
+					<label class="col-sm-3 control-label">难易程度：</label>
+					<div class="col-sm-9">
+						<select name="diffLevel" class="form-control noselect2" th:with="type=${@dict.getType('work_task_diff_level')}" th:field="*{diffLevel}" >
+							<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" ></option>
+						</select>
+					</div>
+				</div>
+			</div>
+            <div class="col-md-6">
+				<div class="form-group draggable">
+					<label class="col-sm-3 control-label">优先级：</label>
+					<div class="col-sm-9">
+						<select name="priority" class="form-control noselect2" th:with="type=${@dict.getType('work_task_priority')}" th:field="*{priority}" >
+							<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" ></option>
+						</select>
+					</div>
+				</div>
+			</div>
+            <div class="col-md-6">
+				<div class="form-group draggable">
+					<label class="col-sm-3 control-label">计划开始时间：</label>
+					<div class="col-sm-9">
+						<input id="startTime" name="planStartDate" th:value="${#dates.format(task.planStartDate, 'yyyy-MM-dd')}" class="form-control select-time" type="text">
+					</div>
+				</div>
+			</div>
+            <div class="col-md-6">
+				<div class="form-group draggable">
+					<label class="col-sm-3 control-label">计划完成时间：</label>
+					<div class="col-sm-9">
+					<input id="endTime" name="planEndDate" th:value="${#dates.format(task.planEndDate, 'yyyy-MM-dd')}" class="form-control select-time" type="text">
+					</div>
+				</div>
+			</div>
+            <div class="col-md-6">
+				<div class="form-group draggable">
+					<label class="col-sm-3 control-label">预计工时：</label>
+					<div class="col-sm-9">
+					<input id="planHours" name="planHours" th:field="*{planHours}" class="form-control" type="text">
+					</div>
+				</div>
+			</div>
+            <div class="col-md-6">
+				<div class="form-group draggable">
+					<label class="col-sm-3 control-label">附件：</label>
+					<div class="col-sm-9">
+						<button type="button" class="layui-btn" id="appendix" lay-data="{ accept: 'file'}">
+							<i class="layui-icon">&#xe67c;</i>上传附件
+						</button>
+						<a id="appendixLink" >[[${task.appendix.originalFileName}]]</a>
+						<input type="hidden" name="appendix.originalFileName" id="originalFileName" th:field="*{appendix.originalFileName}">
+						<input type="hidden" name="appendix.fileId" id="fileId" th:field="*{appendix.fileId}">
+						<input type="hidden" name="appendix.filePath" id="filePath" th:field="*{appendix.filePath}">
+					</div>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+	<script th:src="@{/ajax/libs/select/select2.js}"></script>
+    <script type="text/javascript">
+		var prefix = ctx + "work/task";
+		$("#form-workTask-edit").validate({
+			rules:{
+        		taskTitle:{
+        			required:true
+        		},
+        		diffLevel:{
+        			required:true
+        		},
+        		priority:{
+        			required:true
+        		},
+        		planStartDate:{
+        			required:true
+        			
+        		},
+        		planEndDate:{
+        			required:true
+        			
+        		},
+        		taskType:{
+        			required:true
+        			
+        		},
+        		dealUserId:{
+        			required:function(){
+        				return false;
+        			}
+        			
+        		},
+        		planHours:{
+        			required:true,
+        			digits:true,
+        			range:[1,100]
+        			
+        		}
+            },	
+        	messages: {
+        		planHours:{
+	        		digits:"只能输入正整数"
+        		}
+            }
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-workTask-edit').serialize());
+	            window.parent.$.table.refresh();
+	        }
+	    }
+		$(function(){
+			//初始化select2
+			var param = "[[${task.appendix.downloadParam}]]".replace("&amp;","&");
+			$("#appendixLink").click(function(){
+	    		downloadFile(param);
+	    	});
+			//layui上传附件
+		    layui.use('upload', function(){
+		      var upload = layui.upload;
+		       
+		      //执行实例
+		      var uploadInst = upload.render({
+		        elem: '#appendix' //绑定元素
+		        ,size: 1024*10
+		        ,url: ctx + "common/upload" //上传接口
+		        ,done: function(res){
+					//上传完毕回调
+					$.modal.msgSuccess("上传成功");
+					var downloadParam = "?fileName="+res.fileName+"&originalFileName="+res.originalFileName;
+					$("#appendixLink").text(res.originalFileName).attr("onclick","downloadFile('"+downloadParam+"')");
+					$("#originalFileName").val(res.originalFileName);
+					$("#fileId").val('');
+					$("#filePath").val(res.fileName);
+		        }
+		        ,error: function(){
+		          $.modal.msgError("上传失败");
+		        }
+		      });
+			
+		});
+	    });
+	 	//下载附件
+		function downloadFile(downloadParam){
+		    window.location.href = ctx + "common/download" + downloadParam;
+		    
+		}
+	 	
+	</script>
+</body>
+</html>

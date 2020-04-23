@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.emp.mapper.EmpOvertimeAuditMapper">
+    
+    <resultMap type="EmpOvertimeAudit" id="EmpOvertimeAuditResult">
+        <result property="overtimeAuditId"    column="overtime_audit_id"    />
+        <result property="overtimeBillId"    column="overtime_bill_id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="auditName"    column="audit_name"    />
+        <result property="auditUserId"    column="audit_user_id"    />
+        <result property="auditEmpId"    column="audit_emp_id"    />
+        <result property="auditJob"    column="audit_job"    />
+        <result property="auditTime"    column="audit_time"    />
+        <result property="auditFlag"    column="audit_flag"    />
+        <result property="remark"    column="remark"    />
+        <association property="empOvertimeBill" column="overtime_bill_id" javaType="EmpOvertimeBill" resultMap="EmpOvertimeBillResult" ></association>
+    </resultMap>
+    <resultMap type="EmpOvertimeBill" id="EmpOvertimeBillResult">
+        <result property="overtimeBillId"    column="overtime_bill_id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="theme"    column="theme"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="applyDate"    column="apply_date"    />
+        <result property="startDate"    column="start_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="workPersons"    column="work_persons"    />
+        <result property="workPersonNames"    column="work_person_names"    />
+        <result property="applyWorktimes"    column="apply_worktimes"    />
+        <result property="matter"    column="matter"    />
+        <result property="completeFlag"    column="complete_flag"    />
+        <result property="auditFlag"    column="audit_flag"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>	
+	<sql id="selectEmpOvertimeAuditVo">
+        select overtime_audit_id, overtime_bill_id, emp_id, user_id, audit_name, audit_user_id, audit_emp_id, audit_job, audit_time, audit_flag, remark from emp_overtime_audit
+    </sql>
+	<sql id="selectEmpOvertimeAuditVo_new">
+        SELECT oa.overtime_audit_id , oa.overtime_bill_id , oa.emp_id , oa.user_id , oa.audit_name , oa.audit_user_id , oa.audit_job ,oa.audit_time,oa.audit_emp_id,
+			oa.audit_flag , ob.emp_id , ob.theme , ob.dept_name , ob.dept_id , ob.user_name , ob.apply_date , 
+			ob.start_date , ob.end_date , ob.work_persons , ob.work_person_names , ob.matter , ob.apply_worktimes , 
+			ob.complete_flag , ob.audit_flag , ob.del_flag
+		FROM oadb2.emp_overtime_audit AS oa INNER JOIN oadb2.emp_overtime_bill AS ob  
+		ON (oa.overtime_bill_id = ob.overtime_bill_id)
+    </sql>
+	
+    <select id="selectEmpOvertimeAuditList" parameterType="EmpOvertimeAudit" resultMap="EmpOvertimeAuditResult">
+        <include refid="selectEmpOvertimeAuditVo"/>
+        <where>  
+            <if test="overtimeAuditId != null  and overtimeAuditId != '' "> and overtime_audit_id = #{overtimeAuditId}</if>
+             <if test="overtimeBillId != null  and overtimeBillId != '' "> and overtime_bill_id = #{overtimeBillId}</if>
+             <if test="empId != null  and empId != '' "> and emp_id = #{empId}</if>
+             <if test="userId != null "> and user_id = #{userId}</if>
+             <if test="auditName != null  and auditName != '' "> and audit_name = #{auditName}</if>
+             <if test="auditUserId != null "> and audit_user_id = #{auditUserId}</if>
+             <if test="auditEmpId != null  and auditEmpId != '' "> and audit_emp_id = #{auditEmpId}</if>
+             <if test="auditJob != null  and auditJob != '' "> and audit_job = #{auditJob}</if>
+             <if test="auditTime != null "> and audit_time = #{auditTime}</if>
+             <if test="auditFlag != null "> and audit_flag = #{auditFlag}</if>
+             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+         </where>
+    </select>
+    
+    <select id="selectEmpOvertimeAuditById" parameterType="String" resultMap="EmpOvertimeAuditResult">
+        <include refid="selectEmpOvertimeAuditVo"/>
+        where overtime_audit_id = #{overtimeAuditId}
+    </select>
+    <insert id="insertEmpOvertimeAudit" parameterType="EmpOvertimeAudit">
+        insert into emp_overtime_audit
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="overtimeAuditId != null  and overtimeAuditId != ''  ">overtime_audit_id,</if>
+			<if test="overtimeBillId != null  and overtimeBillId != ''  ">overtime_bill_id,</if>
+			<if test="empId != null  and empId != ''  ">emp_id,</if>
+			<if test="userId != null  ">user_id,</if>
+			<if test="auditName != null  and auditName != ''  ">audit_name,</if>
+			<if test="auditUserId != null  ">audit_user_id,</if>
+			<if test="auditEmpId != null  and auditEmpId != ''  ">audit_emp_id,</if>
+			<if test="auditJob != null  and auditJob != ''  ">audit_job,</if>
+			<if test="auditTime != null  ">audit_time,</if>
+			<if test="auditFlag != null  ">audit_flag,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="overtimeAuditId != null  and overtimeAuditId != ''  ">#{overtimeAuditId},</if>
+			<if test="overtimeBillId != null  and overtimeBillId != ''  ">#{overtimeBillId},</if>
+			<if test="empId != null  and empId != ''  ">#{empId},</if>
+			<if test="userId != null  ">#{userId},</if>
+			<if test="auditName != null  and auditName != ''  ">#{auditName},</if>
+			<if test="auditUserId != null  ">#{auditUserId},</if>
+			<if test="auditEmpId != null  and auditEmpId != ''  ">#{auditEmpId},</if>
+			<if test="auditJob != null  and auditJob != ''  ">#{auditJob},</if>
+			<if test="auditTime != null  ">#{auditTime},</if>
+			<if test="auditFlag != null  ">#{auditFlag},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateEmpOvertimeAudit" parameterType="EmpOvertimeAudit">
+        update emp_overtime_audit
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="overtimeBillId != null  and overtimeBillId != ''  ">overtime_bill_id = #{overtimeBillId},</if>
+            <if test="empId != null  and empId != ''  ">emp_id = #{empId},</if>
+            <if test="userId != null  ">user_id = #{userId},</if>
+            <if test="auditName != null  and auditName != ''  ">audit_name = #{auditName},</if>
+            <if test="auditUserId != null  ">audit_user_id = #{auditUserId},</if>
+            <if test="auditEmpId != null  and auditEmpId != ''  ">audit_emp_id = #{auditEmpId},</if>
+            <if test="auditJob != null  and auditJob != ''  ">audit_job = #{auditJob},</if>
+            <if test="auditTime != null  ">audit_time = #{auditTime},</if>
+            <if test="auditFlag != null  ">audit_flag = #{auditFlag},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+        </trim>
+        where overtime_audit_id = #{overtimeAuditId}
+    </update>
+
+	<delete id="deleteEmpOvertimeAuditById" parameterType="String">
+        delete from emp_overtime_audit where overtime_audit_id = #{overtimeAuditId}
+    </delete>
+	
+    <delete id="deleteEmpOvertimeAuditByIds" parameterType="String">
+        delete from emp_overtime_audit where overtime_audit_id in 
+        <foreach item="overtimeAuditId" collection="array" open="(" separator="," close=")">
+            #{overtimeAuditId}
+        </foreach>
+    </delete>
+    
+    <!-- 查询分配给自己的延时待办 -->
+    <select id="selectListAllocateMine" parameterType="EmpOvertimeAudit" resultMap="EmpOvertimeAuditResult">
+        <include refid="selectEmpOvertimeAuditVo_new"/>
+        <where>  
+        	ob.del_flag = 0
+            <!-- 0 未审核 audit_flag==1 -->
+            <if test="params.auditStatus == null or params.auditStatus == 0 or params.auditStatus == '' ">
+	            <if test="params.deptId != null  and params.deptId != '' "> and ob.dept_id = #{params.deptId}</if>
+	            <if test="params.userIdArr != null "> 
+	            	and oa.user_id in 
+	            	<foreach item="userId" collection="params.userIdArr" open="(" separator="," close=")">
+			            #{userId}
+			        </foreach>
+	            </if>
+	            and oa.audit_flag=1
+            </if>
+            <!-- 1 已审核 audit_flag==2 3 -->
+            <if test="params.auditStatus != null and params.auditStatus == 1 ">
+	             and oa.audit_flag &gt;= 2 
+	            <if test="empOvertimeBill != null and empOvertimeBill.startDate != null"><!-- 开始日期检索 -->
+					AND date_format(ob.apply_date,'%y%m%d') &gt;= date_format(#{empOvertimeBill.startDate},'%y%m%d')
+				</if>
+				<if test="empOvertimeBill != null and empOvertimeBill.endDate != null"><!-- 结束日期检索 -->
+					AND date_format(ob.apply_date,'%y%m%d') &lt;= date_format(#{empOvertimeBill.endDate},'%y%m%d')
+				</if>
+            </if>
+			<if test="empOvertimeBill != null and empOvertimeBill.theme != null and empOvertimeBill.theme != '' ">
+				AND ob.theme like concat('%',#{empOvertimeBill.theme},'%')
+			</if>
+			AND oa.audit_user_id = ${auditUserId}
+			
+         </where>
+    </select>
+    
+    <!-- 根据延时工单id查询延时工单审核列表 -->
+    <select id="selectOvertimeAuditByOvertimeBillId" parameterType="String" resultMap="EmpOvertimeAuditResult">
+        <include refid="selectEmpOvertimeAuditVo"/>
+        where overtime_bill_id = #{overtimeBillId}
+    </select>
+    
+    <!-- 查看延时工单审核单详情 只能查看与自己相关的 -->
+    <select id="selectOvertimeAuditByAuditIdAndRelationMine"  resultMap="EmpOvertimeAuditResult">
+        <include refid="selectEmpOvertimeAuditVo"/>
+        where overtime_audit_id = #{overtimeAuditId}
+        and (
+		    user_id = #{userId} 
+		    or audit_user_id = #{userId} 
+	    )
+    </select>
+</mapper>

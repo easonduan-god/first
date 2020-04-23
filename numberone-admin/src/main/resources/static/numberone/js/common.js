@@ -247,3 +247,15 @@ layer.config({
     extend: 'moon/style.css',
     skin: 'layer-ext-moon'
 });
+
+;(function ($) {
+	$(document).ready(function () {
+		/** Coding Here */
+	}).keydown(function (e) {
+		if (e.which === 27) {
+			/** 这里编写当ESC按下时的处理逻辑！ */
+			$.modal.close();
+			$.modal.closeAll();
+		}
+	});
+})(jQuery);

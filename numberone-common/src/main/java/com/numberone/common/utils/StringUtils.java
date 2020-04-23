@@ -373,6 +373,18 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
     public static String getUUID(){
     	return UUID.randomUUID().toString().replace("-", "");
     }
+	/**
+	 * 生成任务号：task_id组成 TS+年月日+四位数序号
+	 * @param: @return
+	 * @return: Sting
+	 */
+	public static String genTaskId(int taskSequence) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("TS");
+		sb.append(DateUtils.parseDateToStr(DateUtils.YYYYMMDD, DateUtils.getNowDate()));
+		sb.append(StringUtils.leftPad(taskSequence+"", 4, '0'));
+		return sb.toString();
+	}
     
 
 }

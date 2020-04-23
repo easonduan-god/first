@@ -1,0 +1,290 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse" style="padding-top: 20px">
+				<form role="form" id="overtimeBill-apply-form" class="form-horizontal">
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">部&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;门：</label>
+							<div class="col-sm-9">
+								<select name="params[deptId]" class="form-control" th:with="type=${@dict.getTypeByUserId('sys_dept')}" id="deptInput">
+									<option value=""></option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">员&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;工：</label>
+							<div class="col-sm-9">
+								<select class="form-control" id="userInput" name="userInput">
+								</select>
+								<input type="hidden" name="params[userIds]" id="userIds">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">处理状态：</label>
+							<div class="col-sm-9">
+								<select name="params[auditStatus]" id="auditStatus" class="form-control noselect2">
+									<option value="0">未审核</option>
+									<option value="1">已审核</option>
+								</select>
+							</div>
+							
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">开始日期：</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control select-time" id="startDate" name="empOvertimeBill.startDate"  disabled="disabled">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">结束日期：</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control select-time" id="endDate" name="empOvertimeBill.endDate" autocomplete="off" disabled="disabled">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">主&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;题：</label>
+							<div class="col-sm-9">
+								<input type="text" name="empOvertimeBill.theme" class="form-control">
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-md-6 ">
+						<div class="form-group draggable">
+							<div class="col-sm-12">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+					    		<a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+		        <a class="btn btn-success btn-del disabled" id="auditPass" onclick="audit(1)" shiro:hasPermission="attend:overtimeBill:backlog">
+					<i class="fa fa-plus"></i> 批量审核通过
+				</a>
+				<a class="btn btn-danger btn-del disabled" id="auditRefuse" onclick="audit(0)" shiro:hasPermission="attend:overtimeBill:backlog">
+					<i class="fa fa-remove"></i> 批量审核不通过
+				</a>
+	        </div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:src="@{/ajax/libs/select/select2.js}"></script>
+    <script th:inline="javascript">
+        var detailFlag = [[${@permission.hasPermi('attend:overtimeBill:backlog')}]];
+        var traceFlag = [[${@permission.hasPermi('attend:overtimeBill:backlog')}]];
+        var auditFlags = [[${@dict.getType('emp_attend_audit_flag')}]];
+		
+        var prefix = ctx + "attend/overtimeBill";
+        $(function() {
+        	$("#userInput").change(function(){
+        		$("#userIds").val($.form.selectSelects("userInput"));
+        	});
+        	$("#auditStatus").change(function(){
+        		var auditStatus = $("#auditStatus").val();
+        		if(auditStatus==0){
+        			$("#startDate").attr("disabled",true);
+        			$("#endDate").attr("disabled",true);
+        			$("#startDate").val("");
+        			$("#endDate").val("");
+        			$("#deptInput").attr("disabled",false);
+        			$("#userInput").attr("disabled",false);
+        			$("#auditPass").removeClass("disabled");
+        			$("#auditRefuse").removeClass("disabled");
+        			return;
+        		}
+        		if(auditStatus==1){
+        			$("#startDate").attr("disabled",false);
+        			$("#endDate").attr("disabled",false);
+        			$("#deptInput").attr("disabled",true);
+        			$("#userInput").attr("disabled",true);
+        			$("#auditPass").addClass("disabled");
+        			$("#auditRefuse").addClass("disabled");
+        			$("#userInput").val(null).trigger("change"); 
+        			$("#deptInput").val(null).trigger("change"); 
+        			return;
+        		}
+        		
+        	});
+        	
+        	/* userInput deptInput初始化select2 */
+        	$('#deptInput').select2({
+			    placeholder: '请选择'
+			});
+        	$("#userInput").select2({
+        		placeholder : "请输入人员工号或名称或名称首字母...",
+        		minimumInputLength : 1,//最小需要输入多少个字符才进行查询
+        		multiple : true,//支持多选
+        		allowClear : true,//允许清空
+        		ajax : {
+        			url : "/system/user/searchUser",
+        			dataType : 'json',
+        			type : "post",
+        			delay : 100,
+        			data : function(userName, page) {//向后台发送参数
+        				return {
+        					userName : userName.term
+        				};
+        			},
+        			results : function(data, page) {//处理结果
+        				return {
+        					data
+        				};
+        			}
+        		},
+        		formatResult : function(result, container, query, escapeMarkup) {
+        			return result.userName;
+        		},
+        		formatSelection : function(result, container, query, escapeMarkup) {
+        			return result.userName;
+        		},
+        		formatInputTooShort : function() {
+        			return "请输入人员工号或名称或名称首字母...";
+        		},
+        		escapeMarkup : function(m) {
+        			return m;
+        		}
+        	});
+
+            var options = {
+                url: prefix + "/backlogList",
+                createUrl: prefix + "/add",
+                auditUrl: prefix + "/audit",
+                detailUrl: prefix + "/detailMine/{id}",
+                traceUrl: prefix + "/trace/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "延时审核单",
+                sortable: true,                     // 是否启用排序
+                sortName: "ob.applyDate",           // 排序列名称
+                sortOrder: 'desc',                  // 排序方式  asc 或者 desc
+				search: false,
+				pagination: true,   // 是否显示分页（*）
+                pageNumber: 1,      // 初始化加载第一页，默认第一页
+                pageSize: 5,         // 每页的记录行数（*） 
+                pageList: [5,10, 25, 50],    // 可供选择的每页的行数（*）
+                showSearch: false,   // 是否显示检索信息
+                showRefresh: true, // 是否显示刷新按钮
+                showColumns: false, // 是否显示隐藏某列下拉框
+                showToggle: false,   // 是否显示详细视图和列表视图的切换按钮
+                showFooter : false,
+		        showExport: true,
+		        uniqueId : "overtimeAuditId",
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'overtimeAuditId', 
+					visible: false,
+					title : '业务编号'
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-primary btn-xs ' + detailFlag + '" href="#" onclick="$.operate.detailFull(\'' + row.empOvertimeBill.overtimeBillId + '\')"><i class="fa fa-edit"></i>详情</a> ');
+                        actions.push('<a class="btn btn-info btn-xs ' + traceFlag + '" href="#" onclick="$.operate.traceFull(\'' + row.empOvertimeBill.overtimeBillId + '\')"><i class="fa fa-search"></i>追踪</a>');
+						return actions.join('');
+		            }
+		        },
+				{
+					field : 'empOvertimeBill.theme', 
+					align: 'center',
+					title : '业务主题'
+				},
+				{
+					field : 'empOvertimeBill.applyDate', 
+					align: 'center',
+					title : '业务发起日期',
+		            formatter: function(value, row, index) {
+						return value.split(' ')[0];
+		            }
+				},
+				{
+					field : 'empOvertimeBill.startDate', 
+					align: 'center',
+					title : '开始日期',
+		            formatter: function(value, row, index) {
+						return value.split(' ')[0];
+		            }
+				},
+				{
+					field : 'empOvertimeBill.endDate', 
+					align: 'center',
+					title : '结束日期',
+		            formatter: function(value, row, index) {
+						return value.split(' ')[0];
+		            }
+				},
+				{
+					field : 'auditTime', 
+					align: 'center',
+					title : '处理时间',
+					sortable: true
+				},
+				{
+					field : 'auditFlag',
+					align: 'center',
+					title : '审核状态',//请查询字典表，这样比较优雅 (0未审核 1审核中 2审核不通过 3审核已通过)
+					formatter: function(value, row, index) {
+						return $.table.selectDictLabel(auditFlags, value);
+		            }
+				}]
+            };
+            $.table.init(options);
+        });
+        
+        
+        function audit(auditFlag){
+        	var rows = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+    		if (rows.length == 0) {
+    			$.modal.alertWarning("请至少选择一条记录");
+    			return;
+    		}
+    		var auditFlagStr = auditFlag==1?"审批":"驳回";
+    			
+    		$.modal.confirm("确认要"+ auditFlagStr +"选中的" + rows.length + "条延时工单申请吗?", function() {
+    			layer.prompt({
+					formType: 2,
+					value: '',
+					title: '请输入审批结果'
+					//area: ['800px', '350px'] //自定义文本域宽高
+   				}, function(value, index, elem){
+	    			var url = $.table._option.auditUrl;
+	    			var data = { "params[overtimeAuditIds]": rows.join(),"auditFlag" : auditFlag ,"remark":value};
+					layer.close(index);
+	    			$.operate.submit(url, "post", "json", data);
+   				});
+    		});
+        }
+        
+        function reset(){
+			$("#overtimeBill-apply-form")[0].reset();
+			$('#deptInput').val("").trigger('change');
+		    $('#userInput').val("").trigger('change');
+		}
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<div class="col-sm-12 search-collapse" style="padding-top: 20px">
+	<form id="launch-from">
+		<div class="select-list">
+			<ul>
+				<li>
+					开始日期：<input type="text" id="startDate" name="startDate"/>
+				</li>
+	
+				<li>
+					结束日期：<input type="text" id="endDate" name="endDate"/>
+				</li>
+	
+				<li>
+					主          题：<input type="text" name="theme"/>
+					<input type="hidden" name="params[queryType]" value="launch"/>
+				</li>
+	
+	
+				<li>
+					审核状态：<select id="auditFlag" name="auditFlag" th:with="type=${@dict.getType('emp_attend_audit_flag')}">
+						<option value="">所有</option>
+	                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+	                </select>
+				</li>
+				<li>
+					完成状态：<select id="completeFlag" name="completeFlag" th:with="type=${@dict.getType('emp_attend_complete_flag')}">
+						<option value="">所有</option>
+	                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+	                </select>
+				</li>
+	
+				<li>
+					<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search('launch-from')"><i class="fa fa-search"></i>&nbsp;搜索</a>
+					<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset('launch-from')"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+				</li>
+			</ul>
+		</div>
+	</form>
+</div>

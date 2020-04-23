@@ -35,7 +35,7 @@
 					<button type="button" class="layui-btn" id="appendix" lay-data="{ accept: 'file'}">
 						<i class="layui-icon">&#xe67c;</i>上传附件
 					</button>
-					<a id="appendixLink" >[[${notice.sysFile?.originalFileName}]]</a>
+					<a id="appendixLink" >[[${notice.sysFile.originalFileName}]]</a>
 					<input type="hidden" name="sysFile.originalFileName" id="originalFileName" th:field="*{sysFile.originalFileName}">
 					<input type="hidden" name="sysFile.fileId" id="fileId" th:field="*{sysFile.fileId}">
 					<input type="hidden" name="sysFile.filePath" id="filePath" th:field="*{sysFile.filePath}">
@@ -59,7 +59,7 @@
         var prefix = ctx + "system/notice";
     
 	    $(function() {
-	    	var param = "[[${notice.sysFile?.downloadParam}]]".replace("&amp;","&");
+	    	var param = "[[${notice.sysFile.downloadParam}]]".replace("&amp;","&");
 	    	$("#appendixLink").click(function(){
 	    		downloadFile(param);
 	    	});

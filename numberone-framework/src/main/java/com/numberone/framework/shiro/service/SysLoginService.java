@@ -2,7 +2,12 @@ package com.numberone.framework.shiro.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -38,7 +43,14 @@ public class SysLoginService
 
     @Autowired
     private ISysUserService userService;
+    @Autowired
+    private CacheManager cacheManager;
 
+    private Cache<String, List<Map<String,String>>> cache;
+    @PostConstruct
+    private void init(){
+    	cache = cacheManager.getCache("querableCache");
+    }
     /**
      * 登录
      */
@@ -122,6 +134,12 @@ public class SysLoginService
 	        		operableUserIds.add(sysUser.getUserId());
 	        	}
 	        	user.setOperableUserIds(operableUserIds);
+	        }
+	        
+	        //200225 --新增 用户可以查询的用户列表 hr admin ceo全部 其他用户只能查询本部门员工
+	        List<Map<String,String>> querableList  = userService.selectListByUserAndPostForQuery(user);
+	        if(querableList!=null){
+	        	cache.put("querableMap", querableList);
 	        }
         return user;
     }

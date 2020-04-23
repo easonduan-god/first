@@ -22,6 +22,26 @@
            overflowToDisk="false"
            statistics="true">
     </cache>
+    <!-- 任务序号缓存 锁定24小时 -->
+    <cache name="taskSequenceCache"
+           maxEntriesLocalHeap="2000"
+           eternal="false"
+           timeToIdleSeconds="86400"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           statistics="true">
+    </cache>
+    
+    <!-- 用户可查询缓存 -->
+    <cache name="querableCache"
+           maxEntriesLocalHeap="2000"
+           eternal="true"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           diskPersistent="true"
+           statistics="true">
+    </cache>
 
 </ehcache>
 	

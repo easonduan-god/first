@@ -32,7 +32,7 @@
 				<label class="col-sm-3 control-label">附        件：</label>
 				<div class="col-sm-8">
 					<button type="button" class="btn btn-Default" disabled="disabled"><i class="layui-icon">&#xe67c;</i>上传附件</button>
-					<a id="appendixLink" >[[${notice.sysFile?.originalFileName}]]</a>
+					<a id="appendixLink" >[[${notice.sysFile.originalFileName}]]</a>
 				</div>
 			</div>
             <div class="form-group">
@@ -53,7 +53,7 @@
         var prefix = ctx + "system/notice";
     
 	    $(function() {
-	    	var param = "[[${notice.sysFile?.downloadParam}]]".replace("&amp;","&");
+	    	var param = "[[${notice.sysFile.downloadParam}]]".replace("&amp;","&");
 	    	$("#appendixLink").click(function(){
 	    		downloadFile(param);
 	    	});

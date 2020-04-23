@@ -1,0 +1,104 @@
+.panelBox .tableEditor,.l-dialog .tableEditor,.l-dialog .tableFrame {
+	margin-top: 0
+}
+
+.tableEditor {
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #dcebf7;
+	table-layout: fixed!important;
+	margin-top: 5px
+}
+
+.tableEditor tbody tr:first-child td {
+	border-top: 1px solid #dcebf7
+}
+
+.tableEditor tr,.tableEditor td,.tableEditor th {
+	border-collapse: collapse;
+	padding: 3px 5px;
+	vertical-align: middle;
+	border-top: 1px solid #d5e4f1;
+	border-bottom: 1px solid #d5e4f1
+}
+
+.tableEditor thead tr,.tableEditor tfoot tr,.tdGroup {
+	background: #f4f8fa
+}
+
+.tableEditor thead td,.tableEditor thead th,.tableEditor tfoot td,.tdGroup {
+	font-weight: bold;
+	color: #2a6496;
+	padding: 5px!important;
+	text-align: center
+}
+
+.tdLabel {
+	text-align: right;
+	vertical-align: middle;
+	color: #2a6496;
+	background-color: #f4f8fa
+}
+
+.tdInput {
+	background: #fff;
+	text-align: left
+}
+
+.tdInput .checkbox,.tdInput .radio {
+	height: 26px
+}
+
+.tdButton,.tdPadding {
+	background: #fff;
+	text-align: center
+}
+
+.tdButton .button,.tdButton .simpleButton {
+	margin: 3px 0
+}
+
+.tablePanel,.tableNone {
+	border: 0 solid #000!important;
+	width: 100%;
+	border-collapse: collapse;
+	padding: 0;
+	margin: 0
+}
+
+.tablePanel tr,.tablePanel td,.tablePanel th,.tableNone tr,.tableNone td,.tableNone th {
+	border: 0!important
+}
+
+.tableBorder {
+	border: 1px solid #dcebf7;
+	width: 100%;
+	margin: 5px 0;
+	border-collapse: collapse
+}
+
+.tableFrame {
+	border: 1px solid #dcebf7;
+	width: 100%;
+	border-collapse: collapse;
+	text-align: center;
+	margin: 5px 0;
+	table-layout: fixed
+}
+
+.tableHeader,.tableFooter,.tableFrame thead tr,.tableFrame tfoot tr {
+	border-collapse: collapse;
+	text-align: center;
+	font-weight: bold;
+	color: #2a6496;
+	background-color: #f4f8fa
+}
+
+.tableFrame td,.tableFrame th,.tableHeader td,.tableHeader th,.tableFooter td,.tableFooter th {
+	border: 1px solid #dcebf7;
+	padding: 5px
+}
+
+.l-grid-detailpanel .tableEditor {
+	width: 100%
+}

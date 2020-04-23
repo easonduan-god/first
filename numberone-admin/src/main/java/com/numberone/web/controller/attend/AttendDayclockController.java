@@ -123,7 +123,7 @@ public class AttendDayclockController extends BaseController
 	@GetMapping("/originalData")
 	public String originalData(EmpAttendinfo empAttendinfo)
 	{
-		return "attend/originalData";
+		return prefix + "/originaldata";
 	}
 	
 }

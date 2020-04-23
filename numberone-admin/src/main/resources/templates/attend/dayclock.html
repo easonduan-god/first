@@ -66,7 +66,9 @@
 	<script th:inline="javascript">
 		var datas = [[${@dict.getType('emp_attend_result')}]];
 		var prefix = ctx + "attend/dayclock";
-		
+		var types = [[${@dict.getType('emp_attend_type')}]];
+        var results = [[${@dict.getType('emp_attend_result')}]];
+        var weeks = [[${@dict.getType('sys_week')}]];
 		$(function() {
 		    var options = {
 		        url: prefix + "/list",
@@ -134,18 +136,8 @@
 									align: 'center',
 									valign: 'middle',
 									formatter: function(value, row, index) {
-										var week = "";
-										switch(value){
-										case 1:week="日";break;
-										case 2:week="一";break;
-										case 3:week="二";break;
-										case 4:week="三";break;
-										case 5:week="四";break;
-										case 6:week="五";break;
-										case 7:week="六";break;
-										}
-						                return "星期"+week;
-						        	}
+										return $.table.selectDictLabel(weeks, value);
+						            }
 								}, {
 									field: 'firstTime',   
 									title: '最早打卡',
@@ -168,17 +160,7 @@
 									align: 'center',
 									valign: 'middle',
 									formatter: function(value, row, index) {
-										var result = "";
-										//0正常 1迟到 2早退 3旷工 4异常 5迟到+早退
-										switch(value){
-											case 0:result="正常";break;
-											case 1:result="迟到";break;
-											case 2:result="早退";break;
-											case 3:result="旷工";break;
-											case 4:result="异常";break;
-											case 5:result="迟到+早退";break;
-										}
-						                return result;
+										return $.table.selectDictLabel(results, value);
 						            }
 								},
 								{
@@ -186,7 +168,10 @@
 									title: '考勤类型',
 									width: 100,
 									align: 'center',
-									valign: 'middle'
+									valign: 'middle',
+									formatter: function(value, row, index) {
+										return $.table.selectDictLabel(types, value);
+						            }
 								}
 							]
 						]

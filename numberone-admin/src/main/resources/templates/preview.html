@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html  lang="zh" xmlns:th="http://www.thymeleaf.org"
-	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>预览</title>
+<title>文件预览</title>
+<style>
+ .pdfobject-container { height: 55rem; border: 1rem solid rgba(0,0,0,.1); }
+</style>
 </head>
 <body>
-	<embed src="/common/download?fileName=2020/03/22/你需要了解的行政制度.pdf&originalFileName=巴蛇.pdf" type="application/pdf" style="overflow: auto; position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;">
+<div id="example1"></div>
 </body>
+<script th:src="@{/ajax/libs/PDFObject/pdfobject.js}"></script>
+<script>PDFObject.embed("/数据表2 pj3x.docx", "#example1");</script>
+
 </html>

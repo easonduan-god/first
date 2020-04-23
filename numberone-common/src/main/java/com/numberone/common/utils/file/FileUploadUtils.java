@@ -152,7 +152,9 @@ public class FileUploadUtils
     public static final String getExtname(MultipartFile file)
     {
     	String filename = file.getOriginalFilename();
-    	return filename.substring(filename.lastIndexOf('.'));
+    	int index = filename.lastIndexOf('.');
+    	if(index==-1) return FileUploadUtils.IMAGE_JPG_EXTENSION;
+    	return filename.substring(index);
     }
     
     

@@ -12,6 +12,13 @@
   <link th:href="@{/ajax/libs/eson-master/eson/styles/eson.css}" rel="stylesheet" type="text/css">
   <link th:href="@{/css/calendar.css}" rel="stylesheet" type="text/css">
   
+  <style type="text/css">
+  	.calendar-body li div {
+	    line-height: 100%;
+	    height: 46px;
+	    height: 37px;
+	}
+  </style>
 </head>
 <body>
   
@@ -34,9 +41,9 @@
                         </a>
                       </li>
                       <li class="layui-col-xs3">
-                        <a th:href="@{/attend/dayclock}" title="部门任务" class="link-tab">
+                        <a th:href="@{/work/task/audit}" title="任务审批" class="link-tab">
                           <i class="layui-icon layui-icon-list"></i>
-                          <cite>部门任务</cite>
+                          <cite>任务审批</cite>
                         </a>
                       </li>
                       <li class="layui-col-xs3">
@@ -58,9 +65,9 @@
                         </a>
                       </li>
                       <li class="layui-col-xs3">
-                        <a th:href="@{/attend/overtimebill/mine}"	title="我的延时工单" class="link-tab">
+                        <a th:href="@{/attend/overtimeBill/backlog}"	title="延时待办" class="link-tab">
                           <i class="layui-icon layui-icon-chat"></i>
-                          <cite>我的延时工单</cite>
+                          <cite>延时待办</cite>
                         </a>
                       </li>
                       <li class="layui-col-xs3">
@@ -78,6 +85,12 @@
                       
                     </ul>
                     <ul class="layui-row layui-col-space10">
+                      <li class="layui-col-xs3">
+                        <a th:href="@{/attend/attendBill/backlog}" title="考勤待办" class="link-tab">
+                          <i class="layui-icon layui-icon-flag"></i>
+                          <cite>考勤待办</cite>
+                        </a>
+                      </li>
                       <li class="layui-col-xs3">
                         <a th:href="@{/system/user/profile}" title="个人中心" class="link-tab">
                           <i class="layui-icon layui-icon-username"></i>
@@ -119,27 +132,27 @@
                   <div carousel-item>
                     <ul class="layui-row layui-col-space10">
                       <li class="layui-col-xs6">
-                        <a lay-href="app/content/comment.html" class="layadmin-backlog-body">
-                          <h3>待审评论</h3>
+                        <a th:href="@{/attend/overtimeBill/backlog}" title="延时待办"  class="layadmin-backlog-body link-tab">
+                          <h3>延时待办</h3>
                           <p><cite>66</cite></p>
                         </a>
                       </li>
                       <li class="layui-col-xs6">
-                        <a lay-href="app/forum/list.html" class="layadmin-backlog-body">
-                          <h3>待审帖子</h3>
-                          <p><cite>12</cite></p>
+                        <a th:href="@{/attend/attendBill/backlog}" title="考勤待办"  class="layadmin-backlog-body link-tab">
+                          <h3>考勤待办</h3>
+                          <p><cite>32</cite></p>
                         </a>
                       </li>
                       <li class="layui-col-xs6">
-                        <a lay-href="template/goodslist.html" class="layadmin-backlog-body">
-                          <h3>待审商品</h3>
-                          <p><cite>99</cite></p>
+                        <a th:href="@{/work/task/mineBacklog}" title="个人任务待办"  class="layadmin-backlog-body link-tab">
+                          <h3>个人任务待办</h3>
+                          <p><cite style="color: #FF5722;">2</cite></p>
                         </a>
                       </li>
                       <li class="layui-col-xs6">
-                        <a href="javascript:;" onclick="layer.tips('不跳转', this, {tips: 3});" class="layadmin-backlog-body">
-                          <h3>待发货</h3>
-                          <p><cite>20</cite></p>
+                        <a th:href="@{/work/task/deptBacklog}" title="部门任务待办"  class="layadmin-backlog-body link-tab">
+                          <h3>部门任务待办</h3>
+                          <p><cite>3</cite></p>
                         </a>
                       </li>
                     </ul>
@@ -172,7 +185,7 @@
 		                  <a href="javascript:void(0)"><span th:text="${notice.noticeType=='1'?'通知':'公告'}"></span></a>
 	                  </div>
 	                  <a  class="notice-link" th:title="${notice.noticeId}" href="javascript:void(0)" shiro:hasPermission="system:notice:detail"><p class="layui-text-center" th:text="${notice.noticeTitle}"></p></a>
-	                  <p class="layui-text-bottom"><a class="notice-link" th:title="${notice.noticeId}" href="javascript:void(0)"  shiro:hasPermission="system:notice:detail">详情</a><span>7 天前</span></p>
+	                  <p class="layui-text-bottom"><a class="notice-link" th:title="${notice.noticeId}" href="javascript:void(0)"  shiro:hasPermission="system:notice:detail">详情</a><span>[[${#dates.format(notice.updateTime!=null?notice.updateTime:notice.createTime, 'yyyy-MM-dd')}]]</span></p>
 	                </div>
 	              </div>
 	              
@@ -195,8 +208,11 @@
         <div class="layui-card">
           <!-- <div class="layui-card-header">挂历本</div> -->
           <div class="layui-card-body layui-text">
-          	<div id="calendarDIV" ></div>
+          	<div class="calendar-person" id="calendarDIV" ></div>
           </div><!-- style="margin: 0 auto;width: 380px;" -->
+        </div>
+        <div class="layui-card" style="height: 400px;padding: 1 auto;">
+        	<iframe width="70%" height="85%" th:src="@{/system/test}" frameborder="0" seamless></iframe>
         </div>
 
       </div>
@@ -212,6 +228,7 @@
   <script th:src="@{/ajax/libs/eson-master/eson/nl.min.js}" charset="utf-8" type="text/javascript"></script>
   <script src="../static/numberone/main.js" th:src="@{/numberone/main.js}"></script>
   <script src="../static/numberone/calendar.js"  th:inline="javascript" th:src="@{/numberone/calendar.js}"></script>
+  
   <script th:inline="javascript">
 	var attendCode = [[${@dict.getType('emp_attend_code')}]];
 	$(document).ready(function(){
@@ -222,56 +239,12 @@
 	$(window).resize(function(){
 		initEson("calendarDIV");
 	});
-  layui.config({
-    base: '/oaui/' //静态资源所在路径
-  }).extend({
-    index: 'lib/index' //主入口模块
-  }).use(['index', 'console','laydate'],function(){
-	  var laydate = layui.laydate;
-	//加载日历
-	/* var dateJsonSession = layui.sessionData('dateJson').data;
-	if(dateJsonSession!=undefined){
-		var calendar = laydate.render({
-			elem:'#calendarDIV',
-			type:'date',
-			show:true,
-			calendar:true,
-			position:'static',
-			showBottom:false,
-			mark: dateJsonSession[0]
-			,done:function(value, date){
-				//if(date.year === 2020 && date.month === 1 && date.date === 15){ //点击2017年8月15日，弹出提示语
-				//	calendar.hint('中国人民抗日战争胜利72周年');
-				 //   } 
-			},change:function(value,date){
-				//calendar.hint(value+date);
-			}
-		});
-	}else{
-		$.post("/attend/workday/dateJson",function(dateJson){
-			layui.sessionData('dateJson', {
-		        key: 'data',
-		        value: [
-					dateJson
-		        ]
-			});
-		
-			var calendar = laydate.render({
-				elem:'#calendarDIV',
-				type:'date',
-				show:true,
-				calendar:true,
-				position:'static',
-				showBottom:false,
-				mark: dateJson
-				,done:function(value, date){
-					
-				},change:function(value,date){
-					//calendar.hint(value+date);
-				}
-			});
-		});
-	} */
+	layui.config({
+		base: '/oaui/' //静态资源所在路径
+	}).extend({
+		index: 'lib/index' //主入口模块
+	}).use(['index', 'console','laydate'],function(){
+	var laydate = layui.laydate;
 	
   });
   
@@ -306,12 +279,26 @@
 			  layer.close(index);
 		  }
 	  });
-	  
-	  
-	  
-	  
   }
   	
+  function animationLoad(){
+		L2Dwidget.on('*', (name) => {
+			console.log('%c EVENT ' + '%c -> ' + name, 'background: #222; color: yellow', 'background: #fff; color: #000')
+		}).init({
+			dialog: {
+				// 开启对话框
+				enable: true,
+				script: {
+					// 每空闲 10 秒钟，显示一条一言
+					'every idle 10s': '$hitokoto$',
+					// 当触摸到角色身体
+					'tap body': '哎呀！别碰我！',
+					// 当触摸到角色头部
+					'tap face': '人家已经不是小孩子了！'
+				}
+			}
+		});
+  }
   </script>
   
 </body>

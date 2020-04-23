@@ -231,6 +231,13 @@ public class SysJobServiceImpl implements ISysJobService
     }
 	@Override
 	public void updateAttendInfo() {
+		//200331 只允许在早上5点到六点执行该任务
+		double hour = DateUtils.getHourAndMminutesDoubleValue(new Date());
+		if(hour > 6 || hour < 5){
+			System.out.println("非考勤执行时间");
+			return;
+		}
+		
 		Boolean late_flag = false;//迟到状态
 		Boolean early_flag = false;//早退状态
 		Boolean absent_flag = false;//旷工状态
@@ -248,13 +255,15 @@ public class SysJobServiceImpl implements ISysJobService
 		if( DateUtils.dayOfWeek(new Date())==1 || DateUtils.dayOfWeek(new Date())==2 ){
 			work_flag = false;
 		}
-		//日程状态：(0正常 1工作日 2休息日)
-		if(workday.getWorkdateFlag()==2){
-			work_flag = false;
-		}
-		//工作日
-		if(workday.getWorkdateFlag()==1){
-			work_flag = true;
+		if(workday!=null){
+			//日程状态：(0正常 1工作日 2休息日)
+			if(workday.getWorkdateFlag()==2){
+				work_flag = false;
+			}
+			//工作日
+			if(workday.getWorkdateFlag()==1){
+				work_flag = true;
+			}
 		}
 		
 		
@@ -368,20 +377,20 @@ public class SysJobServiceImpl implements ISysJobService
 							if(DateUtils.getDateIntervalInHours(goWorkTimeFixed,firstTime)>0.5 || DateUtils.getDateIntervalInHours(offWorkTime,offWorkTimeFixed)>0.5){
 								//旷工
 								empAttendDay.setAttendResult(AttendResult.ABSENT);
-								empAttendDay.setAdditionalTime(0.0);
-							}else{
-								//补全额外时间，考勤正常的才可以
-								double additionalTime = 0;
-								if(empAttendDay.getAttendResult()==0){
-									additionalTime = Math.floor(DateUtils.getDateIntervalInHours(offWorkTime,DateUtils.setHours(attendDate, 17)));
-								}
-								empAttendDay.setAdditionalTime(additionalTime>=0?additionalTime:0);
 							}
+							//200408修改 无论是否矿工都要记录额外时间
+							if(offWorkTime!=null){
+								double additionalTime = Math.floor(DateUtils.getDateIntervalInHours(offWorkTime,DateUtils.setHours(attendDate, 19)));
+								empAttendDay.setAdditionalTime(additionalTime>=0?additionalTime:0);
+							}else{
+								empAttendDay.setAdditionalTime(0.0);
+							}
+							
 							
 						}else{
 							Date offWorkTime = offWorkTimes.get(0);
 							empAttendDay.setLastTime(offWorkTime);
-							//--200215调整 若迟到或早退的时间大于30个小时，记为矿工
+							//--200215调整 若迟到或早退的时间大于30分钟，记为矿工
 							//上班时间
 							Date goWorkTimeFixed = DateUtils.getGoWorkTime();
 							//下班时间
@@ -389,11 +398,13 @@ public class SysJobServiceImpl implements ISysJobService
 							if(DateUtils.getDateIntervalInHours(goWorkTimeFixed,firstTime)>0.5 || DateUtils.getDateIntervalInHours(offWorkTime,offWorkTimeFixed)>0.5){
 								//旷工
 								empAttendDay.setAttendResult(AttendResult.ABSENT);
-								empAttendDay.setAdditionalTime(0.0);
-							}else{
-								//补全额外时间
-								double additionalTime = DateUtils.getDateIntervalInHours(offWorkTime,DateUtils.setHours(attendDate, 17))*1.0;
+							}
+							//200408修改 无论是否矿工都要记录额外时间
+							if(offWorkTime!=null){
+								double additionalTime = Math.floor(DateUtils.getDateIntervalInHours(offWorkTime,DateUtils.setHours(attendDate, 19)));
 								empAttendDay.setAdditionalTime(additionalTime>=0?additionalTime:0);
+							}else{
+								empAttendDay.setAdditionalTime(0.0);
 							}
 						}
 					}

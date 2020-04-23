@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style type="text/css">
+	.form-control[readonly]  {
+		background-color: white;
+	}
+	a{
+		color: blue;
+	}
+	a:hover, a:focus, a:active {
+	    color: #FFFFFF;
+	    background-color: #437cae!important;
+	}
+</style>
+<body class="gray-bg">
+	<div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 select-table">
+				<form role="form" id="task-allocate-form" class="form-horizontal m-t">
+					<div class="col-md-12">
+						<h3>任务录入</h3>
+						<hr>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">任务标题：</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" name="taskTitle">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">难易程度：</label>
+							<div class="col-sm-9">
+								<select name="diffLevel" class="form-control noselect2" th:with="type=${@dict.getType('work_task_diff_level')}">
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="${dict.dictValue=='1.0'}"></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">优先级：</label>
+							<div class="col-sm-9">
+								<select name="priority" class="form-control noselect2" th:with="type=${@dict.getType('work_task_priority')}">
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="${dict.dictValue=='4'}"></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">任务类型：</label>
+							<div class="col-sm-9">
+								<select name="taskType" class="form-control noselect2" th:with="type=${@dict.getType('work_task_type')}">
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="${dict.dictValue=='1'}"></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">计划开始日期：</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="startDate" name="planStartDate" autocomplete="off" >
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">计划完成日期：</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="endDate" name="planEndDate" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3  control-label">处理人：</label>
+							<div class="col-sm-9" id="user-box">
+								<select class="form-control" id="userInput" name="dealUserId">
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3  control-label">预计工时：</label>
+							<div class="col-sm-9">
+							    <input name="planHours" class="form-control" ></input>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">任务描述：</label>
+							<div class="col-sm-9" >
+							    <textarea name="taskDesc" class="form-control" maxlength="2000"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">附件：</label>
+							<div class="col-sm-8">
+							<button type="button" class="layui-btn" id="taskAppendix" lay-data="{ accept: 'file'}">
+								<i class="layui-icon">&#xe67c;</i>上传附件
+							</button>
+							<a id="appendixLink"></a>
+							<input type="hidden" name="appendix.originalFileName" id="originalFileName">
+							<input type="hidden" name="appendix.filePath" id="filePath">
+						</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group draggable">
+							<div style="width: 145px;margin: 0 auto;">
+								<button type="button" class="btn btn-primary" onclick="allocateTask()" id="allocateBtn">保存</button>
+								<a  class="btn btn-warning" type="reset" onclick="reset()" id="reset">重置</a>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-danger btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="work:task:allocate">
+					<i class="fa fa-remove"></i> 删除任务
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="edit()" shiro:hasPermission="work:task:allocate">
+		            <i class="fa fa-edit"></i> 修改
+		        </a>
+	        </div>
+			<div class="col-sm-12 select-table ">
+				<br/>
+				<h3>已分配的任务</h3>
+				<hr>
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script th:src="@{/ajax/libs/select/select2.js}"></script>
+	<script th:inline="javascript">
+	var prefix = ctx + "work/task";
+    var types = [[${@dict.getType('work_task_type')}]];
+    var flags = [[${@dict.getType('work_task_flag')}]];
+	$(function(){
+		$("#startDate,#endDate").change(function(){
+			if(!$.validate.form()){
+				$(".error").css('background-color','white');
+			}
+		});
+		layui.use('laydate', function() {
+			var laydate = layui.laydate;
+			var startDate = laydate.render({
+		    	elem: '#startDate',
+		    	value: currDate,
+		    	theme: 'molv',
+		    	trigger: 'click',
+		    	done: function(value, date) {
+		    		// 结束时间大于开始时间
+		    		if (value !== '') {
+		    			endDate.config.min.year = date.year;
+		    			endDate.config.min.month = date.month - 1;
+		    			endDate.config.min.date = date.date;
+		    		} else {
+		    			endDate.config.min.year = '';
+		    			endDate.config.min.month = '';
+		    			endDate.config.min.date = '';
+		    		}
+		    	}
+		    });
+		    var endDate = laydate.render({
+		    	elem: '#endDate',
+		    	min: $('#startDate').val(),
+		    	theme: 'molv',
+		    	value: currDate,
+		    	trigger: 'click',
+		    	done: function(value, date) {
+		    		// 开始时间小于结束时间
+		    		if (value !== '') {
+		    			startDate.config.max.year = date.year;
+		    			startDate.config.max.month = date.month - 1;
+		    			startDate.config.max.date = date.date;
+		    		} else {
+		    			startDate.config.max.year = '';
+		    			startDate.config.max.month = '';
+		    			startDate.config.max.date = '';
+		    		}
+		    	}
+		    });
+		});
+		var options = {
+                url: prefix + "/allocate",
+                detailUrl: prefix + "/detail/{id}",
+                removeUrl: prefix + "/remove",
+                updateUrl: prefix + "/edit/{id}",
+                noEditUrl: prefix + "/noEdit/{id}",
+                sortable: true,                     // 是否启用排序
+                //sortName: "ob.applyDate",           // 排序列名称
+                //sortOrder: 'desc',                  // 排序方式  asc 或者 desc
+				search: false,
+				pagination: true,   // 是否显示分页（*）
+                pageNumber: 1,      // 初始化加载第一页，默认第一页
+                pageSize: 5,         // 每页的记录行数（*） 
+                pageList: [5,10, 25, 50],    // 可供选择的每页的行数（*）
+                showSearch: false,   // 是否显示检索信息
+                showRefresh: true, // 是否显示刷新按钮
+                showColumns: false, // 是否显示隐藏某列下拉框
+                showToggle: false,   // 是否显示详细视图和列表视图的切换按钮
+                showFooter : false,
+                modalName: "任务",
+		        showExport: true,
+		        uniqueId : "taskRecordId",
+                columns: [{
+		            checkbox: true
+		        },
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		                var actions = [];
+		                if(row.taskFlag=='6'){//执行人变更
+    		                actions.push('<a class="btn btn-warning btn-xs" href="#" onclick="alterDetail(\'' + row.taskRecordId + '\')"><i class="fa fa-edit"></i>变更详情</a> ');
+		                }
+		                if(row.taskFlag=='1'){//执行人变更
+   		                	actions.push('<a class="btn btn-primary btn-xs" href="#" onclick="editColumn(\'' + row.taskRecordId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+		                }
+		                return actions.join('');
+		            }
+		        },
+				{
+					field : 'taskRecordId', 
+					visible: false
+				},
+				{
+					field : 'taskId', 
+					align: 'center',
+					title : '任务编号',
+		            formatter: function(value, row, index) {
+		            	return '<a href="#"  onclick="$.operate.detailFull(\'' + row.taskRecordId + '\')">' + value + '</a>';
+		            }
+				},
+				{
+					field : 'taskTitle', 
+					align: 'center',
+					title : '任务标题'
+				},
+				{
+					field : 'taskType', 
+					align: 'center',
+					title : '任务类型',
+					formatter: function(value, row, index) {
+						return $.table.selectDictLabel(types, value);
+		            }
+				},
+				{
+					field : 'taskFlag', 
+					align: 'center',
+					title : '任务状态',
+					formatter: function(value, row, index) {
+						return $.table.selectDictLabel(flags, value);
+		            }
+				},
+				{
+					field : 'dealUserName', 
+					align: 'center',
+					title : '处理人'
+				},
+				{
+					field : 'planStartDate', 
+					align: 'center',
+					title : '计划开始日期',
+					sortable: true,
+		            formatter: function(value, row, index) {
+		            	if(value==null) return value;
+						return value.split(' ')[0];
+		            }
+				},
+				{
+					field : 'planEndDate', 
+					align: 'center',
+					title : '计划完成日期',
+					sortable: true,
+		            formatter: function(value, row, index) {
+		            	if(value==null) return value;
+						return value.split(' ')[0];
+		            }
+				},
+				{
+					field : 'planHours', 
+					align: 'center',
+					title : '预计工时',
+					sortable: true
+				}
+				]
+            };
+            $.table.init(options);
+	
+		
+		$("#task-allocate-form").validate({
+        	rules:{
+        		taskTitle:{
+        			required:true
+        		},
+        		diffLevel:{
+        			required:true
+        		},
+        		priority:{
+        			required:true
+        		},
+        		planStartDate:{
+        			required:true
+        			
+        		},
+        		planEndDate:{
+        			required:true
+        			
+        		},
+        		taskType:{
+        			required:true
+        			
+        		},
+        		planHours:{
+        			required:true,
+        			digits:true,
+        			range:[1,100]
+        			
+        		}
+            },	
+        	messages: {
+        		planHours:{
+	        		digits:"只能输入正整数"
+        		}
+            }
+        });
+		//初始化select2
+    	$("#userInput").select2({
+    		placeholder : "请输入人员工号或名称或名称首字母...",
+    		minimumInputLength : 1,//最小需要输入多少个字符才进行查询
+    		multiple : false,//支持多选
+    		allowClear : false,//允许清空
+    		ajax : {
+    			url : "/system/user/searchUser",
+    			dataType : 'json',
+    			type : "post",
+    			delay : 100,
+    			data : function(userName, page) {//向后台发送参数
+    				return {
+    					userName : userName.term
+    				};
+    			},
+    			results : function(data, page) {//处理结果
+    				return {
+    					data
+    				};
+    			}
+    		},
+    		formatResult : function(result, container, query, escapeMarkup) {
+    			return result.userName;
+    		},
+    		formatSelection : function(result, container, query, escapeMarkup) {
+    			return result.userName;
+    		},
+    		formatInputTooShort : function() {
+    			return "请输入人员工号或名称或名称首字母...";
+    		},
+    		escapeMarkup : function(m) {
+    			return m;
+    		}
+    	});
+	
+	    //layui上传附件
+	    layui.use('upload', function(){
+	      var upload = layui.upload;
+	       
+	      //执行实例
+	      var uploadInst = upload.render({
+	        elem: '#taskAppendix' //绑定元素
+	        ,size: 1024*10
+	        ,url: ctx + "common/upload" //上传接口
+	        ,done: function(res){
+				//上传完毕回调
+				$.modal.msgSuccess("上传成功");
+				var downloadParam = "?fileName="+res.fileName+"&originalFileName="+res.originalFileName;
+				$("#appendixLink").text(res.originalFileName).attr("onclick","downloadFile('"+downloadParam+"')");
+				$("#originalFileName").val(res.originalFileName);
+				$("#filePath").val(res.fileName);
+	        }
+	        ,error: function(){
+	          $.modal.msgError("上传失败");
+	        }
+	      });
+	    });
+	});
+	//下载附件
+	function downloadFile(downloadParam){
+	    window.location.href = ctx + "common/download" + downloadParam;
+	    
+	}
+	function reset(){
+		$("#task-allocate-form")[0].reset();
+	    $('#userInput').val("").trigger('change');
+	}
+	
+	//分配任务
+	function allocateTask(){
+		if(!$.validate.form()){
+			$(".error").css('background-color','white');
+			return;
+		}
+		if($("[name=dealUserId]").val()==null){
+			$.modal.msgError("请先选择处理人");
+			return;
+		}
+		$.modal.loading("提交中。。。");
+		$.post(prefix+"/launchAllocate", $("#task-allocate-form").serialize(),function(data){
+			$(allocateBtn).attr("disabled",true);
+			$(reset).attr("disabled",true);
+			//0是成功
+			if(data.code==0){
+				$.modal.closeLoading();
+				layer.confirm("分配任务成功", {
+        	        icon: 1,
+        	        title: "系统提示",
+        	        btn: ['确认'],
+        	        shadeClose: true,
+        	        btnclass: ['btn btn-primary'],
+        	        end: function(){
+            	        location.href = location.href;
+        	        }
+        	    }, function (index) {
+        	    	layer.close(index);
+        	    });
+			}else{
+				$.modal.closeLoading();
+				$.modal.msgError(data.msg);
+				$(allocateBtn).removeAttr("disabled");
+				$(reset).removeAttr("disabled");
+			}
+		});
+	}
+	function edit(){
+		var row = $.common.isEmpty($.table._option.uniqueId)
+		? $.table.selectFirstColumns()
+		: $.table.selectColumns($.table._option.uniqueId);
+		var url = $.table._option.noEditUrl.replace("{id}", row);
+		$.post(url,{},function(result){
+			if(result.code=='0'){
+				$.operate.editFull();
+			}else{
+				$.modal.msgError(result.msg);
+			}
+		},"json");
+	}
+	function editColumn(taskRecordId){
+		var url = $.table._option.noEditUrl.replace("{id}", taskRecordId);
+		$.post(url,{},function(result){
+			if(result.code=='0'){
+				$.operate.editFull(taskRecordId);
+			}else{
+				$.modal.msgError(result.msg);
+			}
+		},"json");
+	}
+    function alterDetail(taskRecordId){
+		$.post(prefix+"/alterDetail",{"taskRecordId":taskRecordId},function(result){
+			$("#task-alterDetail-form").find("input[name=alterUserName]").val(result.data.alterUserName);
+			$("#task-alterDetail-form").find("textarea[name=remark]").val(result.data.remark);
+    		$.modal.openDiv("指派", "#detailDiv");
+		},"json");
+    }
+	</script>
+</body>
+<div class="col-sm-12 search-collapse" id="detailDiv" style="display: none;">
+	<form id="task-alterDetail-form" class="form-horizontal">					
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">处理人：</label>
+			<div class="col-sm-9" >
+				<input type="text" name="alterUserName" class="form-control" readonly="readonly">
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="form-group draggable">
+			<label class="col-sm-3 control-label">备注：</label>
+			<div class="col-sm-9" >
+				<textarea name="remark" rows="5" class="form-control" readonly="readonly"></textarea>
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+</html>

@@ -18,6 +18,7 @@ import com.numberone.common.enums.BusinessType;
 import com.numberone.common.page.TableDataInfo;
 import com.numberone.framework.util.ShiroUtils;
 import com.numberone.framework.web.base.BaseController;
+import com.numberone.system.domain.SysFileBean;
 import com.numberone.system.domain.SysNotice;
 import com.numberone.system.service.ISysNoticeService;
 
@@ -94,7 +95,11 @@ public class SysNoticeController extends BaseController
     @GetMapping("/edit/{noticeId}")
     public String edit(@PathVariable("noticeId") Long noticeId, ModelMap mmap)
     {
-        mmap.put("notice", noticeService.selectNoticeById(noticeId));
+    	SysNotice notice = noticeService.selectNoticeById(noticeId);
+    	if(notice.getSysFile()==null){
+    		notice.setSysFile(new SysFileBean());
+    	}
+        mmap.put("notice", notice);
         //编辑
         return prefix + "/edit";
     }
@@ -105,7 +110,11 @@ public class SysNoticeController extends BaseController
     @RequiresPermissions("system:notice:detail")
     public String detail(@PathVariable("noticeId") Long noticeId, ModelMap mmap)
     {
-    	mmap.put("notice", noticeService.selectNoticeById(noticeId));
+    	SysNotice notice = noticeService.selectNoticeById(noticeId);
+    	if(notice.getSysFile()==null){
+    		notice.setSysFile(new SysFileBean());
+    	}
+    	mmap.put("notice", notice);
     	return prefix + "/detail";
     }
 

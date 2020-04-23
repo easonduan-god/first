@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/numberone/css/ry-ui.css}" rel="stylesheet"/>
+<link th:href="@{/ajax/libs/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet"/>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content">
+        <div class="row center-block" style="width:90%; padding-left: auto;padding-right: auto;" >
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5 id="operateCount">操作员(0)</h5>
+                    </div>
+                    <div class="ibox-content"  style="height: 400px;overflow:auto;">
+                    	<div id="tree" class="ztree"></div>
+                    </div>
+                    <div class="ibox-title" style="height: 55px">
+                        <input type="text" name="keyword" id="keyword" class="form-control" autocomplete="off" placeholder="查找 部门、用户">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+					<div class="ibox-title">
+                        <h5 id="receiveCount">接收人(0)</h5>
+                    </div>
+                    <div class="ibox-content" style="height: 400px;overflow:auto;">
+                    	<div id="receiveTree" class="ztree"></div>
+                    </div>
+                    <div class="ibox-title" style="height: 55px">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	<div th:include="include :: footer"></div>
+	<script th:src="@{/js/jquery-ui-1.10.4.min.js}"></script>
+	<script th:src="@{/ajax/libs/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js}"></script>
+	<script type="text/javascript">
+	var opeUserCount = [[${userCount}]];
+	var recUserCount = 0;
+	$("#operateCount").text("操作员("+opeUserCount+")");
+	$("#receiveCount").text("接收人("+recUserCount+")");
+	//用户存储被删除的子节点的父节点 key为子节点id value为父节点
+	var parentNodes = {};
+	
+	//统一初始化 方便阅读
+	(function(){
+		//初始化操作用户树
+		initOperateTree();
+		//初始化接收用户树
+		initReceiveTree();
+		
+		//监听输入框keyword输入change事件 并进行tree的搜索
+		//$("#keyword").change(inputChange);
+		
+	})();
+	
+	//查询可操作的用户树数据 并初始化用户数
+	function initOperateTree(){
+		
+		var url = ctx + "system/user/treeData";
+		var options = {
+	        url: url,
+	        id : "tree",
+	        dblClickExpand : false,
+	        expandLevel: 3,
+	        onClick : zOnClick,
+	        onDblClick : zOnDblClick
+	    };
+		$.tree.init(options);
+		function zOnClick(event, treeId, treeNode) {
+			var operateTree = $.fn.zTree.getZTreeObj("tree");
+			
+			operateTree.expandNode(treeNode);
+		}
+		
+		function zOnDblClick(event, treeId, treeNode){
+			var operateTree = $.fn.zTree.getZTreeObj("tree");
+			var receiveTree = $.fn.zTree.getZTreeObj("receiveTree");
+			var level = treeNode.level;
+			var parentNode = treeNode.getParentNode();
+			
+			//只要子节点
+			if(level==3){
+				receiveTree.addNodes(null,treeNode,false);
+				operateTree.removeNode(treeNode);
+				opeUserCount--;
+				recUserCount++;
+				$("#operateCount").text("操作员("+opeUserCount+")");
+				$("#receiveCount").text("接收人("+recUserCount+")");
+				//操作完后，将父节点存起来
+				parentNodes[treeNode.id] = parentNode;
+			}
+		}
+	}
+	
+	//初始化接收用户树
+	function initReceiveTree(){
+		
+		var url = ctx + "system/user/treeData";
+		var options = {
+	        id : "receiveTree",
+	        dblClickExpand : false,
+	        onClick : zOnClick,
+	        showRemoveBtn : true,
+	        enable : true,
+	        beforeRemove : zBeforeRemove,
+	        onDblClick : zOnDblClick
+	    };
+		$.tree.init(options);
+		function zOnClick(event, treeId, treeNode) {
+		}
+		
+		function zOnDblClick(event, treeId, treeNode){
+			var operateTree = $.fn.zTree.getZTreeObj("tree");
+			var receiveTree = $.fn.zTree.getZTreeObj("receiveTree");
+			opeUserCount++;
+			recUserCount--;
+			$("#operateCount").text("操作员("+opeUserCount+")");
+			$("#receiveCount").text("接收人("+recUserCount+")");
+			//删除接收方的子节点 并将字节的放回操作tree去 父节点为之前存好的
+			receiveTree.removeNode(treeNode);
+			operateTree.addNodes(parentNodes[treeNode.id],treeNode,false);
+		}
+		function zBeforeRemove(event, treeNode){
+			var operateTree = $.fn.zTree.getZTreeObj("tree");
+			var receiveTree = $.fn.zTree.getZTreeObj("receiveTree");
+			opeUserCount++;
+			recUserCount--;
+			$("#operateCount").text("操作员("+opeUserCount+")");
+			$("#receiveCount").text("接收人("+recUserCount+")");
+			//删除接收方的子节点 并将字节的放回操作tree去 父节点为之前存好的
+			operateTree.addNodes(parentNodes[treeNode.id],treeNode,false);
+			
+		}
+	}
+	
+	//窗口回调函数 将选择的人员信息返回
+	function submitHandler() {
+		var receiveTree = $.fn.zTree.getZTreeObj("receiveTree");
+		var nodes = receiveTree.getNodes(),ids = [],usernames = [],result={};
+		nodes.forEach((node, index, nodes) => {
+			result[node.id] = node.title;
+			ids.push(node.id);
+			usernames.push(node.title);
+		});
+		result["ids"] = ids.join(',');
+		result["usernames"] = usernames.join(',');
+		$.operate.choosePersonSuccess(result);
+    }
+   </script>
+   
+   
+</body>
+</html>

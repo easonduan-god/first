@@ -1,16 +1,40 @@
-.calendar-quick .calendar-quick-contents a { padding: 10px 0;}
+@charset "UTF-8";
+/*欢迎页*/
+
+/*全局*/
+body{overflow-x:hidden;}
+a:hover, a:focus{text-decoration:none !important;}
+
+/*日历显示*/	
+.calendar-main {-webkit-box-sizing: content-box;-moz-box-sizing: content-box;box-sizing: content-box;padding: 0;box-shadow:none;border-radius:0;border:0;background:none;}
+.calendar-header {padding: 0 10px;}
+.calendar-quick .calendar-quick-contents a { padding: 10px 0; font-size: 16px; font-weight: 600; color: #333;}
 .calendar-body-wapper { padding-bottom: 5px;}
 .calendar-body { vertical-align: top;}
-.calendar-body li {line-height:140%; vertical-align: top; color:#000; font-size:16px}
-.calendar-body li div {overflow: hidden; line-height:120% !important;}
-.calendar-body li.weeks{height:24px; font-size:14px; font-weight:normal}
+.calendar-body li {line-height:140%; vertical-align:top; color:#000; font-size:16px; position: relative; z-index: 1;}
+.calendar-body li.weeks{height:22px; font-size:14px; font-weight:normal}
 .calendar-body li div span{font-size:12px; color:#ccc}
 .calendar-body li div span.hover{color:#2CB4BF}
-.calendar-body li.selected div span{color:#fff}
+.calendar-body li div {overflow: hidden;}
+.calendar-body li.selected div span{color:#fff;}
+
 .calendar-body li.current div span{color:#2CB4BF}
 
-.calendar-main {-webkit-box-sizing: content-box;-moz-box-sizing: content-box;box-sizing: content-box;padding: 0;box-shadow:none;border-radius:0;border:0;background:none;}
-.calendar-header {padding: 0;}
-.calendar-body { vertical-align: top;}
-.calendar-body li div span{font-size:12px; color:#ccc}
+.calendar-header .select-box li{font-size:18px;font-weight:400;}
+.calendar-header .select-box li.area-left{ border-right: 10px solid #aaa;margin-right:5px;}
+.calendar-header .select-box li.area-right{border-left: 10px solid #aaa;margin-left:5px;}
+.calendar-quick {background-color:transparent;margin-left:0;z-index: 100;}
 
+.calendar-body li div span.number{font-size:18px; font-weight:700;color:#000;}
+
+.calendar-body li.disabled div span.number{color: #ddd;}
+.calendar-body li.sunday div span.number{color: #d02f12;}
+.calendar-body li div span.hover{color:#2cb4bf;}
+.calendar-body li.selected div span{color:#fff !important;}
+
+/* 考勤信息 */
+.calendar-sign{position:absolute;left:2px;top:2px;display:block;width:16px;height:16px;line-height:1.5;text-align:center;overflow:hidden;font-size:12px !important;}
+.calendar-sign.rest{color:blue;background:transparent;font-weight:bold;}
+.calendar-sign.worker{color:blue;background:transparent;font-weight:bold;}
+.calendar-sign.absent{color:#fff;background:#d4181d;}
+.calendar-sign.holi{color:#fff;background:green;}
