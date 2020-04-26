@@ -24,7 +24,7 @@ public class AttendWorkdayServiceImpl implements IAttendWorkdayService {
 	@Override
 	public List<EmpNonworkday> selectWorkdayList(EmpNonworkday empNonworkday) {
 		
-		return empNonworkdayMapper.selectWorkdayList(empNonworkday);
+		return empNonworkdayMapper.selectEmpNonworkdayList(empNonworkday);
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class AttendWorkdayServiceImpl implements IAttendWorkdayService {
 			return 0;
 		}else{
 			empNonworkday.setNonworkId(StringUtils.getUUID());
-			return empNonworkdayMapper.insert(empNonworkday);
+			return empNonworkdayMapper.insertEmpNonworkday(empNonworkday);
 		}
 	}
 
@@ -47,28 +47,28 @@ public class AttendWorkdayServiceImpl implements IAttendWorkdayService {
 		if(row>0){
 			return 0;
 		}else{
-			return empNonworkdayMapper.updateByPrimaryKeySelective(empNonworkday);
+			return empNonworkdayMapper.updateEmpNonworkday(empNonworkday);
 		}
 	}
 
 	@Override
 	public EmpNonworkday selectWorkdayById(String id) {
 		
-		return empNonworkdayMapper.selectByPrimaryKey(id);
+		return empNonworkdayMapper.selectEmpNonworkdayById(id);
 	}
 
 	@Override
 	public int deleteWorkdayByIds(String ids) {
 		if(StringUtils.isNotEmpty(ids)){
 			String[] nonworkIds = Convert.toStrArray(ids);
-			return empNonworkdayMapper.deleteWorkdayByIds(nonworkIds);
+			return empNonworkdayMapper.deleteEmpNonworkdayByIds(nonworkIds);
 		}
 		return 0;
 	}
 
 	@Override
 	public int deleteWorkdayById(String id) {
-		return empNonworkdayMapper.deleteWorkdayById(id);
+		return empNonworkdayMapper.deleteEmpNonworkdayById(id);
 	}
 
 	public String checkWorkdateUnique(Date workdate) {
@@ -90,7 +90,7 @@ public class AttendWorkdayServiceImpl implements IAttendWorkdayService {
 
 	@Override
 	public Map<String, String> selectWorkdayListForCalendar() {
-		List<EmpNonworkday> list = empNonworkdayMapper.selectWorkdayList(new EmpNonworkday());
+		List<EmpNonworkday> list = empNonworkdayMapper.selectEmpNonworkdayList(new EmpNonworkday());
 		Map<String, String> map = new HashMap<String, String>();
 		for (EmpNonworkday item : list) {
 			map.put(item.getWorkdateStr(), item.getWorkdateName());
@@ -100,7 +100,7 @@ public class AttendWorkdayServiceImpl implements IAttendWorkdayService {
 
 	@Override
 	public Map<String, Integer> selectDateAndTypeMap() {
-		List<EmpNonworkday> list = empNonworkdayMapper.selectWorkdayList(new EmpNonworkday());
+		List<EmpNonworkday> list = empNonworkdayMapper.selectEmpNonworkdayList(new EmpNonworkday());
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		if(list.size()!=0){
 			for (EmpNonworkday empNonworkday : list) {

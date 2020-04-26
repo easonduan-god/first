@@ -223,4 +223,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	 	and overtime_bill_id = #{overtimeBillId}
 	 	and complete_flag = 1
 	 </select>
+	 
+	 <!-- 待办事项数 延时待办 考勤待办 个人任务待办 部门任务待办 任务审核待办 -->
+	 <select id="selectBacklogCount" resultType="map">
+		SELECT 
+		(SELECT COUNT(0) FROM emp_overtime_audit WHERE audit_flag IN (0,1) AND audit_user_id = #{userId}) overtimeBacklogCount,
+		(SELECT COUNT(0) FROM emp_attend_audit WHERE audit_flag IN (0,1) AND audit_user_id = #{userId}) attendBacklogCount,
+		
+		(SELECT COUNT(0) FROM work_task WHERE task_flag IN (1,2,5) AND deal_user_id = #{userId}) mineTaskCount,
+		(SELECT COUNT(0) FROM work_task WHERE task_flag IN (1,2,5) AND deal_dept_id = #{deptId}) deptTaskCount,
+		(SELECT COUNT(0) FROM work_task_audit WHERE audit_flag IN (0,1) AND audit_user_id = #{userId}) taskAuditCount
+	 </select>
+	 
+	 
 </mapper>

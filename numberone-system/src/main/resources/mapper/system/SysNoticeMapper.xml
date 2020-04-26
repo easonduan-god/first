@@ -101,6 +101,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!-- 加载首页公告 -->
     <select id="selectMainNotice" parameterType="SysNotice" resultMap="SysNoticeResult">
         <include refid="selectNoticeVo"/>
+        where status = 0
         limit 0,6
     </select>
 </mapper>

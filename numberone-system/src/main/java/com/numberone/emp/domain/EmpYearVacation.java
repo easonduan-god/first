@@ -17,6 +17,9 @@ public class EmpYearVacation extends BaseEntity{
 	/** 员工工号 */
 	@Excel(name = "员工工号")
 	private String empId;
+	/** 用户id */
+	@Excel(name = "用户id")
+	private Long userId;
 	/** 年度 */
 	@Excel(name = "年度")
 	private Integer year;
@@ -104,5 +107,13 @@ public class EmpYearVacation extends BaseEntity{
 
 	public void setDept(SysDept dept) {
 		this.dept = dept;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 }

@@ -210,18 +210,25 @@ public class AttendBillServiceImpl implements IAttendBillService {
     	if(endTime.compareTo(startTime)==-1){
     		throw new BusinessException("开始时间不能大于结束时间");
     	}
-    	double differ = DateUtils.getDateIntervalInDays(startDate, new Date());
+    	
+    	
+    	double differ = DateUtils.getDateIntervalInDays(startDate, DateUtils.formatDateToDate(new Date(), DateUtils.YYYY_MM_DD));
     	//只有忘记打卡才可以填写之前的日期
     	if(empAttendBill.getAttendType()!=3 && differ>0){
     		throw new BusinessException("只有忘记打卡才可以填写之前的日期");
     	}
-    	//请假最多只能请到7天前
+    	//忘记打卡最多只能请到7天前
     	if(empAttendBill.getAttendType()==3 && (differ>7 || differ<0 || endDate.compareTo(startDate)!=0)){
     		throw new BusinessException("补卡只能补到一周内,且只能在一个考勤日期内");
     	}
     	//不能在上班区间之外
     	long startTimeHour = DateUtils.getFragmentInHours(startTime, Calendar.DAY_OF_YEAR);
     	long endTimeHour = DateUtils.getFragmentInHours(endTime, Calendar.DAY_OF_YEAR);
+    	//事假的话 要么开始时间为上班时间，要么结束时间为下班日期，必选其一
+    	if(empAttendBill.getAttendType()==0 && (startTimeHour>goWorkTime || endTimeHour<offWorkTime)){
+    		throw new BusinessException("事假，需开始时间为上班时间或者结束时间为下班时间");
+    	}
+    	
     	if(startTimeHour<goWorkTime || startTimeHour>offWorkTime
     			|| endTimeHour<goWorkTime || endTimeHour>offWorkTime){
     		throw new BusinessException("不能在上班区间之外");

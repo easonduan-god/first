@@ -197,6 +197,7 @@ public class SysUserServiceImpl implements ISysUserService
     	//补全数据
     	yearVacation.setYearVacationId(StringUtils.getUUID());
     	yearVacation.setEmpId(user.getEmpId());
+    	yearVacation.setUserId(user.getUserId());
     	yearVacation.setYear(Integer.parseInt(DateUtils.dateTimeNow(DateUtils.YYYY)));
     	yearVacation.setTimeUsed(0.0);
     	yearVacation.setTimeTotal(0.0);

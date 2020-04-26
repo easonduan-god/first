@@ -2,6 +2,7 @@ package com.numberone.emp.mapper;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -121,5 +122,12 @@ public interface EmpOvertimeBillMapper
 	 * @return: int
 	 */
 	public int selectOvertimeAuditIsEnd(String overtimeBillId);
+
+	/**
+	 * 待办事项数 延时待办 考勤待办 个人任务待办 部门任务待办 任务审核待办
+	 * @param user
+	 * @return
+	 */
+	public Map<String,String> selectBacklogCount(@Param("userId")Long userId,@Param("deptId")Long deptId);
 	
 }

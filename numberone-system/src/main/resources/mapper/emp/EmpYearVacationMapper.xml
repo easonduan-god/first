@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.numberone.emp.domain.EmpYearVacation" >
     <id column="year_vacation_id" property="yearVacationId" jdbcType="VARCHAR" />
     <result column="emp_id" property="empId" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" />
     <result column="year" property="year" jdbcType="INTEGER" />
     <result column="time_total" property="timeTotal" jdbcType="DOUBLE" />
     <result column="time_used" property="timeUsed" jdbcType="DOUBLE" />
@@ -262,7 +263,7 @@
  
       
 	<sql id="Base_sql1" >
-    yv.year_vacation_id , yv.emp_id , yv.year , yv.time_total , yv.time_used , 
+    yv.year_vacation_id , yv.emp_id, yv.user_id , yv.year , yv.time_total , yv.time_used , 
     yv.time_surplus , yv.remark , u.user_id , u.user_name , d.dept_name 
   </sql>
   <select id="selectYearVacationList" parameterType="EmpYearVacation" resultMap="BaseResultMap">

@@ -84,7 +84,7 @@ public class EmpAttendBill extends BaseEntity{
      */
     private Integer isOffet;
     /**
-     * 完成状态(0未完成 1已完成)
+     * 完成状态(0未完成 1已完成 2生效)
      */
     private Integer completeFlag;
     /**

@@ -68,10 +68,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark"    column="remark"    />
     </resultMap>
 	<sql id="selectWorkTaskVo">
-        SELECT t.task_record_id, t.task_id, task_title, t.task_flag,(SELECT dict_label FROM sys_dict_data WHERE dict_type='work_task_type' AND dict_value=t.task_type) AS task_type_text, task_type, diff_level, 
-        priority, plan_start_date,real_start_date,real_end_date, plan_end_date, plan_hours, deal_hours, audit_hours, task_desc, 
-        task_appendix, t.deal_dept_id, t.deal_dept_name, create_user_id, create_emp_id, create_user_name, t.task_perform_id,t.task_audit_id,
-        create_time, deal_user_id, deal_emp_id, deal_user_name, deal_time, audit_user_id, audit_emp_id, 
+        SELECT t.task_record_id, t.task_id, t.task_title, t.task_flag,(SELECT dict_label FROM sys_dict_data WHERE dict_type='work_task_type' AND dict_value=t.task_type) AS task_type_text, t.task_type, t.diff_level, 
+        t.priority, t.plan_start_date,t.real_start_date,t.real_end_date, t.plan_end_date, t.plan_hours, t.deal_hours, t.audit_hours, t.task_desc, 
+        t.task_appendix, t.deal_dept_id, t.deal_dept_name, t.create_user_id, t.create_emp_id, t.create_user_name, t.task_perform_id,t.task_audit_id,
+        t.create_time, t.deal_user_id, t.deal_emp_id, t.deal_user_name, t.deal_time, t.audit_user_id, t.audit_emp_id, 
         audit_user_name, audit_time, t.del_flag, file_id, original_file_name,file_path,f.file_size,tp.remark
         FROM work_task t 
         LEFT JOIN sys_file f
@@ -82,10 +82,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
     <select id="selectWorkTaskList" parameterType="WorkTask" resultMap="WorkTaskResult">
         <include refid="selectWorkTaskVo"/>
-        where del_flag=0 
+        where t.del_flag=0 
         <if test="taskId != null  and taskId != '' "> and t.task_id = #{taskId}</if>
         <if test="taskTitle != null  and taskTitle != '' "> and t.task_title like CONCAT('%',#{taskTitle},'%')</if>
-        <if test="taskFlag != null "> and t.task_flag = #{taskFlag}</if>
+        <if test="taskFlag == 1 "> and t.task_flag in (1,2,5)</if>
+        <if test="taskFlag == 0 "> </if>
+        <if test="taskFlag != 1 and taskFlag != 0 "> and t.task_flag = #{taskFlag}</if>
         <if test="dealDeptId != null "> and t.deal_dept_id = #{dealDeptId}</if>
         <if test="params != null">
 	        <if test="params.createStartDate != null and params.createStartDate != ''"><!-- 开始时间检索 -->
@@ -253,7 +255,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="workTask.taskId != null  and workTask.taskId != '' "> and t.task_id = #{workTask.taskId}</if>
         <if test="workTask.taskTitle != null  and workTask.taskTitle != '' "> and t.task_title like CONCAT('%',#{workTask.taskTitle},'%')</if>
         <if test="workTask.taskFlag == 1 "> and t.task_flag in (1,2,5)</if>
-        <if test="workTask.taskFlag != 1 "> and t.task_flag = #{workTask.taskFlag}</if>
+        <if test="workTask.taskFlag == 0 "> </if>
+        <if test="workTask.taskFlag != 1 and workTask.taskFlag != 0 "> and t.task_flag = #{workTask.taskFlag}</if>
         <if test="workTask.dealDeptId != null "> and t.deal_dept_id = #{workTask.dealDeptId}</if>
         <if test="workTask.params != null">
 	        <if test="workTask.params.createStartDate != null and workTask.params.createStartDate != ''"><!-- 开始时间检索 -->

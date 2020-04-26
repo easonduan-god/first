@@ -45,7 +45,7 @@ public class EmpOvertimeBill extends BaseEntity
 	private Double applyWorktimes;
 	/** 事由 */
 	private String matter;
-	/** 完成状态(0未完成 1已完成) */
+	/** 完成状态(0未完成 1已完成 2生效) */
 	private Integer completeFlag;
 	/** 审核状态(0未审核 1审核中 2审核不通过 3审核已通过) */
 	private Integer auditFlag;

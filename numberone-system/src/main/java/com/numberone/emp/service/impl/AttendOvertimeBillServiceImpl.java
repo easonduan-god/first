@@ -85,11 +85,12 @@ public class AttendOvertimeBillServiceImpl implements IAttendOvertimeBillService
 		if(startDate==null || endDate==null || startDate.after(endDate) || intervalDays>1){
 			throw new BusinessException("开始时间结束时间不能为空，开始不能大于结束,结束时间与开始时间最多差一天");
 		}
-		//开始时间不能早于当前日期
+		//开始时间不能早于当前日期，且不大于10
 		double intervalStart_Curr = DateUtils.getDateIntervalInDays(startDate, new Date());
-		if(intervalStart_Curr>=1){
-			throw new BusinessException("开始时间不能早于当前日期");
+		if(intervalStart_Curr>=1 || intervalStart_Curr<-15){
+			throw new BusinessException("开始时间不能早于当前日期，且不大于15天");
 		}
+		
 		//从数据库中查询工作日表
     	EmpNonworkday workday = empNonworkdayMapper.selectWorkdayByDate(startDate);
     	//判断startdate是否是周日
@@ -368,7 +369,7 @@ public class AttendOvertimeBillServiceImpl implements IAttendOvertimeBillService
 			//3.若没有上级了，也就是领导为自身或者为null
 			if(leader==null || leader.getUserId()==sysUser.getUserId()){
 				//获取考勤单
-				EmpOvertimeBill empOvertimeBill = empOvertimeBillMapper.selectEmpOvertimeBillById(overtimeAudit.getOvertimeAuditId());
+				EmpOvertimeBill empOvertimeBill = empOvertimeBillMapper.selectEmpOvertimeBillById(overtimeAudit.getOvertimeBillId());
 				
 				//设置考勤单为完成状态 审核状态(0未审核 1审核中 2审核不通过 3审核已通过)
 				empOvertimeBill.setAuditFlag(3);
