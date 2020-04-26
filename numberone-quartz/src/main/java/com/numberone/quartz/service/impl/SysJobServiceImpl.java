@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.junit.Test;
 import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1087,11 +1086,5 @@ public class SysJobServiceImpl implements ISysJobService
 			});
 	}
 	
-	@Test
-	public void test(){
-		//9-11 13-17
-		Object i = 1;
-		System.out.println(i.equals(1));
-	}
     
 }

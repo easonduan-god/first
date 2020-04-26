@@ -551,64 +551,64 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<update id="updateAttendBill" parameterType="map">
 		update emp_attend_bill
 	    <set>
-	      <if test=emp_id != null">
+	      <if test="emp_id != null">
 	        emp_id = #{emp_id,jdbcType=VARCHAR},
 	      </if>
-	      <if test=userId != null">
+	      <if test="userId != null">
 	        user_id = #{userId,jdbcType=INTEGER},
 	      </if>
-	      <if test=theme != null">
+	      <if test="theme != null">
 	        theme = #{theme,jdbcType=VARCHAR},
 	      </if>
-	      <if test=attend_type != null">
+	      <if test="attend_type != null">
 	        attend_type = #{attend_type,jdbcType=INTEGER},
 	      </if>
-	      <if test=deptName != null">
+	      <if test="deptName != null">
 	        dept_name = #{deptName,jdbcType=VARCHAR},
 	      </if>
-	      <if test=dept_id != null">
+	      <if test="dept_id != null">
 	        dept_id = #{dept_id,jdbcType=INTEGER},
 	      </if>
-	      <if test=user_name != null">
+	      <if test="user_name != null">
 	        user_name = #{user_name,jdbcType=VARCHAR},
 	      </if>
-	      <if test=apply_date != null">
+	      <if test="apply_date != null">
 	        apply_date = #{apply_date,jdbcType=DATE},
 	      </if>
-	      <if test=start_date != null">
+	      <if test="start_date != null">
 	        start_date = #{start_date,jdbcType=DATE},
 	      </if>
-	      <if test=end_date != null">
+	      <if test="end_date != null">
 	        end_date = #{end_date,jdbcType=DATE},
 	      </if>
-	      <if test=start_time != null">
+	      <if test="start_time != null">
 	        start_time = #{start_time,jdbcType=TIMESTAMP},
 	      </if>
-	      <if test=end_time != null">
+	      <if test="end_time != null">
 	        end_time = #{end_time,jdbcType=TIMESTAMP},
 	      </if>
-	      <if test=apply_workdays != null">
+	      <if test="apply_workdays != null">
 	        apply_workdays = #{apply_workdays,jdbcType=INTEGER},
 	      </if>
-	      <if test=apply_workday_times != null">
+	      <if test="apply_workday_times != null">
 	        apply_workday_times = #{apply_workday_times,jdbcType=DOUBLE},
 	      </if>
-	      <if test=matter != null">
+	      <if test="matter != null">
 	        matter = #{matter,jdbcType=VARCHAR},
 	      </if>
-	      <if test=is_offet != null">
+	      <if test="is_offet != null">
 	        is_offet = #{is_offet,jdbcType=INTEGER},
 	      </if>
-	      <if test=complete_flag != null">
+	      <if test="complete_flag != null">
 	        complete_flag = #{complete_flag,jdbcType=INTEGER},
 	      </if>
-	      <if test=audit_flag != null">
+	      <if test="audit_flag != null">
 	        audit_flag = #{audit_flag,jdbcType=INTEGER},
 	      </if>
-	      <if test=entire_effect != null">
+	      <if test="entire_effect != null">
 	        entire_effect = #{entire_effect,jdbcType=INTEGER},
 	      </if>
-	      <if test=del_flag != null">
+	      <if test="del_flag != null">
 	        del_flag = #{del_flag,jdbcType=INTEGER},
 	      </if>
 	    </set>
