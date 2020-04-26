@@ -51,6 +51,7 @@
 	<script th:inline="javascript"> 
 		var ctx = [[@{/}]]; 
 		var currDate = [[${#dates.format(new java.util.Date().getTime(), 'yyyy-MM-dd')}]]
+		var currYear = [[${#dates.format(new java.util.Date().getTime(), 'yyyy')}]]
 		var currDateTime = [[${#dates.format(new java.util.Date().getTime(), 'yyyy-MM-dd hh:mm:ss')}]]
 	</script>
 </div>

@@ -94,6 +94,9 @@
 								rowspan: 2,
 					            formatter: function(value, row, index) {
 					                var actions = [];
+					                if(row.attendResult=='3'){//旷工 提示补卡
+			    		                actions.push('<a class="btn btn-warning btn-xs" href="#" onclick="createMenuItem(\''+ctx+'attend/attendBill/apply\', \'考勤单申请\')"><i class="fa fa-edit"></i>补考勤</a> ');
+		    		                }
 					                return actions.join('');
 					            }
 					        }, {

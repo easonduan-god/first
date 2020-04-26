@@ -19,13 +19,16 @@ public class OATask {
 	
 	/**
 	 * 每日定时更新员工考勤信息
-	 * @param:  参数说明
-	 * @return: void 返回类型
-	 * @throws
 	 */
-	
 	public void updateAttendInfo(){
 		
 		sysJobService.updateAttendInfo();
+	}
+	
+	/**
+	 * 定时更新员工延时工单
+	 */
+	public void updateOvertimeBill(){
+		sysJobService.updateOvertimeBill();
 	}
 }

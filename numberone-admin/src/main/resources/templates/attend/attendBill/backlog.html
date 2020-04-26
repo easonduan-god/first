@@ -209,7 +209,12 @@
 		        },
 				{
 					field : 'empAttendBill.theme', 
-					title : '业务主题'
+					title : '业务主题',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a href="#"  onclick="$.operate.detailFull(\'' + row.attendAuditId + '\')">' + value + '</a>');
+						return actions.join('');
+		            }
 				},
 				{
 					field : 'empAttendBill.applyDate', 

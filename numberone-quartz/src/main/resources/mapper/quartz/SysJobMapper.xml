@@ -160,14 +160,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		left join sys_dept d on u.dept_id = d.dept_id
 		where u.del_flag = '0'
 	</select>
+	<!-- 查询user 根据userid -->
+	<select id="selectUserByUserId" parameterType="long" resultMap="SysUserResult">
+		select u.user_id,u.emp_id, u.login_name, u.user_name, u.email,u.birthday,u.address,u.office_phone, u.phonenumber, u.password, u.sex, u.avatar, u.salt, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name from sys_user u
+		left join sys_dept d on u.dept_id = d.dept_id
+		where u.del_flag = '0'
+		and u.user_id = #{userId}
+	</select>
 	<!-- 查询考勤记录 6点到次日五点 -->
 	<select id="selectAttendBetween6To5"  resultMap="EmpAttendinfoResult">
 		SELECT attendinfo_id, user_id, emp_id, attend_date, WEEK, record_time, remark 
 		FROM emp_attendinfo 
 		where 1=1 
 		AND user_id = #{userId} 
-   		and record_time &gt;= DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d 05:00:00')
-   		and record_time &lt; DATE_FORMAT(CURDATE(),'%Y-%m-%d 06:00:00')
+   		and record_time &gt;= DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d 06:00:00')
+   		and record_time &lt; DATE_FORMAT(CURDATE(),'%Y-%m-%d 05:00:00')
    		order by record_time;
 	</select>
 	<!-- 根据员工id查询员工打卡次数，时间间隔为上班时间 9到17点 -->
@@ -190,11 +197,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 查询本次考勤区间的考勤记录 -->
 	<select id="selectEmpAttenddayByUserId" resultMap="empAttenddayResult">
-		SELECT attendday_id , user_id , emp_id , attend_date , WEEK , last_time , attend_result , attend_type , additional_time , remark
+		SELECT attendday_id , user_id , emp_id , attend_date , WEEK , last_time ,first_time, attend_result , attend_type , additional_time , remark
 		FROM emp_attendday
 		where 1=1
 		and user_id = #{userId} 
    		and DATE_FORMAT(attend_date,'%Y-%m-%d')  = DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d') 
+   		order by attend_date 
+   		LIMIT 0,1
+	</select>
+	
+	<!-- 查询对应的考勤日表emp_attendday信息 考勤结果(0正常 1迟到 2早退 3旷工 4请假)只能是 0 1 2 -->
+	<select id="selectEmpAttenddayResultIn0_1_2ByUserIdAndAttendDate" resultMap="empAttenddayResult">
+		SELECT attendday_id , user_id , emp_id , attend_date , WEEK , last_time , attend_result , attend_type , additional_time , remark
+		FROM emp_attendday
+		where 1=1
+		and user_id = #{userId} 
+   		and DATE_FORMAT(attend_date,'%Y-%m-%d')  = DATE_FORMAT(#{startDate},'%Y-%m-%d') 
+   		and attend_result in (0,1,2)
    		order by attend_date 
    		LIMIT 0,1
 	</select>
@@ -273,50 +292,326 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	      </if>
 	    </trim>
 	  </insert>
-	  <!-- 更新 -->
-	  <update id="updateAttendday" parameterType="empAttenddayQuartz">
-	    update emp_attendday
-	    <set>
-	      <if test="userId != null">
-	        user_id = #{userId,jdbcType=INTEGER},
-	      </if>
-	      <if test="empId != null">
-	        emp_id = #{empId,jdbcType=VARCHAR},
-	      </if>
-      <if test="attendDate != null">
-        attend_date = #{attendDate,jdbcType=DATE},
-      </if>
-      <if test="week != null">
-        week = #{week,jdbcType=INTEGER},
-      </if>
-      <if test="firstTime != null">
-        first_time = #{firstTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="lastTime != null">
-        last_time = #{lastTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="attendResult != null">
-        attend_result = #{attendResult,jdbcType=INTEGER},
-      </if>
-      <if test="attendType != null">
-        attend_type = #{attendType,jdbcType=INTEGER},
-      </if>
-      <if test="additionalTime != null">
-        additional_time = #{additionalTime,jdbcType=DOUBLE},
-      </if>
-      <if test="remark != null">
-        remark = #{remark,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where attendday_id = #{attenddayId,jdbcType=VARCHAR}
-  </update>
+	<!-- 更新 -->
+	<update id="updateAttendday" parameterType="empAttenddayQuartz">
+	update emp_attendday
+	<set>
+	    <if test="userId != null">
+	      user_id = #{userId,jdbcType=INTEGER},
+	    </if>
+	    <if test="empId != null">
+	      emp_id = #{empId,jdbcType=VARCHAR},
+	    </if>
+		<if test="attendDate != null">
+		  attend_date = #{attendDate,jdbcType=DATE},
+		</if>
+		<if test="week != null">
+		  week = #{week,jdbcType=INTEGER},
+		</if>
+		<if test="firstTime != null">
+		  first_time = #{firstTime,jdbcType=TIMESTAMP},
+		</if>
+		<if test="lastTime != null">
+		  last_time = #{lastTime,jdbcType=TIMESTAMP},
+		</if>
+		<if test="attendResult != null">
+		  attend_result = #{attendResult,jdbcType=INTEGER},
+		</if>
+		<if test="attendType != null">
+		  attend_type = #{attendType,jdbcType=INTEGER},
+		</if>
+		<if test="additionalTime != null">
+		  additional_time = #{additionalTime,jdbcType=DOUBLE},
+		</if>
+		<if test="remark != null">
+		  remark = #{remark,jdbcType=VARCHAR},
+		</if>
+	</set>
+	where attendday_id = #{attenddayId,jdbcType=VARCHAR}
+	</update>
   
-  <!-- 查询当天工作日  -->
-  <select id="selectNowWorkday" resultMap="WorkdayResult">
+	<!-- 查询当天工作日  -->
+	<select id="selectNowWorkday" resultMap="WorkdayResult">
 		SELECT nonwork_id , workdate , workdate_type , workdate_name , workdate_flag , description
 		FROM emp_nonworkday
 		where 1=1
-   		and DATE_FORMAT(workdate,'%Y-%m-%d') = DATE_FORMAT(CURDATE(),'%Y-%m-%d') 
+		and DATE_FORMAT(workdate,'%Y-%m-%d') = DATE_FORMAT(CURDATE(),'%Y-%m-%d') 
+		LIMIT 0,1
+	</select>
+	
+	<!-- 查询所有审核通过 未生效的延时工单（只管开始时间）  -->
+	<select id="selectNoActiveOvertimeBillByAttendDate" resultType="map">
+		SELECT
+			overtime_bill_id, user_id, emp_id, theme, dept_name, dept_id, user_name, apply_date, start_date, end_date, 
+			work_persons, work_person_names, apply_worktimes, matter, complete_flag, audit_flag, del_flag
+		FROM
+		emp_overtime_bill AS ob
+		WHERE ob.del_flag = 0
+		AND ob.complete_flag = 1
+		AND ob.audit_flag = 3
+		<if test="attendDate != null"> and DATE_FORMAT(ob.start_date,'%y%m%d')  = DATE_FORMAT(#{attendDate},'%y%m%d')  </if>
+	</select>
+	
+	
+	<!-- 更新该作人员的年假信息，根据最后得到的加班工时,此处需将额外工时换算成天数  -->
+	<update id="updateYearVacationForQuartz" parameterType="double">
+		UPDATE emp_year_vacation yv
+		SET yv.`time_total` = yv.`time_total` + days,
+		yv.`time_surplus` = yv.`time_surplus` + days
+		WHERE yv.`user_id` = 1 AND YEAR = DATE_FORMAT(SYSDATE(),'%Y')
+	</update>
+	
+	
+		<!-- 获取所有已审核通过的忘记打卡未生效考勤单  -->
+	<select id="selectNoActiveForgetClock" resultType="map">
+		SELECT
+		   attend_bill_id, emp_id, user_id, theme, attend_type, dept_name, dept_id, user_name, 
+		   apply_date, start_date, end_date, start_time, end_time, apply_workdays, 
+		   apply_workday_times, matter, is_offet, complete_flag, audit_flag
+		FROM
+		   emp_attend_bill AS ab
+		WHERE ab.del_flag = 0
+		AND attend_type = 3
+		AND ab.complete_flag = 1
+		AND ab.audit_flag = 3
+	</select>
+	
+		<!-- 根据取出的考勤日期查询考勤日信息 只查询旷工的记录 -->
+	<select id="selectAttenddayByAttendateAndUserId" resultMap="empAttenddayResult">
+		SELECT attendday_id , user_id , emp_id , attend_date , WEEK ,first_time, last_time , attend_result , attend_type , additional_time , remark
+		FROM emp_attendday
+		where 1=1
+		<if test="user_id != null"> and user_id = #{userId} </if>
+   		<if test="attendDate != null"> and DATE_FORMAT(attend_date,'%y%m%d')  = DATE_FORMAT(#{attendDate},'%y%m%d')  </if>
+   		<if test="attend_result != null"> and attend_result = #{attendResult} </if>
    		LIMIT 0,1
 	</select>
+	
+	<!-- 根据userid和考勤日期查询延时工单  -->
+	<select id="selectNoActiveOvertimeBillByUserId" resultType="map">
+		SELECT
+			overtime_bill_id, user_id, emp_id, theme, dept_name, dept_id, user_name, apply_date, start_date, end_date, 
+			work_persons, work_person_names, apply_worktimes, matter, complete_flag, audit_flag, del_flag
+		FROM
+		emp_overtime_bill AS ob
+		WHERE ob.del_flag = 0
+		AND ob.complete_flag = 1
+		AND ob.audit_flag = 3
+		AND user_id = #{userId}
+		AND DATE_FORMAT(ob.start_date,'%y%m%d') = DATE_FORMAT(#{attendDate},'%y%m%d')
+	</select>
+	
+	<!--查询此延时工单对应的该用户的有效的考勤日历项  -->
+	<select id="selectActiveCalendarByUserIdAndAttendDate" resultType="map">
+		SELECT
+		   calendar_id,user_id,emp_id,user_name,dept_id,DATE,attend_code,attend_label,effect_flag
+		FROM
+		   emp_attend_calendar AS ac
+		WHERE user_id=1
+		AND effect_flag = 1
+		AND DATE_FORMAT(ac.DATE,'%y%m%d') = DATE_FORMAT(#{attendDate},'%y%m%d')
+	</select>
+	
+	<!-- 将日历项置为无效  -->
+	<update id="updateOverTimeToEffect" parameterType="map">
+		UPDATE emp_attend_calendar
+		SET effect_flag = 0
+		WHERE calendar_id = #{calendar_id}
+	</update>
+	
+		<!-- 新增日历 -->
+	<insert id="insertCalendar" parameterType="map">
+	    insert into emp_attendday
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+	      <if test="calendar_id != null">
+	        calendar_id,
+	      </if>
+	      <if test="user_id != null">
+	        user_id,
+	      </if>
+	      <if test="emp_id != null">
+	        emp_id,
+	      </if>
+	      <if test="user_name != null">
+	        user_name,
+	      </if>
+	      <if test="dept_id != null">
+	        dept_id,
+	      </if>
+	      <if test="DATE != null">
+	        DATE,
+	      </if>
+	      <if test="attend_code != null">
+	        attend_code,
+	      </if>
+	      <if test="attend_label != null">
+	        attend_label,
+	      </if>
+	      <if test="effect_flag != null">
+	        attend_type,
+	      </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+	      <if test="calendar_id != null">
+	        #{calendar_id,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user_id != null">
+	        #{user_id,jdbcType=INTEGER},
+	      </if>
+	      <if test="emp_id != null">
+	        #{emp_id,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user_name != null">
+	        #{user_name,jdbcType=VARCHAR},
+	      </if>
+	      <if test="dept_id != null">
+	        #{dept_id,jdbcType=INTEGER},
+	      </if>
+	      <if test="DATE != null">
+	        #{DATE,jdbcType=DATE},
+	      </if>
+	      <if test="attend_code != null">
+	        #{attend_code,jdbcType=INTEGER},
+	      </if>
+	      <if test="attend_label != null">
+	        #{attend_label,jdbcType=VARCHAR},
+	      </if>
+	      <if test="effect_flag != null">
+	        #{effect_flag,jdbcType=INTEGER},
+	      </if>
+	    </trim>
+	  </insert>
+	  
+	<!-- 获取所有已审核通过的未完全生效的事假考勤单，条件为当前考勤日期  -->
+	<select id="selectNoEntireActivePersonalLeave" parameterType="date" resultType="map">
+		SELECT
+		   attend_bill_id, emp_id, user_id, theme, attend_type, dept_name, dept_id, user_name, 
+		   apply_date, start_date, end_date, start_time, end_time, apply_workdays, 
+		   apply_workday_times, matter, is_offet, complete_flag, audit_flag
+		FROM
+		   emp_attend_bill AS ab
+		WHERE ab.del_flag = 0
+		AND attend_type = 0
+		AND ab.complete_flag in (1,2)
+		AND ab.audit_flag = 3
+		AND entire_effect = 0
+		<if test="attendDate != null"> and DATE_FORMAT(start_date,'%y%m%d')  = DATE_FORMAT(#{attendDate},'%y%m%d')  </if>
+	</select>
+	
+	<!-- 获取所有已审核通过的未完全生效的事假考勤单，条件为当前考勤日期  -->
+	<select id="selectNoEntireActive_Year_AdjustLeave" parameterType="date" resultType="map">
+		SELECT
+		   attend_bill_id, emp_id, user_id, theme, attend_type, dept_name, dept_id, user_name, 
+		   apply_date, start_date, end_date, start_time, end_time, apply_workdays, 
+		   apply_workday_times, matter, is_offet, complete_flag, audit_flag
+		FROM
+		   emp_attend_bill AS ab
+		WHERE ab.del_flag = 0
+		AND attend_type in (1,2)
+		AND ab.complete_flag in (1,2)
+		AND ab.audit_flag = 3
+		AND entire_effect = 0
+		<if test="attendDate != null"> and DATE_FORMAT(start_date,'%y%m%d')  = DATE_FORMAT(#{attendDate},'%y%m%d')  </if>
+	</select>
+	
+	
+	<sql id="selectEmpAttendBillLeavedayItemsVo">
+        select record_id, user_id, emp_id, attend_bill_id, leaveday_item, workday_time, attend_type from emp_attend_bill_leaveday_items,effect_flag
+    </sql>
+	
+    <select id="selectAttendBillItems" parameterType="map" resultType="map">
+        <include refid="selectEmpAttendBillLeavedayItemsVo"/>
+        <where>  
+            <!-- <if test="recordId != null "> and record_id = #{recordId}</if> -->
+             <if test="user_id != null "> and user_id = #{user_id}</if>
+             <if test="emp_id != null  and emp_id != '' "> and emp_id = #{emp_id}</if>
+             <if test="attend_bill_id != null  and attend_bill_id != '' "> and attend_bill_id = #{attend_bill_id}</if>
+             and leaveday_item = #{leavedayItem}
+             and DATE_FORMAT(leaveday_item,'%y%m%d')  &lt; DATE_FORMAT(SYSDATE(),'%y%m%d')  
+             and effect_flag = 0
+             <!-- <if test="workdayTime != null "> and workday_time = #{workdayTime}</if> -->
+             <!-- <if test="attendType != null "> and attend_type = #{attendType}</if> -->
+         </where>
+         order by leaveday_item ASC
+    </select>
+    
+	<update id="updateEmpAttendBillLeavedayItems" parameterType="map">
+        update emp_attend_bill_leaveday_items
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="user_id != null  ">user_id = #{user_id},</if>
+            <if test="emp_id != null  and emp_id != ''  ">emp_id = #{emp_id},</if>
+            <if test="attend_bill_id != null  and attend_bill_id != ''  ">attend_bill_id = #{attend_bill_id},</if>
+            <if test="leaveday_item != null  ">leaveday_item = #{leaveday_item},</if>
+            <if test="workday_time != null  ">workday_time = #{workday_time},</if>
+            <if test="attend_type != null  ">attend_type = #{attend_type},</if>
+        </trim>
+        where record_id = #{recordId}
+    </update>
+    
+	<update id="updateAttendBill" parameterType="map">
+		update emp_attend_bill
+	    <set>
+	      <if test=emp_id != null">
+	        emp_id = #{emp_id,jdbcType=VARCHAR},
+	      </if>
+	      <if test=userId != null">
+	        user_id = #{userId,jdbcType=INTEGER},
+	      </if>
+	      <if test=theme != null">
+	        theme = #{theme,jdbcType=VARCHAR},
+	      </if>
+	      <if test=attend_type != null">
+	        attend_type = #{attend_type,jdbcType=INTEGER},
+	      </if>
+	      <if test=deptName != null">
+	        dept_name = #{deptName,jdbcType=VARCHAR},
+	      </if>
+	      <if test=dept_id != null">
+	        dept_id = #{dept_id,jdbcType=INTEGER},
+	      </if>
+	      <if test=user_name != null">
+	        user_name = #{user_name,jdbcType=VARCHAR},
+	      </if>
+	      <if test=apply_date != null">
+	        apply_date = #{apply_date,jdbcType=DATE},
+	      </if>
+	      <if test=start_date != null">
+	        start_date = #{start_date,jdbcType=DATE},
+	      </if>
+	      <if test=end_date != null">
+	        end_date = #{end_date,jdbcType=DATE},
+	      </if>
+	      <if test=start_time != null">
+	        start_time = #{start_time,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test=end_time != null">
+	        end_time = #{end_time,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test=apply_workdays != null">
+	        apply_workdays = #{apply_workdays,jdbcType=INTEGER},
+	      </if>
+	      <if test=apply_workday_times != null">
+	        apply_workday_times = #{apply_workday_times,jdbcType=DOUBLE},
+	      </if>
+	      <if test=matter != null">
+	        matter = #{matter,jdbcType=VARCHAR},
+	      </if>
+	      <if test=is_offet != null">
+	        is_offet = #{is_offet,jdbcType=INTEGER},
+	      </if>
+	      <if test=complete_flag != null">
+	        complete_flag = #{complete_flag,jdbcType=INTEGER},
+	      </if>
+	      <if test=audit_flag != null">
+	        audit_flag = #{audit_flag,jdbcType=INTEGER},
+	      </if>
+	      <if test=entire_effect != null">
+	        entire_effect = #{entire_effect,jdbcType=INTEGER},
+	      </if>
+	      <if test=del_flag != null">
+	        del_flag = #{del_flag,jdbcType=INTEGER},
+	      </if>
+	    </set>
+	    where attend_bill_id = #{attend_bill_id}
+	</update>
 </mapper> 

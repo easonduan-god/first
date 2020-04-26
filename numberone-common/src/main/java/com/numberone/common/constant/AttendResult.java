@@ -1,7 +1,7 @@
 package com.numberone.common.constant;
 
 /**
- * 考勤类型 0正常 1迟到 2早退 3旷工 4异常 5迟到+早退
+ * 考勤结果 0正常 1迟到 2早退 3旷工 4异常 5迟到+早退 6请假
  * @author: easonduan
  * @Company: 创智和宇
  * @date: 2020年1月31日 下午9:55:47
@@ -33,5 +33,9 @@ public class AttendResult
      * 迟到加早退
      */
     public static final int LATE_EARLY = 5;
+    /**
+     * 请假
+     */
+    public static final int LEAVE = 6;
     
 }

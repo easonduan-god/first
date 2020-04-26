@@ -56,7 +56,7 @@ public class AttendOvertimeBillController extends BaseController{
 	 * @return: String
 	 */
 	@GetMapping("/backlog")
-	@RequiresPermissions("attend:overtimeBill:apply")
+	@RequiresPermissions("attend:overtimeBill:backlog")
 	public String backlog(ModelMap mmap){
 		
 		return prefix+"/backlog";

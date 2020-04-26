@@ -224,6 +224,17 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     	}
     	return date;
     }
+    
+    /**
+     * 获取周围时间 返回指定格式的日期
+     * @param date
+     * @param amount
+     * @return
+     */
+    public static Date getAroundDate(Date date,int amount,String formatStr){
+    	if(formatStr==null) return getAroundDate(date,amount);
+    	return DateUtils.formatDateToDate(DateUtils.getAroundDate(date, amount), DateUtils.YYYY_MM_DD);
+    }
     /**
      * 获取星期
      * @param: @param attendDate

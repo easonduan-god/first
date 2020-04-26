@@ -166,7 +166,6 @@ public class WorkTaskController extends BaseController{
 		if(workTask.getTaskFlag() == null){
 			workTask.setTaskFlag(1);//默认查询待处理
 		}
-		if(workTask.getTaskFlag() == 0) workTask.setTaskFlag(null);
 		List<WorkTask> list = workTaskService.selectListByDeptId(workTask,getSysUser());
 		return getDataTable(list);
 	}

@@ -100,9 +100,24 @@ public interface ISysJobService
     
     /**
      * 定时更新员工考勤信息
-     * @param: @param empAttendAudit
-     * @param: @return 参数说明
-     * @return List<EmpAttendAudit> 返回类型
      */
 	public void updateAttendInfo();
+
+	/**
+	 * 更新更新延时工单
+	 */
+	public void updateOvertimeBill();
+	
+	/**
+	 * 更新考勤单忘记打卡信息
+	 */
+	public void updateAttendBill_ForgetClock();
+	/**
+	 * 更新考勤单事假信息
+	 */
+	public void updateAttendBill_PersonalLeave();
+	/**
+	 * 更新考勤单年假调休假信息
+	 */
+	public void updateAttendBill_Year_AdjustLeave();
 }

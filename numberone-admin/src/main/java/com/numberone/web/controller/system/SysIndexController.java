@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.numberone.common.config.Global;
 import com.numberone.emp.domain.EmpNonworkday;
+import com.numberone.emp.mapper.EmpOvertimeBillMapper;
 import com.numberone.emp.service.IAttendWorkdayService;
 import com.numberone.framework.web.base.BaseController;
 import com.numberone.system.domain.SysMenu;
@@ -38,6 +39,8 @@ public class SysIndexController extends BaseController
     
     @Autowired 
     private IAttendWorkdayService attendWorkdayService;
+    @Autowired 
+    private EmpOvertimeBillMapper empOvertimeBillMapper;
     // 系统首页
     @GetMapping("/index")
     public String index(ModelMap mmap)
@@ -73,8 +76,7 @@ public class SysIndexController extends BaseController
 	    		String workdateName = empNonworkday.getWorkdateName();
 	    		Integer workdateFlag = empNonworkday.getWorkdateFlag();//日程状态(0正常 1工作日 2休息日)
 	    		/**
-	    		 *考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日
-					10 工作日
+	    		 *考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日 10 工作日
 	    		 */
 	    		if(workdateFlag==1){//工作日 1->10
 	    			List<String> itemList = new ArrayList<String>();
@@ -117,7 +119,9 @@ public class SysIndexController extends BaseController
         mmap.put("version", Global.getVersion());
         mmap.put("noticeList", noticeList);
         
-        //待办事项
+        //待办事项数 延时待办 考勤待办 个人任务待办 部门任务待办 任务审核待办
+        Map<String, String> backlogMap = empOvertimeBillMapper.selectBacklogCount(getUserId(),getSysUser().getDeptId());
+        mmap.put("backlogMap", backlogMap);
         
         return "main";
     }

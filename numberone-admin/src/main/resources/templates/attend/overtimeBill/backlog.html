@@ -212,7 +212,12 @@
 				{
 					field : 'empOvertimeBill.theme', 
 					align: 'center',
-					title : '业务主题'
+					title : '业务主题',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a href="#"  onclick="$.operate.detailFull(\'' + row.empOvertimeBill.overtimeBillId + '\')">' + value + '</a>');
+						return actions.join('');
+		            }
 				},
 				{
 					field : 'empOvertimeBill.applyDate', 

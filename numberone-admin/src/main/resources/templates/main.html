@@ -134,33 +134,33 @@
                       <li class="layui-col-xs6">
                         <a th:href="@{/attend/overtimeBill/backlog}" title="延时待办"  class="layadmin-backlog-body link-tab">
                           <h3>延时待办</h3>
-                          <p><cite>66</cite></p>
+                          <p><cite>[[${backlogMap.overtimeBacklogCount}]]</cite></p>
                         </a>
                       </li>
                       <li class="layui-col-xs6">
                         <a th:href="@{/attend/attendBill/backlog}" title="考勤待办"  class="layadmin-backlog-body link-tab">
                           <h3>考勤待办</h3>
-                          <p><cite>32</cite></p>
+                          <p><cite>[[${backlogMap.attendBacklogCount}]]</cite></p>
                         </a>
                       </li>
                       <li class="layui-col-xs6">
                         <a th:href="@{/work/task/mineBacklog}" title="个人任务待办"  class="layadmin-backlog-body link-tab">
                           <h3>个人任务待办</h3>
-                          <p><cite style="color: #FF5722;">2</cite></p>
+                          <p><cite style="color: #FF5722;">[[${backlogMap.mineTaskCount}]]</cite></p>
                         </a>
                       </li>
                       <li class="layui-col-xs6">
                         <a th:href="@{/work/task/deptBacklog}" title="部门任务待办"  class="layadmin-backlog-body link-tab">
                           <h3>部门任务待办</h3>
-                          <p><cite>3</cite></p>
+                          <p><cite>[[${backlogMap.deptTaskCount}]]</cite></p>
                         </a>
                       </li>
                     </ul>
                     <ul class="layui-row layui-col-space10">
                       <li class="layui-col-xs6">
-                        <a href="javascript:;" class="layadmin-backlog-body">
-                          <h3>待审友情链接</h3>
-                          <p><cite style="color: #FF5722;">5</cite></p>
+                        <a th:href="@{/work/task/audit}" title="任务审核待办"  class="layadmin-backlog-body link-tab">
+                          <h3>任务审核待办</h3>
+                          <p><cite>[[${backlogMap.taskAuditCount}]]</cite></p>
                         </a>
                       </li>
                     </ul>
