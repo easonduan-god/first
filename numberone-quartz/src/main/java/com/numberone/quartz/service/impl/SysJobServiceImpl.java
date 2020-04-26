@@ -1085,6 +1085,102 @@ public class SysJobServiceImpl implements ISysJobService
 				
 			});
 	}
+
+	@Override
+	public void updateAttendCalendar() {
+		//首先处理工作日
+		//查询今年所有工作日
+		List<EmpNonworkdayQuartz> workdayList = jobMapper.selectNowWorkdayList();
+		//遍历
+		for (EmpNonworkdayQuartz workday : workdayList) {
+			//查询工作日日历
+			Map<String,Object> calendar = jobMapper.selectActiveWorkdayCalendar(workday.getWorkdate());
+			//更新日历 考勤日项为已生效
+			
+			//存在则记为无效
+			if(calendar!=null){
+				Map<String,Object> newCalendar = new HashMap<String,Object>();
+				newCalendar.put("calendar_id",StringUtils.getUUID() );
+				newCalendar.put("DATE", workday.getWorkdate());
+				//考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日 10 工作日
+				//日程状态(0正常 1工作日 2休息日)
+				newCalendar.put("attend_code", workday.getWorkdateFlag()==1?10:9);
+				newCalendar.put("attend_label", workday.getWorkdateFlag()==1?"休息日":"工作日");
+				newCalendar.put("effect_flag", 1);
+				//更新
+				jobMapper.updateWorkdayCalendar(newCalendar);
+			}else{
+				//新增
+				Map<String,Object> newCalendar = new HashMap<String,Object>();
+				newCalendar.put("calendar_id",StringUtils.getUUID() );
+				newCalendar.put("DATE", workday.getWorkdate());
+				//考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日 10 工作日
+				//日程状态(0正常 1工作日 2休息日)
+				newCalendar.put("attend_code", workday.getWorkdateFlag()==1?10:9);
+				newCalendar.put("attend_label", workday.getWorkdateFlag()==1?"休息日":"工作日");
+				newCalendar.put("effect_flag", 1);
+				//更新
+				jobMapper.insertWorkdayCalendar(newCalendar);
+			}
+		}
+		
+		//处理员工考勤日历
+		//查询所有员工
+		//1、查询所有员工，遍历员工；
+		List<SysUserQuartz> userList = jobMapper.selectUserAll();
+		for (SysUserQuartz user : userList) {
+			Long userId = user.getUserId();
+			//查询员工当前考勤日记录
+			Date attendDate = DateUtils.getAroundDate(new Date(), -1, DateUtils.YYYY_MM_DD);
+			EmpAttenddayQuartz attendday = jobMapper.selectEmpAttenddayResultIn1_2_3_5ByUserIdAndAttendDate(userId, attendDate);
+			if(attendday==null) continue;
+			//更新日历 考勤日项为已生效
+			Map<String,Object> calendar = jobMapper.selectActiveCalendarByUserIdAndAttendDate(userId,attendDate);
+			//存在则记为无效
+	    	if(calendar!=null){
+	    		jobMapper.updateCalendarToNoEffect(calendar);
+	    	}
+			//然后新增考勤日历表记录
+	    	//查询用户
+	    	Map<String,Object> newCalendar = new HashMap<String,Object>();
+	    	newCalendar.put("calendar_id",StringUtils.getUUID() );
+	    	newCalendar.put("user_id", user.getUserId());
+	    	newCalendar.put("emp_id", user.getEmpId());
+	    	newCalendar.put("user_name", user.getUserName());
+	    	newCalendar.put("dept_id", user.getDeptId());
+	    	newCalendar.put("DATE", attendDate);
+	    	//考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日 10 工作日
+	    	//考勤结果 0正常 1迟到 2早退 3旷工 4异常 5迟到+早退 6请假
+	    	Integer attend_code = -1;
+	    	String attend_label = "";
+	    	switch (attendday.getAttendResult()) {
+			case 1:
+				attend_code = 4;
+				attend_label = "迟到";
+				break;
+			case 2:
+				attend_code = 5;
+				attend_label = "早退";
+				break;
+			case 3:
+				attend_code = 6;
+				attend_label = "旷工";
+				break;
+			case 5:
+				attend_code = 7;
+				attend_label = "迟到";
+				break;
+			}
+	    	newCalendar.put("attend_code", attend_code);
+	    	newCalendar.put("attend_label", attend_label);
+	    	newCalendar.put("effect_flag", 1);
+	    	//新增
+	    	jobMapper.insertCalendar(newCalendar);
+		}
+		
+		
+	}
 	
     
+	
 }

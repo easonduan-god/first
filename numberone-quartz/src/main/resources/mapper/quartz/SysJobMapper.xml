@@ -218,6 +218,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
    		LIMIT 0,1
 	</select>
 	
+	<!-- 查询对应的考勤日表emp_attendday信息 考勤结果(考勤结果 0正常 1迟到 2早退 3旷工 4异常 5迟到+早退 6请假)只能是 1 2 3 5-->
+	<select id="selectEmpAttenddayResultIn1_2_3_5ByUserIdAndAttendDate" resultMap="empAttenddayResult">
+		SELECT attendday_id , user_id , emp_id , attend_date , WEEK , last_time , attend_result , attend_type , additional_time , remark
+		FROM emp_attendday
+		where 1=1
+		and user_id = #{userId} 
+   		and DATE_FORMAT(attend_date,'%Y-%m-%d')  = DATE_FORMAT(#{attendDate},'%Y-%m-%d') 
+   		and attend_result in (1,2,3,5)
+   		order by attend_date 
+   		LIMIT 0,1
+	</select>
+	
 	<!-- 插入 -->
 	<insert id="insertAttendday" parameterType="empAttenddayQuartz">
 	    insert into emp_attendday
@@ -335,8 +347,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		SELECT nonwork_id , workdate , workdate_type , workdate_name , workdate_flag , description
 		FROM emp_nonworkday
 		where 1=1
-		and DATE_FORMAT(workdate,'%Y-%m-%d') = DATE_FORMAT(CURDATE(),'%Y-%m-%d') 
+		and DATE_FORMAT(workdate,'%Y-%m-%d') = DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d') 
 		LIMIT 0,1
+	</select>
+	<!-- 查询本年度所有工作日  -->
+	<select id="selectNowWorkdayList" resultMap="WorkdayResult">
+		SELECT nonwork_id , workdate , workdate_type , workdate_name , workdate_flag , description
+		FROM emp_nonworkday
+		where workdate_flag in (1,2)
+		and DATE_FORMAT(workdate,'%Y') = DATE_FORMAT(CURDATE(),'%Y') 
 	</select>
 	
 	<!-- 查询所有审核通过 未生效的延时工单（只管开始时间）  -->
@@ -412,9 +431,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		AND DATE_FORMAT(ac.DATE,'%y%m%d') = DATE_FORMAT(#{attendDate},'%y%m%d')
 	</select>
 	
+	<!--查询工作日日历  -->
+	<select id="selectActiveWorkdayCalendar" resultType="map">
+		SELECT
+		   calendar_id,DATE,attend_code,attend_label,effect_flag
+		FROM
+		   emp_workday_calendar
+		WHERE 
+		effect_flag = 1
+		AND DATE_FORMAT(ac.DATE,'%y%m%d') = DATE_FORMAT(SYSDATE(),'%y%m%d')
+	</select>
+	
 	<!-- 将日历项置为无效  -->
-	<update id="updateOverTimeToEffect" parameterType="map">
+	<update id="updateCalendarToNoEffect" parameterType="map">
 		UPDATE emp_attend_calendar
+		SET effect_flag = 0
+		WHERE calendar_id = #{calendar_id}
+	</update>
+	<!-- 将工作日历项置为无效  -->
+	<update id="updateWorkdayCalendarToNoEffect" parameterType="map">
+		UPDATE emp_workday_calendar
 		SET effect_flag = 0
 		WHERE calendar_id = #{calendar_id}
 	</update>
@@ -466,6 +502,44 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	      </if>
 	      <if test="dept_id != null">
 	        #{dept_id,jdbcType=INTEGER},
+	      </if>
+	      <if test="DATE != null">
+	        #{DATE,jdbcType=DATE},
+	      </if>
+	      <if test="attend_code != null">
+	        #{attend_code,jdbcType=INTEGER},
+	      </if>
+	      <if test="attend_label != null">
+	        #{attend_label,jdbcType=VARCHAR},
+	      </if>
+	      <if test="effect_flag != null">
+	        #{effect_flag,jdbcType=INTEGER},
+	      </if>
+	    </trim>
+	  </insert>
+		<!-- 新增工作日历 -->
+	<insert id="insertWorkdayCalendar" parameterType="map">
+	    insert into emp_attendday
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+	      <if test="calendar_id != null">
+	        calendar_id,
+	      </if>
+	      <if test="DATE != null">
+	        DATE,
+	      </if>
+	      <if test="attend_code != null">
+	        attend_code,
+	      </if>
+	      <if test="attend_label != null">
+	        attend_label,
+	      </if>
+	      <if test="effect_flag != null">
+	        attend_type,
+	      </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+	      <if test="calendar_id != null">
+	        #{calendar_id,jdbcType=VARCHAR},
 	      </if>
 	      <if test="DATE != null">
 	        #{DATE,jdbcType=DATE},
@@ -613,5 +687,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	      </if>
 	    </set>
 	    where attend_bill_id = #{attend_bill_id}
+	</update>
+	
+	<update id="updateWorkdayCalendar" parameterType="map">
+		update emp_workday_calendar
+	    <set>
+	      <if test="DATE != null">
+	        DATE = #{DATE,jdbcType=DATE},
+	      </if>
+	      <if test="attend_code != null">
+	        attend_code = #{attend_code,jdbcType=VARCHAR},
+	      </if>
+	      <if test="attend_label != null">
+	        attend_label = #{attend_label,jdbcType=VARCHAR},
+	      </if>
+	      <if test="effect_flag != null">
+	        effect_flag = #{dept_id,jdbcType=INTEGER},
+	      </if>
+	    </set>
+	    where calendar_id = #{calendar_id}
 	</update>
 </mapper> 

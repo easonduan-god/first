@@ -103,4 +103,15 @@
 			AND date_format(workdate,'%y%m%d') = date_format(#{startDate},'%y%m%d')
 		</if>
 	</select>
+	
+	<select id="selectCalendarJson" parameterMap="Long" resultType="map">
+		select date,attend_code,attend_label
+		from emp_workday_calendar
+		where effect_flag = 1
+		union all
+		select date,attend_code,attend_label
+		from emp_attend_calendar
+		where effect_flag = 1
+		and user_id = #{userId}
+	</select>
 </mapper>

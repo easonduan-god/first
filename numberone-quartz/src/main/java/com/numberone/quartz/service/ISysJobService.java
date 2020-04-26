@@ -120,4 +120,9 @@ public interface ISysJobService
 	 * 更新考勤单年假调休假信息
 	 */
 	public void updateAttendBill_Year_AdjustLeave();
+	
+	/**
+	 * 新建员工考勤日历（5点25分）
+	 */
+	public void updateAttendCalendar();
 }

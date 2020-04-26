@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.numberone.emp.domain.EmpNonworkday;
+import com.numberone.system.domain.SysUser;
 
 public interface IAttendWorkdayService {
 	
@@ -81,4 +82,11 @@ public interface IAttendWorkdayService {
 	public Map<String, String> selectWorkdayListForCalendar();
 
 	public Map<String, Integer> selectDateAndTypeMap();
+
+	/**
+	 * 查询日历
+	 * @param sysUser
+	 * @return
+	 */
+	public List<Map<String, String>> selectCalendarJson(SysUser sysUser);
 }

@@ -14,6 +14,7 @@ import com.numberone.common.utils.StringUtils;
 import com.numberone.emp.domain.EmpNonworkday;
 import com.numberone.emp.mapper.EmpNonworkdayMapper;
 import com.numberone.emp.service.IAttendWorkdayService;
+import com.numberone.system.domain.SysUser;
 
 @Service
 public class AttendWorkdayServiceImpl implements IAttendWorkdayService {
@@ -108,6 +109,11 @@ public class AttendWorkdayServiceImpl implements IAttendWorkdayService {
 			}
 		}
 		return map;
+	}
+
+	@Override
+	public List<Map<String, String>> selectCalendarJson(SysUser sysUser) {
+		return empNonworkdayMapper.selectCalendarJson(sysUser.getUserId());
 	}
 
 }

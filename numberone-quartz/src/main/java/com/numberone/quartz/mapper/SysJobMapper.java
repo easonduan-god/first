@@ -130,7 +130,7 @@ public interface SysJobMapper
 
 	public void updateAttendday(EmpAttenddayQuartz empAttendday);
 
-	public EmpNonworkdayQuartz selectNowWorkday();
+	public List<EmpNonworkdayQuartz> selectNowWorkdayList();
 
 	/**
 	 * 根据当前日期查询所有审核通过 未生效的延时工单（只管开始时间）
@@ -221,4 +221,28 @@ public interface SysJobMapper
 	public void updateEmpAttendBillLeavedayItems(Map<String, Object> attendBillItem);
 
 	public void updateAttendBill(Map<String, Object> attendBill);
+
+	public Map<String, Object> selectActiveWorkdayCalendar(Date workdate);
+
+	/**
+	 * 更新工作日历到无效
+	 * @param calendar
+	 */
+	public void updateWorkdayCalendarToNoEffect(Map<String, Object> calendar);
+
+	/**
+	 * 新增工作日历
+	 * @param newCalendar
+	 */
+	public void insertWorkdayCalendar(Map<String, Object> newCalendar);
+
+	public EmpNonworkdayQuartz selectNowWorkday();
+
+	/**
+	 * 更新
+	 * @param newCalendar
+	 */
+	public void updateWorkdayCalendar(Map<String, Object> newCalendar);
+
+	public EmpAttenddayQuartz selectEmpAttenddayResultIn1_2_3_5ByUserIdAndAttendDate(@Param("userId") Long userId,@Param("attendDate") Date attendDate);
 }

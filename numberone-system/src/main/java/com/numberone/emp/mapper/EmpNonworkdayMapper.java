@@ -76,4 +76,11 @@ public interface EmpNonworkdayMapper {
 	 * @return: EmpNonworkday
 	 */
 	EmpNonworkday selectWorkdayByDate(@Param("startDate") Date startDate);
+
+	/**
+	 * 查询日历
+	 * @param userId
+	 * @return
+	 */
+	public List<Map<String, String>> selectCalendarJson(Long userId);
 }
