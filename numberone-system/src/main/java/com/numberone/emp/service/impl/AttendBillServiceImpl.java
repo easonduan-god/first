@@ -149,7 +149,7 @@ public class AttendBillServiceImpl implements IAttendBillService {
 			empAttendBill.setUserId(sysUser.getUserId());//用户id
 			empAttendBill.setUserName(sysUser.getUserName());//用户名称
 			empAttendBill.setDeptId(sysUser.getDeptId());//部门id
-			empAttendBill.setDeptName(sysUser.getDept().getDeptName());//部门名称
+			empAttendBill.setDeptName(sysUser.getDeptName());//部门名称
 			Integer attendType = empAttendBillTemp.getAttendType();//考勤类型(0事假 1年假 2调休假 3忘记打卡)
 			empAttendBill.setAttendType(empAttendBillTemp.getAttendType());//考勤类型
 			empAttendBill.setApplyWorkdays(empAttendBillTemp.getApplyWorkdays());//工作日
@@ -244,7 +244,7 @@ public class AttendBillServiceImpl implements IAttendBillService {
     		throw new BusinessException("输入错误");
     	}
     	//2.从数据库中查询工作日表
-    	Map<String,Integer> workdayMap = attendWorkdayService.selectDateAndTypeMap();
+    	Map<String,Integer> workdayMap = attendWorkdayService.selectDateAndFlagMap();
     	
     	//3.遍历dateMap与申请的时间进行比对，首先判断该日期是否是周末，且没有被设置为工作日
 		Iterator<String> iterator = dateList.iterator();
@@ -265,7 +265,7 @@ public class AttendBillServiceImpl implements IAttendBillService {
 				}
 				
 			}
-			//休息日
+			//休息日 日程状态(0正常 1工作日 2休息日)
 			if(workdayMap.containsKey(dateKey) && workdayMap.get(dateKey)==2){
 				iterator.remove();
 				continue;

@@ -100,20 +100,20 @@ public class AttendWorkdayServiceImpl implements IAttendWorkdayService {
 	}
 
 	@Override
-	public Map<String, Integer> selectDateAndTypeMap() {
+	public Map<String, Integer> selectDateAndFlagMap() {
 		List<EmpNonworkday> list = empNonworkdayMapper.selectEmpNonworkdayList(new EmpNonworkday());
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		if(list.size()!=0){
 			for (EmpNonworkday empNonworkday : list) {
-				map.put(empNonworkday.getWorkdateStr(), empNonworkday.getWorkdateType());
+				map.put(empNonworkday.getWorkdateStr(), empNonworkday.getWorkdateFlag());
 			}
 		}
 		return map;
 	}
 
 	@Override
-	public List<Map<String, String>> selectCalendarJson(SysUser sysUser) {
-		return empNonworkdayMapper.selectCalendarJson(sysUser.getUserId());
+	public List<Map<String, Object>> selectCalendarJson(SysUser sysUser,Date first_date) {
+		return empNonworkdayMapper.selectCalendarJson(sysUser.getUserId(),first_date);
 	}
 
 }

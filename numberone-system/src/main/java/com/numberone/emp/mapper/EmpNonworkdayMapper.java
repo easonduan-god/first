@@ -80,7 +80,8 @@ public interface EmpNonworkdayMapper {
 	/**
 	 * 查询日历
 	 * @param userId
+	 * @param first_date 
 	 * @return
 	 */
-	public List<Map<String, String>> selectCalendarJson(Long userId);
+	public List<Map<String, Object>> selectCalendarJson(@Param("userId") Long userId,@Param("first_date") Date first_date);
 }

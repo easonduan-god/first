@@ -104,14 +104,16 @@
 		</if>
 	</select>
 	
-	<select id="selectCalendarJson" parameterMap="Long" resultType="map">
+	<select id="selectCalendarJson" resultType="map">
 		select date,attend_code,attend_label
 		from emp_workday_calendar
 		where effect_flag = 1
+		AND date_format(date,'%y%m') = date_format(#{first_date},'%y%m')
 		union all
 		select date,attend_code,attend_label
 		from emp_attend_calendar
 		where effect_flag = 1
 		and user_id = #{userId}
+		AND date_format(date,'%y%m') = date_format(#{first_date},'%y%m')
 	</select>
 </mapper>

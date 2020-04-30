@@ -81,12 +81,17 @@ public interface IAttendWorkdayService {
 
 	public Map<String, String> selectWorkdayListForCalendar();
 
-	public Map<String, Integer> selectDateAndTypeMap();
+	/**
+	 * 查询工作日 日期为key 状态为value
+	 * @return
+	 */
+	public Map<String, Integer> selectDateAndFlagMap();
 
 	/**
 	 * 查询日历
 	 * @param sysUser
+	 * @param first_date 
 	 * @return
 	 */
-	public List<Map<String, String>> selectCalendarJson(SysUser sysUser);
+	public List<Map<String, Object>> selectCalendarJson(SysUser sysUser, Date first_date);
 }
