@@ -335,4 +335,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and u.dept_id = #{deptId}
 	</select>
 	
+	<insert id="insertMonthHour" parameterType="map">
+        insert into work_month_hour
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="record_id != null  and record_id != ''  ">record_id,</if>
+			<if test="user_id != null  ">user_id,</if>
+			<if test="dept_id != null  ">dept_id,</if>
+			<if test="dept_name != null  and dept_name != ''  ">dept_name,</if>
+			<if test="user_name != null  and user_name != ''  ">user_name,</if>
+			<if test="month != null  ">month,</if>
+			<if test="emp_id != null  and emp_id != ''  ">emp_id,</if>
+			<if test="hour != null  ">hour,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="record_id != null  and record_id != ''  ">#{record_id},</if>
+			<if test="user_id != null  ">#{user_id},</if>
+			<if test="dept_id != null  ">#{dept_id},</if>
+			<if test="dept_name != null  and dept_name != ''  ">#{dept_name},</if>
+			<if test="user_name != null  and user_name != ''  ">#{user_name},</if>
+			<if test="month != null  ">#{month},</if>
+			<if test="emp_id != null  and emp_id != ''  ">#{emp_id},</if>
+			<if test="hour != null  ">#{hour},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+         </trim>
+    </insert>
 </mapper> 

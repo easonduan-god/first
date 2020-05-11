@@ -504,7 +504,7 @@
 	    , workday_time
 	    , attend_type)
 	SELECT
-	    record_id
+	    null
 	    , user_id
 	    , emp_id
 	    , '${attendBillId}'
@@ -591,4 +591,13 @@
            #{userId}
 	</foreach>
   </select>
+  
+  <!-- 查询忘记打卡次数 -->
+  <select id="selectForgetCountByUserIdAndMonth" resultType="int">
+  	select count(1) from emp_attend_bill
+  	where attend_type = 3
+  	and user_id = #{userId}
+  	and date_format(start_date,'%y%m') = date_format(#{month},'%y%m')
+  </select>
+  
 </mapper>

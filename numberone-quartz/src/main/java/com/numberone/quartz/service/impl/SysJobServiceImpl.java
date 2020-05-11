@@ -1,5 +1,7 @@
 package com.numberone.quartz.service.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +11,10 @@ import javax.annotation.PostConstruct;
 
 import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.numberone.common.config.Global;
@@ -19,6 +24,8 @@ import com.numberone.common.support.Convert;
 import com.numberone.common.utils.Arith;
 import com.numberone.common.utils.DateUtils;
 import com.numberone.common.utils.StringUtils;
+import com.numberone.common.utils.file.FileUploadUtils;
+import com.numberone.common.utils.file.FileUtils;
 import com.numberone.quartz.domain.EmpAttenddayQuartz;
 import com.numberone.quartz.domain.EmpAttendinfoQuartz;
 import com.numberone.quartz.domain.EmpNonworkdayQuartz;
@@ -43,6 +50,7 @@ public class SysJobServiceImpl implements ISysJobService
     @Autowired
     private SysJobMapper jobMapper;
 
+    private static final Logger log = LoggerFactory.getLogger(SysJobServiceImpl.class);
     /**
      * 项目启动时，初始化定时器
      */
@@ -235,12 +243,15 @@ public class SysJobServiceImpl implements ISysJobService
     /**
      * 定时更新员工考勤信息
      */
+    @Scheduled(cron = "${krystal.quarz.order.cron}")
 	@Override
 	public void updateAttendInfo() {
 		//上班时间
 		Date goWorkTimeFixed = DateUtils.getGoWorkTime();
+		double goWorkHourFixed = DateUtils.getHourAndMminutesDoubleValue(goWorkTimeFixed);
 		//下班时间
 		Date offWorkTimeFixed = DateUtils.getOffWorkTime();
+		double offWorkHourFixed = DateUtils.getHourAndMminutesDoubleValue(offWorkTimeFixed);
     	Double offWorkHours = Double.parseDouble(Global.getConfig("OAManage.offWorkTime"));
 		//200331 只允许在早上5点到六点执行该任务
 		double hour = DateUtils.getHourAndMminutesDoubleValue(new Date());
@@ -278,27 +289,35 @@ public class SysJobServiceImpl implements ISysJobService
 		}
 		
 		Date attendDate = DateUtils.getOnlyDate(DateUtils.getAroundDate(new Date(), -1));
+		
 		//1、查询所有员工，遍历员工；
 		List<SysUserQuartz> userList = jobMapper.selectUserAll();
 		for (SysUserQuartz user : userList) {
 			Long userId = user.getUserId();
-			//2、根据员工id查询该员工前一天6点到当前日期5点的打卡数据；
-			List<EmpAttendinfoQuartz> empAttendinfoList = jobMapper.selectAttendBetween6To5(userId);
-				//人为的制造两次正常考勤信息
+			//人为的制造两次正常考勤信息
 				EmpAttendinfoQuartz attendInfo1 = new EmpAttendinfoQuartz();
+				attendInfo1.setAttendinfoId(StringUtils.getUUID());
+				attendInfo1.setWeek(DateUtils.dayOfWeek(attendDate));
 				attendInfo1.setAttendDate(attendDate);
 				attendInfo1.setEmpId(user.getEmpId());
 				attendInfo1.setUserId(userId);
 				attendInfo1.setWeek(DateUtils.dayOfWeek(attendDate));
-				attendInfo1.setRecordTime(DateUtils.getDateSomeTime(attendDate, 9, 0, 0));
+				attendInfo1.setRecordTime(DateUtils.getDateSomeTime(attendDate, 8, 0, 0));
 				EmpAttendinfoQuartz attendInfo2 = new EmpAttendinfoQuartz();
+				attendInfo2.setWeek(DateUtils.dayOfWeek(attendDate));
+				attendInfo2.setAttendinfoId(StringUtils.getUUID());
 				attendInfo2.setAttendDate(attendDate);
 				attendInfo2.setEmpId(user.getEmpId());
 				attendInfo2.setUserId(userId);
 				attendInfo2.setWeek(DateUtils.dayOfWeek(attendDate));
-				attendInfo2.setRecordTime(DateUtils.getDateSomeTime(attendDate, 17, 0, 0));
-				empAttendinfoList.add(attendInfo1);
-				empAttendinfoList.add(attendInfo2);
+				attendInfo2.setRecordTime(DateUtils.getDateSomeTime(attendDate, 21, 0, 0));
+				
+				//保存到数据库
+				jobMapper.insertAttendinfo(attendInfo1);
+				jobMapper.insertAttendinfo(attendInfo2);
+			
+			//2、根据员工id查询该员工前一天6点到当前日期5点的打卡数据；
+			List<EmpAttendinfoQuartz> empAttendinfoList = jobMapper.selectAttendBetween6To5(userId);
 			//---------------------------------------------------------------
 			//0.2 20200204 添加非工作日考勤
 				//若休息日当天没有打卡
@@ -306,8 +325,14 @@ public class SysJobServiceImpl implements ISysJobService
 			if(work_flag == false && empAttendinfoList.size()<=0){
 				continue;
 			}else{
+				//查询早上6点到上午9点的打卡次数（包括9点）
+				//int row_69 = jobMapper.selectAttendinfoCountBetween6to9(userId,attendDate);
 				//查询上班时间打卡次数
-				int row = jobMapper.selectAttendinfoCountBetween9to17(userId);
+				int row_917 = jobMapper.selectAttendinfoCountBetween9to17(userId,attendDate);
+				//查询下午17点到第二天5点的打卡次数（包括17点不包括5点）
+				//int row_175 = jobMapper.selectAttendinfoCountBetween17to5(userId,attendDate);
+				
+				
 				//创建日常考勤对象，用于存储考勤数据,先从数据库查询
 				EmpAttenddayQuartz empAttendDay = jobMapper.selectEmpAttenddayByUserId(userId);
 				if(empAttendDay==null){
@@ -320,12 +345,6 @@ public class SysJobServiceImpl implements ISysJobService
 				//一个考勤区间中，只有不大于1一次的考勤记录，必为旷工
 				if(empAttendinfoList.size()<=1){
 					absent_flag=true;
-				}else{
-					//若有不少于两次打卡记录，且至少有一次是在上班时间，则不计为旷工
-					absent_flag=true;
-					if(row>0){
-						absent_flag = false;
-					}
 				}
 				
 				//---------------------------------------------------------------
@@ -340,12 +359,12 @@ public class SysJobServiceImpl implements ISysJobService
 						if( doubleHours > Double.parseDouble(Global.getConfig("OAManage.goWorkTime")) ){
 							late_flag = true;
 							//6、若为迟到状态，且有在上班时间打卡的记录（不包括上班打卡的记录），记为早退flag为true；
-							if( row>1 ){
+							if( row_917>1 ){
 								early_flag = true;
 							}
 						}else{
 							//5、若非迟到状态，且有在上班时间打卡的记录，早退flag为true；
-							if( row>0 ){
+							if( row_917>0 ){
 								early_flag = true;
 							}
 						}
@@ -355,7 +374,7 @@ public class SysJobServiceImpl implements ISysJobService
 						}else if(late_flag==true && early_flag!=true){
 							//迟到
 							empAttendDay.setAttendResult(AttendResult.LATE);
-						}else if(late_flag!=true && early_flag!=true){
+						}else if(late_flag!=true && early_flag){
 							//早退
 							empAttendDay.setAttendResult(AttendResult.EARLY);
 						}else{
@@ -386,6 +405,7 @@ public class SysJobServiceImpl implements ISysJobService
 				if(empAttendinfoList!=null && empAttendinfoList.size()!=0){
 					//最开始打卡时间
 					Date firstTime = empAttendinfoList.get(0).getRecordTime();
+					double firstHour = DateUtils.getHourAndMminutesDoubleValue(firstTime);
 					empAttendDay.setFirstTime(firstTime);
 					//下班时间
 					List<Date> offWorkTimes = jobMapper.getOffWorkTime(userId);
@@ -394,17 +414,18 @@ public class SysJobServiceImpl implements ISysJobService
 						//如果包括上班打卡记录
 						if(offWorkTimes.get(0).compareTo(empAttendinfoList.get(0).getRecordTime())==0){
 							Date offWorkTime = offWorkTimes.get(1);
+							double endHour = DateUtils.getHourAndMminutesDoubleValue(offWorkTime);
 							empAttendDay.setLastTime(offWorkTime);
 							//--200215调整 若迟到或早退的时间大于30个小时，记为矿工
 
-							if(DateUtils.getDateIntervalInHours(goWorkTimeFixed,firstTime)>0.5 || DateUtils.getDateIntervalInHours(offWorkTime,offWorkTimeFixed)>0.5){
+							if(firstHour-goWorkHourFixed>0.5 || offWorkHourFixed-endHour>0.5){
 								//旷工
 								if(work_flag)
 									empAttendDay.setAttendResult(AttendResult.ABSENT);
 							}
 							//200408修改 无论是否旷工都要记录额外时间
 							if(offWorkTime!=null){
-								double additionalTime = Math.floor(DateUtils.getDateIntervalInHours(offWorkTime,DateUtils.setHours(attendDate, 19)));
+								double additionalTime = endHour-19;
 								empAttendDay.setAdditionalTime(additionalTime>=0?additionalTime:0);
 							}else{
 								empAttendDay.setAdditionalTime(0.0);
@@ -413,16 +434,17 @@ public class SysJobServiceImpl implements ISysJobService
 							
 						}else{
 							Date offWorkTime = offWorkTimes.get(0);
+							double endHour = DateUtils.getHourAndMminutesDoubleValue(offWorkTime);
 							empAttendDay.setLastTime(offWorkTime);
 							//--200215调整 若迟到或早退的时间大于30分钟，记为矿工
-							if(DateUtils.getDateIntervalInHours(goWorkTimeFixed,firstTime)>0.5 || DateUtils.getDateIntervalInHours(offWorkTime,offWorkTimeFixed)>0.5){
+							if(firstHour-goWorkHourFixed>0.5 || offWorkHourFixed-endHour>0.5){
 								//旷工
 								if(work_flag)
 									empAttendDay.setAttendResult(AttendResult.ABSENT);
 							}
 							//200408修改 无论是否旷工都要记录额外时间
 							if(offWorkTime!=null){
-								double additionalTime = Math.floor(DateUtils.getDateIntervalInHours(offWorkTime,DateUtils.setHours(attendDate, 19)));
+								double additionalTime = endHour-19;
 								empAttendDay.setAdditionalTime(additionalTime>=0?additionalTime:0);
 							}else{
 								empAttendDay.setAdditionalTime(0.0);
@@ -457,12 +479,14 @@ public class SysJobServiceImpl implements ISysJobService
 				
 			}
 		}
+		log.info("更新考勤信息成功");
 	}
 
 	
 	/**
 	 * 定时更新延时工单
 	 */
+    @Scheduled(cron = "${krystal.quarz.order.cron}")
 	@Override
 	public void updateOvertimeBill() {
 		Double goWorkTime = Double.parseDouble(Global.getConfig("OAManage.goWorkTime"));
@@ -476,15 +500,17 @@ public class SysJobServiceImpl implements ISysJobService
 		}
 			//当前考勤日期 指执行这个任务的前一天
 			//Date attendDate = DateUtils.getAroundDate(DateUtils.getNowDate(), -1, DateUtils.YYYY_MM_DD);
-		//1、所有审核通过 未生效的延时工单
+		//1、查询所有审核通过 未完全生效的延时工单（只管开始时间） 30天以内
 		List<Map<String,Object>> overtimeBillList = jobMapper.selectNoActiveOvertimeBillByAttendDate(null);
 		//2、遍历延时工单
 		overtimeBillList.forEach(overtimeBill -> {
 			//2.1、遍历关联的工作人员
+			int row = 0;
 			for (Long userId : Convert.toLongArray(Convert.toStr(overtimeBill.get("work_persons")))) {
 				Date attendDate = (Date) overtimeBill.get("start_date");
 				//2.2、查询对应的考勤日表emp_attendday信息 考勤结果(0正常 1迟到 2早退 3旷工 4请假)只能是 0 1 2
 				EmpAttenddayQuartz attendday = jobMapper.selectEmpAttenddayResultIn0_1_2ByUserIdAndAttendDate(userId,attendDate);
+				if(attendday==null) continue;
 				//2.3、将延时工单中的申请工时与考勤日表中的额外工时进行比对，规则如下
 				Double additionalHours = attendday.getAdditionalTime();
 				Double applyHours = Convert.toDouble(overtimeBill.get("apply_worktimes"));
@@ -494,18 +520,31 @@ public class SysJobServiceImpl implements ISysJobService
 					//额外<申请 取额外
 				additionalHours = additionalHours >= applyHours ? applyHours : additionalHours;
 				//2.4、更新该作人员的年假信息，根据最后得到的加班工时,此处需将额外工时换算成天数
-				jobMapper.updateYearVacationForQuartz(Arith.div(additionalHours, goWorkHour, 1));
+				row += jobMapper.updateYearVacationForQuartz(Arith.div(additionalHours, goWorkHour, 1),userId);
+				
+				//2.5、将该用户对应的延时工单项 设置为已生效1 emp_overtime_user
+				overtimeBill.put("hour", additionalHours);
+				row += jobMapper.updateOvertimeItemToEffect(overtimeBill);
 			}
-			//2.3、更新延时工单 完成状态为已生效2    
-			jobMapper.updateOverTimeToEffect(overtimeBill);
+			//查询是否还存在 未生效的延时工单项
+			if(jobMapper.selectOvertimeItemCount(overtimeBill)==0){
+				//不存在，设置延时工单未完全生效
+				overtimeBill.put("entire_effect", 1);
+			}
+			//2.3、更新延时工单 完成状态为已生效2
+			overtimeBill.put("complete_flag", 2);
+			if(row>0)
+				jobMapper.updateOvertimeBill(overtimeBill);
 			
 		});
+		log.info("更新延时工单成功");
 	}
 
 	/**
 	 * 更新补卡
 	 */
-	@Override
+    @Scheduled(cron = "${krystal.quarz.order.cron}")
+    @Override
 	public void updateAttendBill_ForgetClock() {
 		Double goWorkTime = Double.parseDouble(Global.getConfig("OAManage.goWorkTime"));
     	Double offWorkTime = Double.parseDouble(Global.getConfig("OAManage.offWorkTime"));
@@ -528,24 +567,11 @@ public class SysJobServiceImpl implements ISysJobService
 			Long userId = Convert.toLong(forgetClock.get("user_id"));
 			//若存在则取出该用户在此补卡工单的开始日期
 			Date startDate = (Date) forgetClock.get("start_date");
-			Map<String,Object> overtimeBill = jobMapper.selectNoActiveOvertimeBillByUserId(userId,startDate);
-				
 				//根据取出的考勤日期查询考勤日信息 只查询旷工信息
 				EmpAttenddayQuartz attendday = jobMapper.selectAttenddayByAttendateAndUserId(startDate,userId,AttendResult.ABSENT);
 				if(attendday==null){
 					return;
 				}
-				//得到额外工时，然后与延时工单中的申请工时比对，规则如下
-				Double additionalHours = attendday.getAdditionalTime();
-				Double applyHours = Convert.toDouble(overtimeBill.get("apply_worktimes"));
-					//一切以申请工时为准
-					//额外>=申请 取申请
-					//额外<申请 取额外
-				additionalHours = additionalHours >= applyHours ? applyHours : additionalHours;
-				//2.4、更新该作人员的年假信息，根据最后得到的加班工时,此处需将额外工时换算成天数
-				jobMapper.updateYearVacationForQuartz(Arith.div(additionalHours, goWorkHour, 1));
-				//更新延时工单 完成状态为已生效2 
-				jobMapper.updateOverTimeToEffect(overtimeBill);
 			//2.2、处理忘记打卡
 					//根据得到的忘记打卡日期查询考勤日信息 (上边代码中已获得)
 					//（提醒，补卡只允许补上旷下旷全旷，其他不允许补）
@@ -555,7 +581,7 @@ public class SysJobServiceImpl implements ISysJobService
 				double startHour = DateUtils.getHourAndMminutesDoubleValue(startTime);
 		    	Date endTime = (Date) forgetClock.get("end_time");
 		    	double endHour = DateUtils.getHourAndMminutesDoubleValue(endTime);
-		    	double diffHour = endHour-endHour;//数据差
+		    	double diffHour = endHour-startHour;//数据差
 				//此时再判断考勤日信息中的早晚打卡时间何如
 		    	int attendResult = 0;//考勤结果(0正常 1迟到 2早退 3旷工 4请假)
 				//晚-早>=goWorkHour 正常
@@ -577,7 +603,8 @@ public class SysJobServiceImpl implements ISysJobService
 		    	attendday.setAttendType(3);
 		    	jobMapper.updateAttendday(attendday);
 			//2.3、更新补卡考勤单为已生效2
-		    	jobMapper.updateAttendBillToEffect(overtimeBill);
+		    	forgetClock.put("complete_flag", 2);
+		    	jobMapper.updateAttendBill(forgetClock);
 			//2.4、查询此补卡考勤单对应的该用户的有效的考勤日历项
 		    	Map<String,Object> calendar = jobMapper.selectActiveCalendarByUserIdAndAttendDate(userId,startDate);
 				//存在则记为无效
@@ -601,27 +628,35 @@ public class SysJobServiceImpl implements ISysJobService
 		    	//新增
 		    	jobMapper.insertCalendar(newCalendar);
 		});
+		log.info("更新考勤单成功");
 	}
 
 	/**
 	 * 更新事假 事假处理 考勤类型(0事假 1年假 2调休假 3忘记打卡)
 	 */
-	@Override
+    @Scheduled(cron = "${krystal.quarz.order.cron}")
+    @Override
 	public void updateAttendBill_PersonalLeave() {
 		Double goWorkTime = Double.parseDouble(Global.getConfig("OAManage.goWorkTime"));
     	Double offWorkTime = Double.parseDouble(Global.getConfig("OAManage.offWorkTime"));
-		
+    	//200331 只允许在早上5点到六点执行该任务
+		double hour = DateUtils.getHourAndMminutesDoubleValue(new Date());
+		if(hour > 6 || hour < 5){
+			System.out.println("非考勤执行时间");
+			return;
+		}
 		//---------------------------------------------------------------------
 		//1、获取所有已审核通过的未完全生效的事假考勤单或者已生效单存在未生效考勤日项
 			List<Map<String,Object>> personalLeaveList = jobMapper.selectNoEntireActivePersonalLeave(null);
 		//2、遍历考勤单
 			personalLeaveList.forEach(personalLeave -> {
-				//2.1、查询所对应的考勤日信息（任务执行日截止 不包括执行日）
+				int  row = 0;
+				//2.1、查询所对应的考勤单信息（任务执行日截止 不包括执行日）
 				List<Map<String, Object>> attendBillItems = jobMapper.selectAttendBillItems(personalLeave);
 				Date start_date = (Date) personalLeave.get("start_date");
 				Date end_date = (Date) personalLeave.get("end_date");
 				//2.2、遍历考勤单日
-				attendBillItems.forEach(attendBillItem -> {
+				for (Map<String, Object> attendBillItem : attendBillItems) {
 					//2.3、获取userid和对应的考勤日期
 					Long userId = Convert.toLong(attendBillItem.get("user_id"));
 					Date attendDate = (Date) attendBillItem.get("leaveday_item");
@@ -636,15 +671,15 @@ public class SysJobServiceImpl implements ISysJobService
 						//并在此处更新日项信息 return继续循环
 						attendday.setAttendResult(AttendResult.LEAVE);
 						attendday.setAttendType(0);
-						jobMapper.updateAttendday(attendday);
+						row += jobMapper.updateAttendday(attendday);
 						attendBillItem.put("effect_flag", 1);
-						jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
+						row += jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
 						
 						//更新日历 考勤日项为已生效
 						Map<String,Object> calendar = jobMapper.selectActiveCalendarByUserIdAndAttendDate(userId,attendDate);
 						//存在则记为无效
 				    	if(calendar!=null){
-				    		jobMapper.updateCalendarToNoEffect(calendar);
+				    		row += jobMapper.updateCalendarToNoEffect(calendar);
 				    	}
 						//然后新增考勤日历表记录
 				    	//查询用户
@@ -661,8 +696,8 @@ public class SysJobServiceImpl implements ISysJobService
 				    	newCalendar.put("attend_label", "事假");
 				    	newCalendar.put("effect_flag", 1);
 				    	//新增
-				    	jobMapper.insertCalendar(newCalendar);
-						return;
+				    	row += jobMapper.insertCalendar(newCalendar);
+						continue;
 					}
 					//2.7、若是小于8
 						//判断这一天是考勤的首日还是结束日
@@ -704,17 +739,17 @@ public class SysJobServiceImpl implements ISysJobService
 					    		}
 							}
 							attendday.setAttendResult(attendResult);
-							jobMapper.updateAttendday(attendday);
+							row += jobMapper.updateAttendday(attendday);
 							//-------------------
 							attendBillItem.put("effect_flag", 1);
-							jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
+							row += jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
 							
 							
 							//更新日历 考勤日项为已生效
 							Map<String,Object> calendar = jobMapper.selectActiveCalendarByUserIdAndAttendDate(userId,attendDate);
 							//存在则记为无效
 					    	if(calendar!=null){
-					    		jobMapper.updateCalendarToNoEffect(calendar);
+					    		row += jobMapper.updateCalendarToNoEffect(calendar);
 					    	}
 							//然后新增考勤日历表记录
 					    	//查询用户
@@ -731,8 +766,8 @@ public class SysJobServiceImpl implements ISysJobService
 					    	newCalendar.put("attend_label", "事假");
 					    	newCalendar.put("effect_flag", 1);
 					    	//新增
-					    	jobMapper.insertCalendar(newCalendar);
-							return;
+					    	row += jobMapper.insertCalendar(newCalendar);
+					    	continue;
 						}
 					
 					//2.8、考勤单的开始结束时间与考勤日信息中早晚时间取并集，并经如下规则
@@ -795,16 +830,16 @@ public class SysJobServiceImpl implements ISysJobService
 						attendday.setAdditionalTime(0.0);
 						attendday.setAttendType(0);
 						attendday.setAttendResult(attendResult);
-						jobMapper.updateAttendday(attendday);
+						row += jobMapper.updateAttendday(attendday);
 						//-------------------
 						attendBillItem.put("effect_flag", 1);
-						jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
+						row += jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
 						
 						//更新日历 考勤日项为已生效
 						Map<String,Object> calendar = jobMapper.selectActiveCalendarByUserIdAndAttendDate(userId,attendDate);
 						//存在则记为无效
 				    	if(calendar!=null){
-				    		jobMapper.updateCalendarToNoEffect(calendar);
+				    		row += jobMapper.updateCalendarToNoEffect(calendar);
 				    	}
 						//然后新增考勤日历表记录
 				    	//查询用户
@@ -821,47 +856,56 @@ public class SysJobServiceImpl implements ISysJobService
 				    	newCalendar.put("attend_label", "事假");
 				    	newCalendar.put("effect_flag", 1);
 				    	//新增
-				    	jobMapper.insertCalendar(newCalendar);
-				    	return;
+				    	row += jobMapper.insertCalendar(newCalendar);
+				    	continue;
 						
-				});
+				}
 				//2.9、查询是否还存在未生效的日项	
 				if(jobMapper.selectAttendBillItems(personalLeave)==null){
 					//不存在则更新考勤单为完全生效
 					personalLeave.put("complete_flag", 2);
 					personalLeave.put("entire_effect", 1);
 					jobMapper.updateAttendBill(personalLeave);
-				}else{
+				}else if(row>0){
 					//部分生效
 					personalLeave.put("complete_flag", 2);
 					personalLeave.put("entire_effect", 0);
 					jobMapper.updateAttendBill(personalLeave);
 				}
 			});
+			log.info("更新考勤单成功");
 	}
 
 	/**
 	 * 更新年假 调休假
 	 */
+    @Scheduled(cron = "${krystal.quarz.order.cron}")
 	@Override
 	public void updateAttendBill_Year_AdjustLeave() {
 		Double goWorkTime = Double.parseDouble(Global.getConfig("OAManage.goWorkTime"));
     	Double offWorkTime = Double.parseDouble(Global.getConfig("OAManage.offWorkTime"));
     	double goWorkHour = offWorkTime-goWorkTime;//上班工作多少小时
-		
+    	//200331 只允许在早上5点到六点执行该任务
+		double hour = DateUtils.getHourAndMminutesDoubleValue(new Date());
+		if(hour > 6 || hour < 5){
+			System.out.println("非考勤执行时间");
+			return;
+		}
 		//---------------------------------------------------------------------
 		//1、获取所有已审核通过的未完全生效的事假考勤单或者已生效单存在未生效考勤日项
 			List<Map<String,Object>> Year_AdjustLeaveList = jobMapper.selectNoEntireActive_Year_AdjustLeave(null);
 		//2、遍历考勤单
 			Year_AdjustLeaveList.forEach(Year_AdjustLeave -> {
+				int row = 0;
 				//2.1、查询所对应的考勤日信息（任务执行日截止 不包括执行日）
 				List<Map<String, Object>> attendBillItems = jobMapper.selectAttendBillItems(Year_AdjustLeave);
 				Date start_date = (Date) Year_AdjustLeave.get("start_date");
 				Date end_date = (Date) Year_AdjustLeave.get("end_date");
+				Long userId = Convert.toLong(Year_AdjustLeave.get("user_id"));
 				//2.2、遍历考勤单日
-				attendBillItems.forEach(attendBillItem -> {
+				for (Map<String, Object> attendBillItem : attendBillItems) {
+					
 					//2.3、获取userid和对应的考勤日期
-					Long userId = Convert.toLong(attendBillItem.get("user_id"));
 					Date attendDate = (Date) attendBillItem.get("leaveday_item");
 					
 					//2.4、查询用户当前考勤日期所对应的考勤日信息					
@@ -874,15 +918,15 @@ public class SysJobServiceImpl implements ISysJobService
 						//并在此处更新日项信息 return继续循环
 						attendday.setAttendResult(AttendResult.LEAVE);
 						attendday.setAttendType((Integer) Year_AdjustLeave.get("attend_type"));
-						jobMapper.updateAttendday(attendday);
+						row += jobMapper.updateAttendday(attendday);
 						attendBillItem.put("effect_flag", 1);
-						jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
+						row += jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
 						
 						//更新日历 考勤日项为已生效
 						Map<String,Object> calendar = jobMapper.selectActiveCalendarByUserIdAndAttendDate(userId,attendDate);
 						//存在则记为无效
 				    	if(calendar!=null){
-				    		jobMapper.updateCalendarToNoEffect(calendar);
+				    		row += jobMapper.updateCalendarToNoEffect(calendar);
 				    	}
 						//然后新增考勤日历表记录
 				    	//查询用户
@@ -899,8 +943,8 @@ public class SysJobServiceImpl implements ISysJobService
 				    	newCalendar.put("attend_label", Year_AdjustLeave.get("attend_type").equals(1)?"年假":"调休假");
 				    	newCalendar.put("effect_flag", 1);
 				    	//新增
-				    	jobMapper.insertCalendar(newCalendar);
-						return;
+				    	row += jobMapper.insertCalendar(newCalendar);
+						continue;
 					}
 					//2.7、若是小于8
 						//判断这一天是考勤的首日还是结束日
@@ -942,10 +986,10 @@ public class SysJobServiceImpl implements ISysJobService
 					    		}
 							}
 							attendday.setAttendResult(attendResult);
-							jobMapper.updateAttendday(attendday);
+							row += jobMapper.updateAttendday(attendday);
 							//-------------------
 							attendBillItem.put("effect_flag", 1);
-							jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
+							row += jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
 							
 							
 							//更新日历 考勤日项为已生效
@@ -969,8 +1013,8 @@ public class SysJobServiceImpl implements ISysJobService
 					    	newCalendar.put("attend_label", Year_AdjustLeave.get("attend_type").equals(1)?"年假":"调休假");
 					    	newCalendar.put("effect_flag", 1);
 					    	//新增
-					    	jobMapper.insertCalendar(newCalendar);
-							return;
+					    	row += jobMapper.insertCalendar(newCalendar);
+					    	continue;
 						}
 					
 					//2.8、考勤单的开始结束时间与考勤日信息中早晚时间取并集，并经如下规则
@@ -1033,16 +1077,16 @@ public class SysJobServiceImpl implements ISysJobService
 						attendday.setAdditionalTime(0.0);
 						attendday.setAttendType((Integer) Year_AdjustLeave.get("attend_type"));
 						attendday.setAttendResult(attendResult);
-						jobMapper.updateAttendday(attendday);
+						row += jobMapper.updateAttendday(attendday);
 						//-------------------
 						attendBillItem.put("effect_flag", 1);
-						jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
+						row += jobMapper.updateEmpAttendBillLeavedayItems(attendBillItem);
 						
 						//更新日历 考勤日项为已生效
 						Map<String,Object> calendar = jobMapper.selectActiveCalendarByUserIdAndAttendDate(userId,attendDate);
 						//存在则记为无效
 				    	if(calendar!=null){
-				    		jobMapper.updateCalendarToNoEffect(calendar);
+				    		row += jobMapper.updateCalendarToNoEffect(calendar);
 				    	}
 						//然后新增考勤日历表记录
 				    	//查询用户
@@ -1059,15 +1103,15 @@ public class SysJobServiceImpl implements ISysJobService
 				    	newCalendar.put("attend_label", Year_AdjustLeave.get("attend_type").equals(1)?"年假":"调休假");
 				    	newCalendar.put("effect_flag", 1);
 				    	//新增
-				    	jobMapper.insertCalendar(newCalendar);
-				    	return;
+				    	row += jobMapper.insertCalendar(newCalendar);
+				    	continue;
 						
-				});
+				}
 				
 				//更新用户年假 只有在未生效时才可以
-				if(Year_AdjustLeave.get("complete_flag").equals(1)){
+				if(Year_AdjustLeave.get("complete_flag").equals(1) && row>0){
 					//2.9、更新该作人员的年假信息，根据最后得到的加班工时,此处需将额外工时换算成天数
-					jobMapper.updateYearVacationForQuartz(-Arith.div((double) Year_AdjustLeave.get("apply_workday_times"), goWorkHour, 1));
+					jobMapper.updateYearVacationForQuartz(-Arith.div((double) Year_AdjustLeave.get("apply_workday_times"), goWorkHour, 1),userId);
 					
 				}
 				//2.10、查询是否还存在未生效的日项	
@@ -1076,7 +1120,7 @@ public class SysJobServiceImpl implements ISysJobService
 					Year_AdjustLeave.put("complete_flag", 2);
 					Year_AdjustLeave.put("entire_effect", 1);
 					jobMapper.updateAttendBill(Year_AdjustLeave);
-				}else{
+				}else if(row>0){
 					//部分生效
 					Year_AdjustLeave.put("complete_flag", 2);
 					Year_AdjustLeave.put("entire_effect", 0);
@@ -1084,10 +1128,18 @@ public class SysJobServiceImpl implements ISysJobService
 				}
 				
 			});
+			log.info("更新考勤单成功");
 	}
 
+    @Scheduled(cron = "${krystal.quarz.order.cron}")
 	@Override
 	public void updateAttendCalendar() {
+		//200331 只允许在早上5点到六点执行该任务
+		double hour = DateUtils.getHourAndMminutesDoubleValue(new Date());
+		if(hour > 6 || hour < 5){
+			System.out.println("非考勤执行时间");
+			return;
+		}
 		//首先处理工作日
 		//查询今年所有工作日
 		List<EmpNonworkdayQuartz> workdayList = jobMapper.selectNowWorkdayList();
@@ -1097,15 +1149,15 @@ public class SysJobServiceImpl implements ISysJobService
 			Map<String,Object> calendar = jobMapper.selectActiveWorkdayCalendar(workday.getWorkdate());
 			//更新日历 考勤日项为已生效
 			
-			//存在则记为无效
+			//存在则更新
 			if(calendar!=null){
 				Map<String,Object> newCalendar = new HashMap<String,Object>();
-				newCalendar.put("calendar_id",StringUtils.getUUID() );
+				newCalendar.put("calendar_id",calendar.get("calendar_id") );
 				newCalendar.put("DATE", workday.getWorkdate());
 				//考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日 10 工作日
 				//日程状态(0正常 1工作日 2休息日)
 				newCalendar.put("attend_code", workday.getWorkdateFlag()==1?10:9);
-				newCalendar.put("attend_label", workday.getWorkdateFlag()==1?"休息日":"工作日");
+				newCalendar.put("attend_label", workday.getWorkdateFlag()==1?"工作日":"休息日");
 				newCalendar.put("effect_flag", 1);
 				//更新
 				jobMapper.updateWorkdayCalendar(newCalendar);
@@ -1117,7 +1169,7 @@ public class SysJobServiceImpl implements ISysJobService
 				//考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日 10 工作日
 				//日程状态(0正常 1工作日 2休息日)
 				newCalendar.put("attend_code", workday.getWorkdateFlag()==1?10:9);
-				newCalendar.put("attend_label", workday.getWorkdateFlag()==1?"休息日":"工作日");
+				newCalendar.put("attend_label", workday.getWorkdateFlag()==1?"工作日":"休息日");
 				newCalendar.put("effect_flag", 1);
 				//更新
 				jobMapper.insertWorkdayCalendar(newCalendar);
@@ -1176,10 +1228,40 @@ public class SysJobServiceImpl implements ISysJobService
 	    	newCalendar.put("effect_flag", 1);
 	    	//新增
 	    	jobMapper.insertCalendar(newCalendar);
+	    	log.info("更新日历成功");
 		}
 		
 		
 	}
+
+    /**
+     * 定时备份数据库
+     */
+	@Override
+	public void backupDatabase() {
+		//200331 只允许在早上5点到六点执行该任务
+		double hour = DateUtils.getHourAndMminutesDoubleValue(new Date());
+		if(hour > 6 || hour < 5){
+			System.out.println("非执行时间");
+			return;
+		}
+		String hostIP = Global.getConfig("numberone.hostIp");
+		String databaseName = Global.getConfig("numberone.databaseName");
+		String username = Global.getConfig("numberone.databaseUsername");
+		String password = Global.getConfig("numberone.databasePassword");
+
+		String backupUrl = FileUploadUtils.getDefaultBaseDir()+"backup/oadb_"+DateUtils.getDate()+".sql";
+		Process process;
+		try {
+			process = Runtime.getRuntime().exec(" mysqldump -h" + hostIP + " -u" + username + " -p" + password + " --set-charset=UTF8 " + databaseName);
+			InputStream inputStream = process.getInputStream();
+			FileUtils.writeBytesCreate(backupUrl, inputStream);
+		} catch (IOException e) {
+			log.error("备份数据库失败:"+e.getMessage());
+		}
+		log.info("备份数据库成功，路径:"+backupUrl);
+	}
+
 	
     
 	

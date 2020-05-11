@@ -31,6 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<id     property="userId"       column="user_id"      />
 		<id     property="empId"       column="emp_id"      />
 		<result property="deptId"       column="dept_id"      />
+		<result property="deptName"       column="dept_name"      />
 		<result property="loginName"    column="login_name"   />
 		<result property="userName"     column="user_name"    />
 		<result property="email"        column="email"        />
@@ -154,15 +155,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  		)
 	</insert>
 	
+	
 	<!-- 查询所有员工 -->
 	<select id="selectUserAll" resultMap="SysUserResult">
-		select u.user_id,u.emp_id, u.login_name, u.user_name, u.email,u.birthday,u.address,u.office_phone, u.phonenumber, u.password, u.sex, u.avatar, u.salt, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name from sys_user u
+		select u.user_id,u.emp_id,u.dept_id, u.login_name, u.user_name, u.email,u.birthday,u.address,u.office_phone, u.phonenumber, u.password, u.sex, u.avatar, u.salt, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name from sys_user u
 		left join sys_dept d on u.dept_id = d.dept_id
 		where u.del_flag = '0'
 	</select>
 	<!-- 查询user 根据userid -->
 	<select id="selectUserByUserId" parameterType="long" resultMap="SysUserResult">
-		select u.user_id,u.emp_id, u.login_name, u.user_name, u.email,u.birthday,u.address,u.office_phone, u.phonenumber, u.password, u.sex, u.avatar, u.salt, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name from sys_user u
+		select u.user_id,u.emp_id,u.dept_id, u.login_name, u.user_name, u.email,u.birthday,u.address,u.office_phone, u.phonenumber, u.password, u.sex, u.avatar, u.salt, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name from sys_user u
 		left join sys_dept d on u.dept_id = d.dept_id
 		where u.del_flag = '0'
 		and u.user_id = #{userId}
@@ -177,12 +179,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
    		and record_time &lt; DATE_FORMAT(CURDATE(),'%Y-%m-%d 05:00:00')
    		order by record_time;
 	</select>
+	<!-- 根据员工id查询员工打卡次数，查询早上6点到上午9点的打卡次数（包括9点） -->
+	<select id="selectAttendinfoCountBetween6to9" resultType="int">
+		SELECT count(*) from emp_attendinfo where 1=1 
+			and user_id = #{userId}
+   		and record_time &gt; DATE_FORMAT(#{attendDate},'%Y-%m-%d 06:00:00') 
+   		and record_time &lt;= DATE_FORMAT(#{attendDate},'%Y-%m-%d 09:00:00') 
+   		order by record_time 
+	</select>
 	<!-- 根据员工id查询员工打卡次数，时间间隔为上班时间 9到17点 -->
 	<select id="selectAttendinfoCountBetween9to17" resultType="int">
 		SELECT count(*) from emp_attendinfo where 1=1 
 			and user_id = #{userId}
-   		and record_time &gt;= DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d 09:00:00') 
-   		and record_time &lt; DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d 17:00:00') 
+   		and record_time &gt; DATE_FORMAT(#{attendDate},'%Y-%m-%d 09:00:00') 
+   		and record_time &lt; DATE_FORMAT(#{attendDate},'%Y-%m-%d 17:00:00') 
+   		order by record_time 
+	</select>
+	<!-- 根据员工id查询员工打卡次数，查询下午17点到第二天5点的打卡次数（包括17点不包括5点） -->
+	<select id="selectAttendinfoCountBetween17to5" resultType="int">
+		SELECT count(*) from emp_attendinfo where 1=1 
+			and user_id = #{userId}
+   		and record_time &gt;= DATE_FORMAT(#{attendDate},'%Y-%m-%d 17:00:00') 
+   		and record_time &lt; DATE_FORMAT(CURDATE(),'%Y-%m-%d 05:00:00') 
    		order by record_time 
 	</select>
 	
@@ -212,7 +230,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		FROM emp_attendday
 		where 1=1
 		and user_id = #{userId} 
-   		and DATE_FORMAT(attend_date,'%Y-%m-%d')  = DATE_FORMAT(#{startDate},'%Y-%m-%d') 
+   		and DATE_FORMAT(attend_date,'%Y-%m-%d')  = DATE_FORMAT(#{attendDate},'%Y-%m-%d') 
    		and attend_result in (0,1,2)
    		order by attend_date 
    		LIMIT 0,1
@@ -358,16 +376,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and DATE_FORMAT(workdate,'%Y') = DATE_FORMAT(CURDATE(),'%Y') 
 	</select>
 	
-	<!-- 查询所有审核通过 未生效的延时工单（只管开始时间）  -->
+	<!-- 查询所有审核通过 未完全生效的延时工单（只管开始时间）  30天以内 -->
 	<select id="selectNoActiveOvertimeBillByAttendDate" resultType="map">
 		SELECT
 			overtime_bill_id, user_id, emp_id, theme, dept_name, dept_id, user_name, apply_date, start_date, end_date, 
-			work_persons, work_person_names, apply_worktimes, matter, complete_flag, audit_flag, del_flag
+			work_persons, work_person_names, apply_worktimes, matter, complete_flag, audit_flag, del_flag,entire_effect
 		FROM
 		emp_overtime_bill AS ob
 		WHERE ob.del_flag = 0
-		AND ob.complete_flag = 1
+		AND ob.complete_flag in (1,2)
 		AND ob.audit_flag = 3
+		AND ob.entire_effect = 0
+		AND DATE_FORMAT(SYSDATE(),'%y%m%d')-DATE_FORMAT(ob.start_date,'%y%m%d') &lt;= 30
 		<if test="attendDate != null"> and DATE_FORMAT(ob.start_date,'%y%m%d')  = DATE_FORMAT(#{attendDate},'%y%m%d')  </if>
 	</select>
 	
@@ -375,9 +395,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 更新该作人员的年假信息，根据最后得到的加班工时,此处需将额外工时换算成天数  -->
 	<update id="updateYearVacationForQuartz" parameterType="double">
 		UPDATE emp_year_vacation yv
-		SET yv.`time_total` = yv.`time_total` + days,
-		yv.`time_surplus` = yv.`time_surplus` + days
-		WHERE yv.`user_id` = 1 AND YEAR = DATE_FORMAT(SYSDATE(),'%Y')
+		SET 
+		<if test="days&gt;=0">yv.`time_total` = yv.`time_total` + #{days},</if>
+		<if test="days&lt;0">yv.`time_used` = yv.`time_used` - #{days},</if>
+		yv.`time_surplus` = yv.`time_surplus` + #{days}
+		WHERE yv.`user_id` = #{userId} AND YEAR = DATE_FORMAT(SYSDATE(),'%Y')
 	</update>
 	
 	
@@ -400,9 +422,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		SELECT attendday_id , user_id , emp_id , attend_date , WEEK ,first_time, last_time , attend_result , attend_type , additional_time , remark
 		FROM emp_attendday
 		where 1=1
-		<if test="user_id != null"> and user_id = #{userId} </if>
+		<if test="userId != null"> and user_id = #{userId} </if>
    		<if test="attendDate != null"> and DATE_FORMAT(attend_date,'%y%m%d')  = DATE_FORMAT(#{attendDate},'%y%m%d')  </if>
-   		<if test="attend_result != null"> and attend_result = #{attendResult} </if>
+   		<if test="attendResult != null"> and attend_result = #{attendResult} </if>
    		LIMIT 0,1
 	</select>
 	
@@ -426,20 +448,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		   calendar_id,user_id,emp_id,user_name,dept_id,DATE,attend_code,attend_label,effect_flag
 		FROM
 		   emp_attend_calendar AS ac
-		WHERE user_id=1
+		WHERE user_id=#{userId}
 		AND effect_flag = 1
 		AND DATE_FORMAT(ac.DATE,'%y%m%d') = DATE_FORMAT(#{attendDate},'%y%m%d')
 	</select>
 	
 	<!--查询工作日日历  -->
-	<select id="selectActiveWorkdayCalendar" resultType="map">
+	<select id="selectActiveWorkdayCalendar" parameterType="date" resultType="map">
 		SELECT
 		   calendar_id,DATE,attend_code,attend_label,effect_flag
 		FROM
 		   emp_workday_calendar
 		WHERE 
 		effect_flag = 1
-		AND DATE_FORMAT(ac.DATE,'%y%m%d') = DATE_FORMAT(SYSDATE(),'%y%m%d')
+		AND DATE_FORMAT(DATE,'%y%m%d') = DATE_FORMAT(#{workdate},'%y%m%d')
 	</select>
 	
 	<!-- 将日历项置为无效  -->
@@ -457,7 +479,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 		<!-- 新增日历 -->
 	<insert id="insertCalendar" parameterType="map">
-	    insert into emp_attendday
+	    insert into emp_attend_calendar
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
 	      <if test="calendar_id != null">
 	        calendar_id,
@@ -484,7 +506,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	        attend_label,
 	      </if>
 	      <if test="effect_flag != null">
-	        attend_type,
+	        effect_flag,
 	      </if>
 	    </trim>
 	    <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -519,7 +541,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	  </insert>
 		<!-- 新增工作日历 -->
 	<insert id="insertWorkdayCalendar" parameterType="map">
-	    insert into emp_attendday
+	    insert into emp_workday_calendar
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
 	      <if test="calendar_id != null">
 	        calendar_id,
@@ -534,7 +556,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	        attend_label,
 	      </if>
 	      <if test="effect_flag != null">
-	        attend_type,
+	        effect_flag,
 	      </if>
 	    </trim>
 	    <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -590,17 +612,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	
 	<sql id="selectEmpAttendBillLeavedayItemsVo">
-        select record_id, user_id, emp_id, attend_bill_id, leaveday_item, workday_time, attend_type from emp_attend_bill_leaveday_items,effect_flag
+        select record_id, user_id, emp_id, attend_bill_id, leaveday_item, workday_time, attend_type,effect_flag from emp_attend_bill_leaveday_items
     </sql>
 	
     <select id="selectAttendBillItems" parameterType="map" resultType="map">
         <include refid="selectEmpAttendBillLeavedayItemsVo"/>
         <where>  
-            <!-- <if test="recordId != null "> and record_id = #{recordId}</if> -->
              <if test="user_id != null "> and user_id = #{user_id}</if>
              <if test="emp_id != null  and emp_id != '' "> and emp_id = #{emp_id}</if>
              <if test="attend_bill_id != null  and attend_bill_id != '' "> and attend_bill_id = #{attend_bill_id}</if>
-             and leaveday_item = #{leavedayItem}
              and DATE_FORMAT(leaveday_item,'%y%m%d')  &lt; DATE_FORMAT(SYSDATE(),'%y%m%d')  
              and effect_flag = 0
              <!-- <if test="workdayTime != null "> and workday_time = #{workdayTime}</if> -->
@@ -617,9 +637,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="attend_bill_id != null  and attend_bill_id != ''  ">attend_bill_id = #{attend_bill_id},</if>
             <if test="leaveday_item != null  ">leaveday_item = #{leaveday_item},</if>
             <if test="workday_time != null  ">workday_time = #{workday_time},</if>
+            <if test="effect_flag != null  ">effect_flag = #{effect_flag},</if>
             <if test="attend_type != null  ">attend_type = #{attend_type},</if>
         </trim>
-        where record_id = #{recordId}
+        where record_id = #{record_id}
     </update>
     
 	<update id="updateAttendBill" parameterType="map">
@@ -702,9 +723,103 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	        attend_label = #{attend_label,jdbcType=VARCHAR},
 	      </if>
 	      <if test="effect_flag != null">
-	        effect_flag = #{dept_id,jdbcType=INTEGER},
+	        effect_flag = #{effect_flag,jdbcType=INTEGER},
 	      </if>
 	    </set>
 	    where calendar_id = #{calendar_id}
 	</update>
+	
+	<!-- 更新延时工单 -->
+	<update id="updateOvertimeBill" parameterType="map">
+        update emp_overtime_bill
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="emp_id != null  and emp_id != ''  ">emp_id = #{emp_id},</if>
+            <if test="user_id != null  ">user_id = #{user_id},</if>
+            <if test="theme != null  and theme != ''  ">theme = #{theme},</if>
+            <if test="dept_name != null  and dept_name != ''  ">dept_name = #{dept_name},</if>
+            <if test="dept_id != null  ">dept_id = #{dept_id},</if>
+            <if test="user_name != null  and user_name != ''  ">user_name = #{user_name},</if>
+            <if test="apply_date != null  ">apply_date = #{apply_date},</if>
+            <if test="start_date != null  ">start_date = #{start_date},</if>
+            <if test="end_date != null  ">end_date = #{end_date},</if>
+            <if test="work_person_names != null  and work_person_names != ''  ">work_person_names = #{work_person_names},</if>
+            <if test="work_persons != null  and work_persons != ''  ">work_persons = #{work_persons},</if>
+            <if test="apply_worktimes != null  ">apply_worktimes = #{apply_worktimes},</if>
+            <if test="matter != null  and matter != ''  ">matter = #{matter},</if>
+            <if test="complete_flag != null  ">complete_flag = #{complete_flag},</if>
+            <if test="audit_flag != null  ">audit_flag = #{audit_flag},</if>
+            <if test="del_flag != null  ">del_flag = #{del_flag},</if>
+            <if test="entire_effect != null  ">entire_effect = #{entire_effect},</if>
+        </trim>
+        where overtime_bill_id = #{overtime_bill_id}
+    </update>
+    
+    <!-- 将该用户对应的延时工单项 设置未已生效1 emp_overtime_user  顺便加上实际加班工时-->
+    <update id="updateOvertimeItemToEffect" parameterType="map">
+    	update emp_overtime_user
+    		set effect_flag = 1,hour = #{hour}
+    	where user_id = #{user_id}
+    	and overtime_bill_id = #{overtime_bill_id}
+    </update>
+    
+    <!-- 查询是否还存在 未生效的延时工单项 -->
+    <select id="selectOvertimeItemCount" parameterType="map" resultType="int">
+    	select count(1)
+    	from emp_overtime_user
+    	where user_id = #{user_id}
+    	and effect_flag = 0
+    	and overtime_bill_id = #{overtime_bill_id}
+    </select>
+    
+  <insert id="insertAttendinfo" parameterType="EmpAttendinfoQuartz">
+    insert into emp_attendinfo
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="attendinfoId != null">
+        attendinfo_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="empId != null">
+        emp_id,
+      </if>
+      <if test="attendDate != null">
+        attend_date,
+      </if>
+      <if test="week != null">
+        week,
+      </if>
+      <if test="recordTime != null">
+        record_time,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="attendinfoId != null">
+        #{attendinfoId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="empId != null">
+        #{empId,jdbcType=VARCHAR},
+      </if>
+      <if test="attendDate != null">
+        #{attendDate,jdbcType=DATE},
+      </if>
+      <if test="week != null">
+        #{week,jdbcType=INTEGER},
+      </if>
+      <if test="recordTime != null">
+        #{recordTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+
 </mapper> 

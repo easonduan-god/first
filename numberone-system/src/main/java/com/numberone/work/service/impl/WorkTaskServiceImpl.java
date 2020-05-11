@@ -21,6 +21,7 @@ import com.numberone.system.domain.SysUser;
 import com.numberone.system.mapper.SysFileMapper;
 import com.numberone.system.mapper.SysUserMapper;
 import com.numberone.system.service.ISysDictDataService;
+import com.numberone.work.domain.WorkMonthHour;
 import com.numberone.work.domain.WorkTask;
 import com.numberone.work.domain.WorkTaskAudit;
 import com.numberone.work.domain.WorkTaskPerform;
@@ -661,6 +662,13 @@ public class WorkTaskServiceImpl implements IWorkTaskService
 			task.setAuditHours(Integer.parseInt(audit.getParams().get("auditHours").toString()));
 			task.setAuditTime(currDate);
 			row += workTaskMapper.updateWorkTask(task);
+			
+			//200508 新增 新建工时表 并在任务审核完毕后 更新工时表数据
+			WorkMonthHour monthHour = new WorkMonthHour();
+			monthHour.setUserId(task.getDealUserId());
+			monthHour.setMonth(task.getDealTime());
+			monthHour.setHour(task.getAuditHours()*1.0);
+			row += workTaskMapper.updateWorkMonthHour(monthHour);
 		return row;
 	}
 

@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style>
+     [class*="col-"] {
+      padding-left: 1px;
+      padding-right: 1px;
+    }
+    .row {
+      margin-left: 1px;
+      margin-right: 1px;
+    }
+    .container-fluid {
+      margin: 1px;
+      padding: 1px;
+    } 
+	
+</style>
+<body class="gray-bg">
+	<div class="col-sm-12">
+		<div class="ibox-content" style="height: 60px">
+			<div class="col-sm-3">
+				<select class="form-control noselect2" onchange="changeReport()" id="month" name="month "  th:with="type=${@dict.getType('report_month')}">
+	                <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="${currMonth}"></option>
+	            </select>
+			</div>
+			<div class="col-sm-3">
+				<select name="deptId" class="form-control"  onchange="changeReport()" th:with="type=${@dict.getTypeByUserId('sys_dept')}" id="deptId">
+					<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+				</select>
+			</div>
+			<div class="col-sm-1 col-sm-offset-5">
+				<a class="btn btn-success" shiro:hasPermission="emp:report:dept" onclick="downloadReprot();">
+					<i class="fa fa-download"></i> 本期报表数据下载
+				</a>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-12">
+		<div class="col-sm-6">
+			<div class="ibox-content"  style="height: 400px;">
+				<!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    			<div id="main1" style="height:400px;"></div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="ibox-content"  style="height: 400px">
+				<div id="main2" style="height:400px;"></div>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+	<!-- 引入 ECharts 文件 -->
+    <script type="text/javascript" th:src="@{/ajax/libs/echarts-all-3.js}"></script>
+    <script th:inline="javascript">
+    var prefix = ctx+"work/report"
+    $(function(){
+    	chart1();
+    	chart2();
+    	changeReport();
+    });
+    
+    var myChart1 = echarts.init(document.getElementById('main1'));
+    function chart1(){
+    	// 基于准备好的dom，初始化echarts实例
+
+        // 指定图表的配置项和数据
+        var option = {
+      		toolbox: {
+                  show: true,
+                  feature: {
+                    dataZoom: {
+                      yAxisIndex: 'none' 
+                    },
+                    dataView: {readOnly: false},   //  缩放
+                    magicType: {type: ['line', 'bar']},   ///　　折线  直方图切换
+                    restore: {}, // 重置
+                    saveAsImage: {} // 导出图片
+                  }
+                },
+            title: {
+                text: '任务月报'
+            },
+            tooltip: {},
+            legend: {
+                data:['次数']
+            },
+            xAxis: {
+                data: ["员工数","总工时","任务处理数","平均任务工时","平均任务数"]
+            },
+            yAxis: {},
+            series: [{
+                name: '次数',
+                type: 'bar',
+                data: []
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart1.setOption(option);
+    }
+    var myChart2 = echarts.init(document.getElementById('main2'));
+    function chart2(){
+    	// 基于准备好的dom，初始化echarts实例
+
+        // 指定图表的配置项和数据
+        var option = {
+       	    title: {
+       	        text: '任务同比'
+       	    },
+       	    tooltip: {
+       	        trigger: 'axis'
+       	    },
+       	    legend: {
+       	        data: ['本期', '上期']
+       	    },
+      		toolbox: {
+                show: true,
+                feature: {
+                  dataZoom: {
+                    yAxisIndex: 'none' 
+                  },
+                  dataView: {readOnly: false},   //  缩放
+                  magicType: {type: ['line', 'bar']},   ///　　折线  直方图切换
+                  restore: {}, // 重置
+                  saveAsImage: {} // 导出图片
+                }
+            },
+       	    calculable: true,
+       	    xAxis: [
+       	        {
+       	            type: 'category',
+       	            data: ["员工数","总工时","任务处理数","平均任务工时","平均任务数"]
+       	        }
+       	    ],
+       	    yAxis: [
+       	        {
+       	            type: 'value'
+       	        }
+       	    ],
+       	    series: [
+       	        {
+       	            name: '本期',
+       	            type: 'bar',
+       	            data: []
+       	        },
+       	        {
+       	            name: '上期',
+       	            type: 'bar',
+       	            data: []
+       	        }
+       	    ]
+       	};
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart2.setOption(option);
+    }
+    
+    function changeReport(){
+    	var deptId = $("#deptId").val();
+    	var month = $("#month").val();
+    	$.post(prefix+'/reportData',{"deptId":deptId,"month":month},function (result) {
+    		var dataArr = result.dataArr;
+    		
+	    	// 填入数据
+	        myChart1.setOption({
+	        	title: {
+	                text: result.monthStr+'期任务月报'
+	            },
+	            series: [{
+	            	name: '次数',
+	                data: dataArr[0]
+	            }]
+	        });
+	        myChart2.setOption({
+	        	title: {
+	                text: result.monthStr+'期任务同比'
+	            },
+	            series: [
+	            	{
+	       	            name: '本期',
+	       	            data: dataArr[1]
+	       	        },
+	       	        {
+	       	            name: '上期',
+	       	            data: dataArr[2]
+	       	        }
+	            ]
+	        });
+        });
+    	
+    }
+    
+    function downloadReprot(){
+    	var deptId = $("#deptId").val();
+    	var month = $("#month").val();
+    	
+		$.modal.loading("正在导出数据，请稍后...");
+		$.post("/work/report/export", {"deptId":deptId,"month":month}, function(result) {
+			if (result.code == web_status.SUCCESS) {
+				window.location.href = ctx
+						+ "common/download?fileName="
+						+ result.msg + "&delete=" + true;
+			} else {
+				$.modal.alertError(result.msg);
+			}
+			$.modal.closeLoading();
+		});
+    }
+    </script>
+</body>
+</html>

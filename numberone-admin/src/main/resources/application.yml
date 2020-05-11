@@ -6,14 +6,22 @@ numberone:
   version: 3.2.0
   # 版权年份
   copyrightYear: 2020
-  # 文件上传路径
-  profile: D:/workspace/eclipse/profile/
+  # 文件上传路径D:/workspace/eclipse/profile/
+  profile: /mydir/profile/
   #邮件默认账户
   defaultAccount: qq2554033105@126.com
   #邮件默认授权码
   defaultPwd: qq2554033105
   # 获取ip地址开关
   addressEnabled: true
+  #数据库ip
+  hostIp: easonduan.icu
+  #数据库名
+  databaseName: oadb2
+  #数据库用户名
+  databaseUsername: root
+  #数据库密码
+  databasePassword: dJj+++1234
   
 # OA系统相关配置
 OAManage:
@@ -138,7 +146,7 @@ gen:
   # 作者
   author: eason
   # 默认生成包路径 system 需改成自己的模块名称 如 system monitor tool
-  packageName: com.numberone.sys
+  packageName: com.numberone.work
   # 自动去除表前缀，默认是true
   autoRemovePre: true
   # 表前缀(类名不会包含表前缀)

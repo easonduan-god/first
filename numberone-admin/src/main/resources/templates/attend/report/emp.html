@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+	<div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form role="form" id="report-search-form" class="form-horizontal">
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">部&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;门：</label>
+							<div class="col-sm-9">
+								<select name="deptId" class="form-control" th:with="type=${@dict.getTypeByUserId('sys_dept')}" id="deptInput">
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">员&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;工：</label>
+							<div class="col-sm-9">
+								<select class="form-control" id="userInput" name="userInput">
+								</select>
+								<input type="hidden" name="params[userIds]" id="userIds">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group draggable">
+							<label class="col-sm-3 control-label">月&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;份：</label>
+							<div class="col-sm-9">
+								<select class="form-control noselect2" id="auditFlag" name="auditFlag " th:with="type=${@dict.getType('report_month')}">
+				                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"  th:selected="${dict.dictValue=currMonth}"></option>
+				                </select>
+							</div>
+						</div>
+					</div>
+					
+					
+					<div class="col-md-6 ">
+						<div class="form-group draggable">
+							<div class="col-sm-12">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+					    		<a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		
+			<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+	        </div>
+	        
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+	<script th:src="@{/ajax/libs/select/select2.js}"></script>
+    <script th:inline="javascript">
+        var prefix = ctx + "attend/report";
+
+        $(function() {
+			/* userInput deptInput初始化select2 */
+        	$('#deptInput').select2({
+			    placeholder: '请选择'
+			});
+        	$("#userInput").select2({
+        		placeholder : "请输入人员工号或名称或名称首字母...",
+        		minimumInputLength : 1,//最小需要输入多少个字符才进行查询
+        		multiple : true,//支持多选
+        		allowClear : true,//允许清空
+        		ajax : {
+        			url : "/system/user/searchUser",
+        			dataType : 'json',
+        			type : "post",
+        			delay : 100,
+        			data : function(userName, page) {//向后台发送参数
+        				return {
+        					userName : userName.term
+        				};
+        			},
+        			results : function(data, page) {//处理结果
+        				return {
+        					data
+        				};
+        			}
+        		},
+        		formatResult : function(result, container, query, escapeMarkup) {
+        			return result.userName;
+        		},
+        		formatSelection : function(result, container, query, escapeMarkup) {
+        			return result.userName;
+        		},
+        		formatInputTooShort : function() {
+        			return "请输入人员工号或名称或名称首字母...";
+        		},
+        		escapeMarkup : function(m) {
+        			return m;
+        		}
+        	});
+        	$("#userInput").change(function(){
+        		$("#userIds").val($.form.selectSelects("userInput"));
+        	});
+        	
+            var options = {
+                url: prefix + "/list",
+				exportUrl: prefix + "/export",
+                modalName: "员工考勤月报",
+				search: false,
+		        showExport: true,
+                columns: [
+				{
+					field : 'empId', 
+					title : '员工号',
+					sortable: true
+				},
+				{
+					field : 'userName', 
+					title : '用户名',
+					sortable: true
+				},
+				{
+					field : 'deptName', 
+					title : '部门名',
+					sortable: true
+				},
+				{
+					field : 'month', 
+					title : '月份',
+					sortable: true
+				},
+				{
+					field : 'createTime', 
+					title : '报表生成时间',
+					sortable: true
+				},
+				{
+					field : 'lateCount', 
+					title : '迟到次数',
+					sortable: true
+				},
+				{
+					field : 'earlyCount', 
+					title : '早退次数',
+					sortable: true
+				},
+				{
+					field : 'absentCount', 
+					title : '旷工次数',
+					sortable: true
+				},
+				{
+					field : 'forgetCount', 
+					title : '忘记打卡次数',
+					sortable: true
+				},
+				{
+					field : 'leaveCount', 
+					title : '请假次数',
+					sortable: true
+				},
+				{
+					field : 'leaveDays', 
+					title : '请假天数',
+					sortable: true
+				},
+				{
+					field : 'leaveHours', 
+					title : '请假工时',
+					sortable: true
+				},
+				{
+					field : 'attendRate', 
+					title : '到勤率',
+					sortable: true
+				},
+				{
+					field : 'abnormalRate', 
+					title : '考勤异常率',
+					sortable: true
+				},
+				{
+					field : 'overtimeCount', 
+					title : '累计加班次数',
+					sortable: true
+				},
+				{
+					field : 'overtimeRate', 
+					title : '加班率',
+					sortable: true
+				},
+				{
+					field : 'overtimeHours', 
+					title : '累计加班工时',
+					sortable: true
+				},
+				{
+					field : 'avgOvertimeHours', 
+					title : '平均加班工时（工时/次数）',
+					sortable: true
+				}]
+            };
+            $.table.init(options);
+    		//重置表单
+    		function reset(){
+    			$("#report-search-form")[0].reset();
+    			$('#deptInput').val("").trigger('change');
+    		    $('#userInput').val("").trigger('change');
+    		    $("#userIds").val("");
+    		}
+        });
+    </script>
+</body>
+</html>

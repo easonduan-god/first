@@ -126,6 +126,14 @@ public interface EmpAttendBillMapper {
 	 */
 	List<String> selectUsernamesByUserIdsAndStartDate(@Param("userIds") String[] userIds,@Param("startDate") Date startDate);
 
+	/**
+	 * 一个月内忘记打卡不准超过3次 包括未审核的
+	 * @param userId
+	 * @param startDate
+	 * @return
+	 */
+	int selectForgetCountByUserIdAndMonth(@Param("userId") Long userId,@Param("month") Date month);
+
 
 	
 	

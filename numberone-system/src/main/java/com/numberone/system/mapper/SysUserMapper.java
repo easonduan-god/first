@@ -212,5 +212,11 @@ public interface SysUserMapper
 	 * @return: List<Map<String,String>>
 	 */
 	public List<Map<String, String>> selectUserListByDeptIdForQuery(Long deptId);
+
+	/**
+	 * 新增工时
+	 * @param monthHour
+	 */
+	public void insertMonthHour(Map<String, Object> monthHour);
 	
 }

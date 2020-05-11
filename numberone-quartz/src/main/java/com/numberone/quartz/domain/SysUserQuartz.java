@@ -23,6 +23,7 @@ public class SysUserQuartz
     /** 部门ID */
     @Excel(name = "部门编号", type = Type.IMPORT)
     private Long deptId;
+    private String deptName;
 
     /** 部门父ID */
     private Long parentId;
@@ -271,6 +272,14 @@ public class SysUserQuartz
 
 	public void setOfficePhone(String officePhone) {
 		this.officePhone = officePhone;
+	}
+
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
 	}
 
 	@Override

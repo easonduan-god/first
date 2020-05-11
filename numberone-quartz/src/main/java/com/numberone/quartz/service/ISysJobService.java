@@ -125,4 +125,10 @@ public interface ISysJobService
 	 * 新建员工考勤日历（5点25分）
 	 */
 	public void updateAttendCalendar();
+
+	/**
+	 * 定时备份数据库
+	 */
+	public void backupDatabase();
+
 }

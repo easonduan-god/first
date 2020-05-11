@@ -77,7 +77,7 @@
                         </a>
                       </li>
                       <li class="layui-col-xs3">
-                        <a th:href="@{/attend/overtimebill/mine}" title="考勤月报" class="link-tab">
+                        <a th:href="@{/attend/report/dept}" title="部门考勤月报" class="link-tab">
                           <i class="layui-icon layui-icon-chart-screen"></i>
                           <cite>考勤月报</cite>
                         </a>
@@ -211,8 +211,8 @@
           	<div class="calendar-person" id="calendarDIV" ></div>
           </div><!-- style="margin: 0 auto;width: 380px;" -->
         </div>
-        <div class="layui-card" style="height: 400px;padding: 1 auto;">
-        	<iframe width="70%" height="85%" th:src="@{/system/test}" frameborder="0" seamless></iframe>
+        <div class="layui-card" style="height: 360px;padding: 1 auto;">
+        	<iframe width="70%" height="98%" th:src="@{/system/test}" frameborder="0" seamless></iframe>
         </div>
 
       </div>
@@ -279,25 +279,6 @@
 			  layer.close(index);
 		  }
 	  });
-  }
-  	
-  function animationLoad(){
-		L2Dwidget.on('*', (name) => {
-			console.log('%c EVENT ' + '%c -> ' + name, 'background: #222; color: yellow', 'background: #fff; color: #000')
-		}).init({
-			dialog: {
-				// 开启对话框
-				enable: true,
-				script: {
-					// 每空闲 10 秒钟，显示一条一言
-					'every idle 10s': '$hitokoto$',
-					// 当触摸到角色身体
-					'tap body': '哎呀！别碰我！',
-					// 当触摸到角色头部
-					'tap face': '人家已经不是小孩子了！'
-				}
-			}
-		});
   }
   </script>
   

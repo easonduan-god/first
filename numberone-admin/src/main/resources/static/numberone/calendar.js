@@ -138,7 +138,7 @@ function initEson(divId) {
 					
 				}
 				//日期颜色考勤代码 0事假 1年假 2调休假 3忘记打卡 4迟到 5早退 6矿工 7迟到+早退（迟到） 9休息日
-				var random = Math.ceil(Math.random()*10); 
+				/*var random = Math.ceil(Math.random()*10); 
 				
 				//随机生成考勤
 				if(random%3==0){
@@ -147,7 +147,7 @@ function initEson(divId) {
 						spec = codes[randomKey].css || '';
 						//console.info(spec);
 					}
-				}
+				}*/
 				
 				var bunch = [];
 				bunch.push('<div class="date" data-y="'+ y.toString() + '" data-m="' + m.toString() + '" data-d="' + d.toString() + '">');

@@ -1,6 +1,7 @@
 package com.numberone.web.controller.system;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.numberone.common.config.Global;
+import com.numberone.common.utils.DateUtils;
 import com.numberone.emp.mapper.EmpOvertimeBillMapper;
 import com.numberone.emp.service.IAttendWorkdayService;
 import com.numberone.framework.web.base.BaseController;
@@ -62,18 +64,18 @@ public class SysIndexController extends BaseController
     // 日历
     @RequestMapping("/index/calendarJson")
     @ResponseBody
-    public Map<String,Object> calendarJson(ModelMap mmap)
+    public Map<String,Object> calendarJson(Date first_date,ModelMap mmap)
     {
     	Map<String,Object> map = new HashMap<String,Object>();
     	
-	    	Map<String,List<String>> itemMap = new HashMap<String,List<String>>();
+	    	Map<String,List<Object>> itemMap = new HashMap<String,List<Object>>();
 	    	
-	    	List<Map<String,String>> list = attendWorkdayService.selectCalendarJson(getSysUser());
-	    	for (Map<String, String> map2 : list) {
-    			List<String> itemList = new ArrayList<String>();
+	    	List<Map<String,Object>> list = attendWorkdayService.selectCalendarJson(getSysUser(),first_date);
+	    	for (Map<String, Object> map2 : list) {
+    			List<Object> itemList = new ArrayList<Object>();
     			itemList.add(map2.get("attend_code"));
     			itemList.add(map2.get("attend_label"));
-    			itemMap.put(map2.get("date"), itemList);
+    			itemMap.put(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, (Date) map2.get("date")), itemList);
 			}
 	    map.put("data", itemMap);
 	    return map;

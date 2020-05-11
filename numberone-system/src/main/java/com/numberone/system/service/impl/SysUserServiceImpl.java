@@ -1,6 +1,8 @@
 package com.numberone.system.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -187,11 +189,37 @@ public class SysUserServiceImpl implements ISysUserService
         // 新增用户与角色管理
         insertUserRole(user);
         
+        SysUser newUser = userMapper.selectUserById(userId);
         //---200207 新增用户年假
-        	insertUserYearVacation(user);
+        	insertUserYearVacation(newUser);
+        	
+        	//---200509 新增用户工时记录
+        	insertMonthHour(newUser);
         return rows;
     }
-  //---200207 新增用户年假
+    
+    /**
+     * 新增用户工时 200509
+     * @param user
+     */
+    private void insertMonthHour(SysUser user) {
+    	Date month = DateUtils.formatDateToDate(new Date() , DateUtils.YYYY_MM);
+    	Long userId = user.getUserId();
+		Map<String,Object> monthHour = new HashMap<String,Object>();
+		monthHour.put("record_id",StringUtils.getUUID());
+		monthHour.put("user_id",userId);
+		monthHour.put("dept_id",user.getDeptId());
+		monthHour.put("dept_name",user.getDeptName());
+		monthHour.put("user_name",user.getUserName());
+		monthHour.put("month",month);
+		monthHour.put("emp_id",user.getEmpId());
+		monthHour.put("hour",0);
+		monthHour.put("remark",null);
+		
+		userMapper.insertMonthHour(monthHour);
+	}
+
+//---200207 新增用户年假
     private void insertUserYearVacation(SysUser user) {
     	EmpYearVacation yearVacation = new EmpYearVacation();
     	//补全数据

@@ -362,4 +362,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </trim>
         where task_record_id = #{taskRecordId}
     </update>
+    
+	<!-- 更新工时 -->
+    <update id="updateWorkMonthHour" parameterType="WorkMonthHour">
+        update work_month_hour
+        set hour = hour + #{hour}
+        where DATE_FORMAT(month,'%Y%m') = DATE_FORMAT(#{month},'%Y%m')
+        and user_id = #{userId}
+    </update>
 </mapper>

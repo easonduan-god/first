@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.work.mapper.WorkReportMapper">
+    
+    <resultMap type="WorkTaskEmpReport" id="WorkTaskEmpReportResult">
+        <result property="recordId"    column="record_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="month"    column="month"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="totalHours"    column="total_hours"    />
+        <result property="taskCount"    column="task_count"    />
+        <result property="avgTaskHours"    column="avg_task_hours"    />
+        <result property="taskCompleteRate"    column="task_complete_rate"    />
+        <result property="taskReworkRate"    column="task_rework_rate"    />
+        <result property="taskReworkCount"    column="task_rework_count"    />
+        <result property="taskAlterRate"    column="task_alter_rate"    />
+        <result property="taskAlterCount"    column="task_alter_count"    />
+    </resultMap>
+	
+	<sql id="selectWorkTaskEmpReportVo">
+        select record_id, user_id, emp_id, user_name, month, dept_id, dept_name, create_time, total_hours, task_count, avg_task_hours, task_complete_rate, task_rework_rate, task_rework_count, task_alter_rate, task_alter_count from work_task_emp_report
+    </sql>
+	
+    <select id="selectWorkTaskEmpReportList" parameterType="WorkTaskEmpReport" resultMap="WorkTaskEmpReportResult">
+        <include refid="selectWorkTaskEmpReportVo"/>
+        <where>  
+            <if test="recordId != null  and recordId != '' "> and record_id = #{recordId}</if>
+			<if test="params.userIds != null "> and user_id in
+				<foreach item="userId" collection="params.userIds" open="(" separator="," close=")">
+					#{userId}
+				</foreach>
+			</if>
+			<if test="empId != null  and empId != '' "> and emp_id = #{empId}</if>
+			<if test="userName != null  and userName != '' "> and user_name = #{userName}</if>
+			<if test="month != null "> and date_format(month,'%y%m') = date_format(#{month},'%y%m')</if>
+			<if test="deptId != null "> and dept_id = #{deptId}</if>
+			<if test="deptName != null  and deptName != '' "> and dept_name = #{deptName}</if>
+			<if test="createTime != null "> and create_time = #{createTime}</if>
+			<if test="totalHours != null "> and total_hours = #{totalHours}</if>
+			<if test="taskCount != null "> and task_count = #{taskCount}</if>
+			<if test="avgTaskHours != null "> and avg_task_hours = #{avgTaskHours}</if>
+			<if test="taskCompleteRate != null "> and task_complete_rate = #{taskCompleteRate}</if>
+			<if test="taskReworkRate != null "> and task_rework_rate = #{taskReworkRate}</if>
+			<if test="taskReworkCount != null "> and task_rework_count = #{taskReworkCount}</if>
+			<if test="taskAlterRate != null "> and task_alter_rate = #{taskAlterRate}</if>
+			<if test="taskAlterCount != null "> and task_alter_count = #{taskAlterCount}</if>
+         </where>
+    </select>
+    
+    
+    <resultMap type="WorkTaskDeptReport" id="WorkTaskDeptReportResult">
+        <result property="recordId"    column="record_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="deptLeader"    column="dept_leader"    />
+        <result property="month"    column="month"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="empCount"    column="emp_count"    />
+        <result property="totalHours"    column="total_hours"    />
+        <result property="taskCount"    column="task_count"    />
+        <result property="avgTaskHours"    column="avg_task_hours"    />
+        <result property="avgTaskCount"    column="avg_task_count"    />
+        <result property="taskCompleteRate"    column="task_complete_rate"    />
+        <result property="taskReworkRate"    column="task_rework_rate"    />
+        <result property="taskReworkCount"    column="task_rework_count"    />
+        <result property="taskAlterRate"    column="task_alter_rate"    />
+        <result property="taskAlterCount"    column="task_alter_count"    />
+    </resultMap>
+	
+	<sql id="selectWorkTaskDeptReportVo">
+        select record_id, dept_id, dept_name, dept_leader, month, create_time, emp_count, total_hours, task_count, avg_task_hours, avg_task_count, task_complete_rate, task_rework_rate, task_rework_count, task_alter_rate, task_alter_count from work_task_dept_report
+    </sql>
+	
+    <select id="selectDeptReport" parameterType="WorkTaskDeptReport" resultMap="WorkTaskDeptReportResult">
+        <include refid="selectWorkTaskDeptReportVo"/>
+        <where>  
+            <if test="recordId != null  and recordId != '' "> and record_id = #{recordId}</if>
+             <if test="deptId != null "> and dept_id = #{deptId}</if>
+             <if test="deptName != null  and deptName != '' "> and dept_name = #{deptName}</if>
+             <if test="deptLeader != null  and deptLeader != '' "> and dept_leader = #{deptLeader}</if>
+             <if test="month != null "> and date_format(month,'%y%m') = date_format(#{month},'%y%m')</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="empCount != null "> and emp_count = #{empCount}</if>
+             <if test="totalHours != null "> and total_hours = #{totalHours}</if>
+             <if test="taskCount != null "> and task_count = #{taskCount}</if>
+             <if test="avgTaskHours != null "> and avg_task_hours = #{avgTaskHours}</if>
+             <if test="avgTaskCount != null "> and avg_task_count = #{avgTaskCount}</if>
+             <if test="taskCompleteRate != null "> and task_complete_rate = #{taskCompleteRate}</if>
+             <if test="taskReworkRate != null "> and task_rework_rate = #{taskReworkRate}</if>
+             <if test="taskReworkCount != null "> and task_rework_count = #{taskReworkCount}</if>
+             <if test="taskAlterRate != null "> and task_alter_rate = #{taskAlterRate}</if>
+             <if test="taskAlterCount != null "> and task_alter_count = #{taskAlterCount}</if>
+         </where>
+    </select>
+</mapper>

@@ -84,37 +84,44 @@ public interface SysJobMapper
 	
 	/**
 	 * 根据员工id查询员工打卡信息 前一天6点到当前日期5点
-	 * @param: @param userId
-	 * @param: @return 参数说明
-	 * @return: EmpAttendinfo 返回类型
-	 * @throws
+	 * @param userId
+	 * @return
 	 */
 	public List<EmpAttendinfoQuartz> selectAttendBetween6To5(Long userId);
 	
 	/**
 	 * 根据员工id查询员工打卡次数，时间间隔为上班时间9到17点
-	 * @param: @param userId
-	 * @param: @return 参数说明
-	 * @return: int 返回类型
-	 * @throws
+	 * @param userId
+	 * @param attendDate
+	 * @return
 	 */
-	public int selectAttendinfoCountBetween9to17(Long userId);
+	public int selectAttendinfoCountBetween9to17(@Param("userId")Long userId,@Param("attendDate") Date attendDate);
+	/**
+	 * 根据员工id查询员工打卡次数，查询早上6点到上午9点的打卡次数（包括9点）
+	 * @param userId
+	 * @param attendDate
+	 * @return
+	 */
+	public int selectAttendinfoCountBetween6to9(@Param("userId")Long userId,@Param("attendDate") Date attendDate);
+	/**
+	 * 根据员工id查询员工打卡次数，查询下午17点到第二天5点的打卡次数（包括17点不包括5点）
+	 * @param userId
+	 * @param attendDate
+	 * @return
+	 */
+	public int selectAttendinfoCountBetween17to5(@Param("userId")Long userId,@Param("attendDate") Date attendDate);
 	
 	/**
-	 * @param userId 
-	 * 获取下班打卡时间，也就是8点半以后两次打卡记录
-	 * @param: @return 参数说明
-	 * @return: Date 返回类型
-	 * @throws
+	 * 获取下班打卡时间，也就是9点以后两次打卡记录
+	 * @param userId
+	 * @return
 	 */
 	public List<Date> getOffWorkTime(Long userId);
 	
 	/**
 	 * 查询本次考勤区间的考勤记录
-	 * @param: @param userId
-	 * @param: @return 参数说明
-	 * @return: EmpAttenddayQuartz 返回类型
-	 * @throws
+	 * @param userId
+	 * @return
 	 */
 	public EmpAttenddayQuartz selectEmpAttenddayByUserId(Long userId);
 	
@@ -126,14 +133,14 @@ public interface SysJobMapper
 	 */
 	public EmpAttenddayQuartz selectEmpAttenddayResultIn0_1_2ByUserIdAndAttendDate(@Param("userId") Long userId,@Param("attendDate") Date attendDate);
 	
-	public void insertAttendday(EmpAttenddayQuartz empAttendday);
+	public int insertAttendday(EmpAttenddayQuartz empAttendday);
 
-	public void updateAttendday(EmpAttenddayQuartz empAttendday);
+	public int updateAttendday(EmpAttenddayQuartz empAttendday);
 
 	public List<EmpNonworkdayQuartz> selectNowWorkdayList();
 
 	/**
-	 * 根据当前日期查询所有审核通过 未生效的延时工单（只管开始时间）
+	 * 查询所有审核通过 未完全生效的延时工单（只管开始时间） 30天以内
 	 * @param attendDate
 	 * @return
 	 */
@@ -141,8 +148,9 @@ public interface SysJobMapper
 
 	/**
 	 * 用于定时任务的更新年假信息 主要是更新天数
+	 * @param userId 
 	 */
-	public int updateYearVacationForQuartz(Double days);
+	public int updateYearVacationForQuartz(@Param("days")Double days, @Param("userId")Long userId);
 
 	/**
 	 * 更新延时工单完成状态为 已生效2
@@ -170,13 +178,7 @@ public interface SysJobMapper
 	 * @param attendDate 
 	 * @return
 	 */
-	public Map<String, Object> selectNoActiveOvertimeBillByUserId(@Param("userId")Long userId,@Param("startDate") Date attendDate);
-
-	/**
-	 * 更新考勤单为已生效2
-	 * @param overtimeBill
-	 */
-	public void updateAttendBillToEffect(Map<String, Object> overtimeBill);
+	public Map<String, Object> selectNoActiveOvertimeBillByUserId(@Param("userId")Long userId,@Param("attendDate") Date attendDate);
 
 	/**
 	 * 查询此延时工单对应的该用户的有效的考勤日历项
@@ -189,14 +191,14 @@ public interface SysJobMapper
 	 * 将日历项记为无效 0
 	 * @param calendar
 	 */
-	public void updateCalendarToNoEffect(Map<String, Object> calendar);
+	public int updateCalendarToNoEffect(Map<String, Object> calendar);
 
 	public SysUserQuartz selectUserByUserId(Long userId);
 
 	/**
 	 * 新增日历
 	 */
-	public void insertCalendar(Map<String,Object> newCalendar);
+	public int insertCalendar(Map<String,Object> newCalendar);
 
 	/**
 	 * 获取所有已审核通过的未完全生效的事假考勤单，条件为当前考勤日期
@@ -218,9 +220,9 @@ public interface SysJobMapper
 	 */
 	public List<Map<String, Object>> selectAttendBillItems(Map<String, Object> personalLeave);
 
-	public void updateEmpAttendBillLeavedayItems(Map<String, Object> attendBillItem);
+	public int updateEmpAttendBillLeavedayItems(Map<String, Object> attendBillItem);
 
-	public void updateAttendBill(Map<String, Object> attendBill);
+	public int updateAttendBill(Map<String, Object> attendBill);
 
 	public Map<String, Object> selectActiveWorkdayCalendar(Date workdate);
 
@@ -242,7 +244,33 @@ public interface SysJobMapper
 	 * 更新
 	 * @param newCalendar
 	 */
-	public void updateWorkdayCalendar(Map<String, Object> newCalendar);
+	public int updateWorkdayCalendar(Map<String, Object> newCalendar);
 
 	public EmpAttenddayQuartz selectEmpAttenddayResultIn1_2_3_5ByUserIdAndAttendDate(@Param("userId") Long userId,@Param("attendDate") Date attendDate);
+
+	/**
+	 * 将该用户对应的延时工单项 设置未已生效1 emp_overtime_user 顺便加上实际加班工时
+	 * @param overtimeBill
+	 */
+	public int updateOvertimeItemToEffect(Map<String, Object> overtimeBill);
+
+	/**
+	 * 更新延时工单
+	 * @param overtimeBill
+	 */
+	public int updateOvertimeBill(Map<String, Object> overtimeBill);
+
+	/**
+	 * 查询是否还存在 未生效的延时工单项
+	 * @param overtimeBill
+	 * @return
+	 */
+	public int selectOvertimeItemCount(Map<String, Object> overtimeBill);
+
+	/**
+	 * 新增考勤信息
+	 * @param attendInfo1
+	 * @return
+	 */
+	public int insertAttendinfo(EmpAttendinfoQuartz attendInfo1);
 }

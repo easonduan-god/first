@@ -142,6 +142,15 @@ public class AttendBillServiceImpl implements IAttendBillService {
 			//empAttendBill，根据用户id，开始日期，结束日期，在emp_attend_bill_leaveday_items表中检索
 			//判断是否有符合的记录，符合的话，提示页面“与已有考勤单冲突”
 			if(empAttendBillLeavedayItemsMapper.selectDateConflict(empAttendBill)>0) throw new BusinessException("与已有考勤单冲突");
+			
+			//200508 新增 一个月内忘记打卡不准超过3次 包括未审核的
+			if(empAttendBillTemp.getAttendType()==3){
+				if(empAttendBillMapper.selectForgetCountByUserIdAndMonth(sysUser.getUserId(),empAttendBillTemp.getStartDate())>3){
+					throw new BusinessException("一个月只允许申请不超过3次补卡");
+				}
+				
+			}
+			
 		//3.获取临时表中的工作日和工时，存到考勤单对象中,并不补全勤单数据；
 			String attendBillId = StringUtils.getUUID();
 			empAttendBill.setAttendBillId(attendBillId);//id

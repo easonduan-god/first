@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.numberone.emp.mapper.EmpAttendReportMapper">
+    
+    <resultMap type="EmpAttendReport" id="EmpAttendReportResult">
+        <result property="recordId"    column="record_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="month"    column="month"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="lateCount"    column="late_count"    />
+        <result property="earlyCount"    column="early_count"    />
+        <result property="absentCount"    column="absent_count"    />
+        <result property="forgetCount"    column="forget_count"    />
+        <result property="leaveCount"    column="leave_count"    />
+        <result property="leaveDays"    column="leave_days"    />
+        <result property="leaveHours"    column="leave_hours"    />
+        <result property="attendRate"    column="attend_rate"    />
+        <result property="abnormalRate"    column="abnormal_rate"    />
+        <result property="overtimeCount"    column="overtime_count"    />
+        <result property="overtimeRate"    column="overtime_rate"    />
+        <result property="overtimeHours"    column="overtime_hours"    />
+        <result property="avgOvertimeHours"    column="avg_overtime_hours"    />
+    </resultMap>
+	
+	<sql id="selectEmpAttendReportVo">
+        select record_id, user_id, emp_id, user_name, dept_id, dept_name, month, create_time, late_count, early_count, absent_count, forget_count, leave_count, leave_days, leave_hours, attend_rate, abnormal_rate, overtime_count, overtime_rate, overtime_hours, avg_overtime_hours from emp_attend_report
+    </sql>
+	
+    <select id="selectEmpAttendReportList" parameterType="EmpAttendReport" resultMap="EmpAttendReportResult">
+        <include refid="selectEmpAttendReportVo"/>
+        <where>  
+			<if test="recordId != null  and recordId != '' "> and record_id = #{recordId}</if>
+			<if test="params.userIds != null "> and user_id in
+				<foreach item="userId" collection="params.userIds" open="(" separator="," close=")">
+					#{userId}
+				</foreach>
+			</if>
+			<if test="empId != null  and empId != '' "> and emp_id = #{empId}</if>
+			<if test="userName != null  and userName != '' "> and user_name = #{userName}</if>
+			<if test="deptId != null "> and dept_id = #{deptId}</if>
+			<if test="deptName != null  and deptName != '' "> and dept_name = #{deptName}</if>
+			<if test="month != null "> and date_format(month,'%y%m') = date_format(#{month},'%y%m')</if>
+			<if test="createTime != null "> and create_time = #{createTime}</if>
+			<if test="lateCount != null "> and late_count = #{lateCount}</if>
+			<if test="earlyCount != null "> and early_count = #{earlyCount}</if>
+			<if test="absentCount != null "> and absent_count = #{absentCount}</if>
+			<if test="forgetCount != null "> and forget_count = #{forgetCount}</if>
+			<if test="leaveCount != null "> and leave_count = #{leaveCount}</if>
+			<if test="leaveDays != null "> and leave_days = #{leaveDays}</if>
+			<if test="leaveHours != null "> and leave_hours = #{leaveHours}</if>
+			<if test="attendRate != null "> and attend_rate = #{attendRate}</if>
+			<if test="abnormalRate != null "> and abnormal_rate = #{abnormalRate}</if>
+			<if test="overtimeCount != null "> and overtime_count = #{overtimeCount}</if>
+			<if test="overtimeRate != null "> and overtime_rate = #{overtimeRate}</if>
+			<if test="overtimeHours != null "> and overtime_hours = #{overtimeHours}</if>
+			<if test="avgOvertimeHours != null "> and avg_overtime_hours = #{avgOvertimeHours}</if>
+         </where>
+    </select>
+    
+	<resultMap type="EmpDeptAttendReport" id="EmpDeptAttendReportResult">
+        <result property="recordId"    column="record_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="deptLeader"    column="dept_leader"    />
+        <result property="month"    column="month"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="empCount"    column="emp_count"    />
+        <result property="attendRate"    column="attend_rate"    />
+        <result property="lateRate"    column="late_rate"    />
+        <result property="earlyRate"    column="early_rate"    />
+        <result property="absentRate"    column="absent_rate"    />
+        <result property="forgetRate"    column="forget_rate"    />
+        <result property="leaveRate"    column="leave_rate"    />
+        <result property="attendCount"    column="attend_count"    />
+        <result property="earlyCount"    column="early_count"    />
+        <result property="lateCount"    column="late_count"    />
+        <result property="absentCount"    column="absent_count"    />
+        <result property="forgetCount"    column="forget_count"    />
+        <result property="leaveCount"    column="leave_count"    />
+        <result property="leaveDays"    column="leave_days"    />
+        <result property="leaveHours"    column="leave_hours"    />
+        <result property="abnormalRate"    column="abnormal_rate"    />
+        <result property="overtimeCount"    column="overtime_count"    />
+        <result property="perfectCount"    column="perfect_count"    />
+        <result property="overtimeRate"    column="overtime_rate"    />
+        <result property="overtimeHours"    column="overtime_hours"    />
+        <result property="overtimePersonCount"    column="overtime_person_count"    />
+        <result property="avgOvertimeHours"    column="avg_overtime_hours"    />
+        <result property="noOvertimePersonCount"    column="no_overtime_person_count"    />
+        <result property="overtimeLess30"    column="overtime_less30"    />
+        <result property="overtimeMore100"    column="overtime_more100"    />
+        <result property="restOvertimeCount"    column="rest_overtime_count"    />
+        <result property="restOvertimePersonCounta"    column="rest_overtime_person_counta"    />
+        <result property="restOvertimeRate"    column="rest_overtime_rate"    />
+        <result property="restOvertimeHours"    column="rest_overtime_hours"    />
+        <result property="avgRestOvertimeHours"    column="avg_rest_overtime_hours"    />
+        <result property="restNoOvertimePersonCount"    column="rest_no_overtime_person_count"    />
+    </resultMap>
+	
+	<sql id="selectEmpDeptAttendReportVo">
+        select record_id, dept_id, dept_name, dept_leader, month, create_time, emp_count, attend_rate, late_rate, early_rate, absent_rate, forget_rate, leave_rate, attend_count, early_count, late_count, absent_count, forget_count, leave_count, leave_days, leave_hours, abnormal_rate, overtime_count, perfect_count, overtime_rate, overtime_hours, overtime_person_count, avg_overtime_hours, no_overtime_person_count, overtime_less30, overtime_more100, rest_overtime_count, rest_overtime_person_counta, rest_overtime_rate, rest_overtime_hours, avg_rest_overtime_hours, rest_no_overtime_person_count from emp_dept_attend_report
+    </sql>
+	
+    <select id="selectDeptReport" parameterType="EmpDeptAttendReport" resultMap="EmpDeptAttendReportResult">
+        <include refid="selectEmpDeptAttendReportVo"/>
+        <where>  
+            <if test="recordId != null  and recordId != '' "> and record_id = #{recordId}</if>
+             <if test="deptId != null "> and dept_id = #{deptId}</if>
+             <if test="deptName != null  and deptName != '' "> and dept_name = #{deptName}</if>
+             <if test="deptLeader != null  and deptLeader != '' "> and dept_leader = #{deptLeader}</if>
+             <if test="month != null "> and date_format(month,'%y%m') = date_format(#{month},'%y%m')</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="empCount != null "> and emp_count = #{empCount}</if>
+             <if test="attendRate != null "> and attend_rate = #{attendRate}</if>
+             <if test="lateRate != null "> and late_rate = #{lateRate}</if>
+             <if test="earlyRate != null "> and early_rate = #{earlyRate}</if>
+             <if test="absentRate != null "> and absent_rate = #{absentRate}</if>
+             <if test="forgetRate != null "> and forget_rate = #{forgetRate}</if>
+             <if test="leaveRate != null "> and leave_rate = #{leaveRate}</if>
+             <if test="attendCount != null "> and attend_count = #{attendCount}</if>
+             <if test="earlyCount != null "> and early_count = #{earlyCount}</if>
+             <if test="lateCount != null "> and late_count = #{lateCount}</if>
+             <if test="absentCount != null "> and absent_count = #{absentCount}</if>
+             <if test="forgetCount != null "> and forget_count = #{forgetCount}</if>
+             <if test="leaveCount != null "> and leave_count = #{leaveCount}</if>
+             <if test="leaveDays != null "> and leave_days = #{leaveDays}</if>
+             <if test="leaveHours != null "> and leave_hours = #{leaveHours}</if>
+             <if test="abnormalRate != null "> and abnormal_rate = #{abnormalRate}</if>
+             <if test="overtimeCount != null "> and overtime_count = #{overtimeCount}</if>
+             <if test="perfectCount != null "> and perfect_count = #{perfectCount}</if>
+             <if test="overtimeRate != null "> and overtime_rate = #{overtimeRate}</if>
+             <if test="overtimeHours != null "> and overtime_hours = #{overtimeHours}</if>
+             <if test="overtimePersonCount != null "> and overtime_person_count = #{overtimePersonCount}</if>
+             <if test="avgOvertimeHours != null "> and avg_overtime_hours = #{avgOvertimeHours}</if>
+             <if test="noOvertimePersonCount != null "> and no_overtime_person_count = #{noOvertimePersonCount}</if>
+             <if test="overtimeLess30 != null "> and overtime_less30 = #{overtimeLess30}</if>
+             <if test="overtimeMore100 != null "> and overtime_more100 = #{overtimeMore100}</if>
+             <if test="restOvertimeCount != null "> and rest_overtime_count = #{restOvertimeCount}</if>
+             <if test="restOvertimePersonCounta != null "> and rest_overtime_person_counta = #{restOvertimePersonCounta}</if>
+             <if test="restOvertimeRate != null "> and rest_overtime_rate = #{restOvertimeRate}</if>
+             <if test="restOvertimeHours != null "> and rest_overtime_hours = #{restOvertimeHours}</if>
+             <if test="avgRestOvertimeHours != null "> and avg_rest_overtime_hours = #{avgRestOvertimeHours}</if>
+             <if test="restNoOvertimePersonCount != null "> and rest_no_overtime_person_count = #{restNoOvertimePersonCount}</if>
+         </where>
+         limit 0,1
+    </select>
+</mapper>

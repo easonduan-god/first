@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.numberone.work.domain.WorkMonthHour;
 import com.numberone.work.domain.WorkTask;	
 
 /**
@@ -106,5 +107,11 @@ public interface WorkTaskMapper
 	 * @return
 	 */
 	public int updateWorkTaskForAlter(WorkTask task);
+
+	/**
+	 * 更新工时
+	 * @param monthHour
+	 */
+	public int updateWorkMonthHour(WorkMonthHour monthHour);
 	
 }

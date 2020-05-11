@@ -23,6 +23,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 
     public static String YYYY_MM = "yyyy-MM";
     public static String YYYYMMDD = "yyyyMMdd";
+    public static String YYYYMM = "yyyyMM";
 
     public static String YYYY_MM_DD = "yyyy-MM-dd";
 
@@ -233,7 +234,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
      */
     public static Date getAroundDate(Date date,int amount,String formatStr){
     	if(formatStr==null) return getAroundDate(date,amount);
-    	return DateUtils.formatDateToDate(DateUtils.getAroundDate(date, amount), DateUtils.YYYY_MM_DD);
+    	return DateUtils.formatDateToDate(DateUtils.getAroundDate(date, amount), formatStr);
     }
     /**
      * 获取星期
@@ -353,5 +354,40 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 		}
 		
 		return list;
+	}
+	
+	/**
+	 * 获取一个月的天数
+	 * @param date
+	 * @return
+	 */
+    public static int getDaysOfMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+    }
+    
+    /**
+     * 获取工作日天数
+     * @param theYear
+     * @param theMonth
+     * @return
+     */
+    @SuppressWarnings("deprecation")
+	public static int getWorkDays(Date lastMonth) {
+		// 计算指定月有多少工作日
+		int workDays = 0;
+		Calendar cal = Calendar.getInstance();
+		lastMonth.setDate(1);
+		cal.setTime(lastMonth);
+		int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+		for (int i = 0; i < days; i++) {
+			int day = cal.get(Calendar.DAY_OF_WEEK);
+			if (!(day == Calendar.SUNDAY || day == Calendar.SATURDAY)) {
+				workDays++;
+			}
+			cal.add(Calendar.DATE, 1);
+		}
+		return workDays;
 	}
 }

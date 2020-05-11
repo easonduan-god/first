@@ -67,7 +67,6 @@ $(function() {
 		    });
 		    var startDate = laydate.render({
 		    	elem: '#startDate',
-		    	max: $('#endDate').val(),
 		    	theme: 'molv',
 		    	trigger: 'click',
 		    	done: function(value, date) {
@@ -112,6 +111,23 @@ $(function() {
 	            var time = times[i];
 	            laydate.render({
 	                elem: time,
+	                theme: 'molv',
+	                trigger: 'click',
+	                done: function(value, date) {}
+	            });
+	        }
+	    });
+	}
+	// laydate 月份 时间控件绑定
+	if ($(".month-input").length > 0) {
+	    layui.use('laydate', function() {
+	        var laydate = layui.laydate;
+	        var times = $(".month-input");
+	        for (var i = 0; i < times.length; i++) {
+	            var time = times[i];
+	            laydate.render({
+	                elem: time,
+	                type: 'month',
 	                theme: 'molv',
 	                trigger: 'click',
 	                done: function(value, date) {}
